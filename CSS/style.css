@@ -1,0 +1,57 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #0e1013;
+  color: #e5e5e5;
+  margin: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  background: #11141a;
+  padding: 1rem 0;
+  border-bottom: 2px solid #00ff9d;
+}
+
+header h1 a {
+  color: #00ff9d;
+  text-decoration: none;
+}
+
+nav a {
+  color: #e5e5e5;
+  margin-left: 1rem;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: #00ff9d;
+}
+
+.posts article {
+  background: #1a1d24;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+
+.posts article:hover {
+  transform: translateY(-3px);
+}
+
+.posts a {
+  color: #00ff9d;
+  text-decoration: none;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 0;
+  color: #888;
+  border-top: 1px solid #222;
+}
