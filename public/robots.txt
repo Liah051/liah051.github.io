@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dialiah.com/sitemap-index.xml
