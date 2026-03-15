@@ -10,8 +10,8 @@ const { id, url, title } = Astro.props;
 
 <div class="mt-8 pt-8 border-t border-border w-full overflow-visible">
   <h2 class="text-2xl font-semibold mb-6 text-skin-accent">コメント</h2>
-  <p class="text-xs text-skin-muted mb-4">
-    メールアドレスが公開されることはありません。<span class="text-skin-accent">*</span> が付いている欄は必須項目です
+  <p class="text-xs text-skin-muted mb-4 flex items-center gap-2">
+    メールアドレスが公開されることはありません。
   </p>
   
   <div id="comment-message" class="hidden mb-4 p-3 rounded text-sm text-center font-medium"></div>
@@ -24,7 +24,9 @@ const { id, url, title } = Astro.props;
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-1">
-        <label for="comment-author" class="text-sm font-medium text-skin-base">名前 <span class="text-skin-accent">*</span> </label>
+        <label for="comment-author" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+          名前 <span class="required">必須</span>
+        </label>
         <input 
           type="text" 
           id="comment-author" 
@@ -35,7 +37,9 @@ const { id, url, title } = Astro.props;
         />
       </div>
       <div class="space-y-1">
-        <label for="comment-email" class="text-sm font-medium text-skin-base">メールアドレス <span class="text-xs text-skin-muted font-normal">(非公開)</span></label>
+        <label for="comment-email" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+          メールアドレス <span class="private">非公開</span>
+        </label>
         <input 
           type="email" 
           id="comment-email" 
@@ -47,7 +51,9 @@ const { id, url, title } = Astro.props;
     </div>
     
     <div class="space-y-1">
-      <label for="comment-content" class="text-sm font-medium text-skin-base">コメント <span class="text-skin-accent">*</span></label>
+      <label for="comment-content" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+        コメント <span class="required">必須</span>
+      </label>
       <textarea 
         id="comment-content" 
         name="content" 
@@ -58,11 +64,11 @@ const { id, url, title } = Astro.props;
       ></textarea>
     </div>
 
-    <div class="flex justify-end">
+    <div class="flex justify-end pt-2">
       <button 
         type="submit" 
         id="comment-submit"
-        class="bg-skin-accent text-skin-inverted border-2 border-skin-accent px-6 py-2 rounded font-semibold hover:bg-transparent hover:text-skin-accent active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        class="submit-button"
       >
         投稿する
       </button>
@@ -224,3 +230,25 @@ const { id, url, title } = Astro.props;
   setupComments();
   document.addEventListener("astro:after-swap", setupComments);
 </script>
+
+<style>
+  @reference "../styles/global.css";
+
+  .required {
+    @apply text-[10px] bg-accent/10 text-accent px-1.5 py-0.5 rounded leading-none;
+  }
+
+  .private {
+    @apply text-[10px] bg-lime-100 dark:bg-purple-900/30 text-lime-700 dark:text-purple-300 px-1.5 py-0.5 rounded leading-none font-normal;
+  }
+
+  .submit-button {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-10 py-3 text-lg font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
+
+  @media (max-width: 640px) {
+    .submit-button {
+      @apply w-full;
+    }
+  }
+</style>
