@@ -1,0 +1,14 @@
+---
+title: "力学の基礎：運動方程式"
+description: "ダミー記事です。物体に働く力と運動の関係を記述するニュートンの運動方程式について学びます。"
+pubDatetime: 2026-03-09T15:00:00Z
+category_id: "physics"
+group: "力学"
+order: 1
+thumbnail: "https://placehold.co/400x400.jpg"
+---
+
+## 力学の基礎
+
+これは物理カテゴリー「力学」グループのダミー記事です。
+ここには記事の本文が入ります。

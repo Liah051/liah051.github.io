@@ -1,0 +1,94 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+import { SITE } from "../config";
+
+const title = `お問い合わせ | ${SITE.title}`;
+---
+
+<Layout title={title}>
+  <Header />
+  <Breadcrumb />
+  <main id="main-content" class="app-layout">
+    <section id="contact" class="app-prose mb-28 max-w-app">
+      <h1 class="text-2xl tracking-wider sm:text-3xl">お問い合わせ</h1>
+      <p class="mt-4 mb-8 text-foreground/90">
+        お問い合わせは以下のフォームよりお願いいたします。数日以内にご返信いたします。
+      </p>
+
+      <form
+        action={import.meta.env.PUBLIC_CONTACT_FORM_ACTION}
+        method="post"
+        class="contact-form"
+      >
+        <div class="form-group">
+          <label for="name">お名前 <span class="required">必須</span></label>
+          <input type="text" id="name" name="お名前" required placeholder="山田 太郎" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">メールアドレス <span class="required">必須</span></label>
+          <input type="email" id="email" name="Email" required placeholder="example@email.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="subject">件名 <span class="required">必須</span></label>
+          <input type="text" id="subject" name="件名" required placeholder="お問い合わせ内容の要約" />
+        </div>
+
+        <div class="form-group">
+          <label for="message">お問い合わせ内容 <span class="required">必須</span></label>
+          <textarea id="message" name="お問い合わせ内容" required rows="6" placeholder="こちらにご記入ください"></textarea>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="submit-button">送信する</button>
+        </div>
+      </form>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  @reference "../styles/global.css";
+
+  .contact-form {
+    @apply grid gap-6;
+  }
+
+  .form-group {
+    @apply flex flex-col gap-2;
+  }
+
+  .form-group label {
+    @apply text-sm font-semibold text-foreground flex items-center gap-2;
+  }
+
+  .required {
+    @apply text-[10px] bg-accent/10 text-accent px-1.5 py-0.5 rounded leading-none;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    @apply w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground outline-none transition-all duration-200 focus:border-accent focus:ring-2 focus:ring-accent/20;
+    font-family: inherit;
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    @apply opacity-50;
+  }
+
+  .submit-button {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-10 py-3 text-lg font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95;
+  }
+
+  @media (max-width: 640px) {
+    .submit-button {
+      @apply w-full;
+    }
+  }
+</style>

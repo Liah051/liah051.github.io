@@ -1,0 +1,114 @@
+---
+import IconX from "@/assets/icons/IconX.svg";
+import DefaultSidebar from "./sidebars/DefaultSidebar.astro";
+import BlueProtocolSidebar from "./sidebars/BlueProtocol.astro";
+import PhysicsSidebar from "./sidebars/Physics.astro";
+import { SITE } from "@/config";
+import type { MarkdownHeading } from "astro";
+import TableOfContents from "./TableOfContents.astro";
+
+export interface Props {
+  category_id?: string;
+  isPost?: boolean;
+  headings?: MarkdownHeading[];
+}
+const { category_id, isPost, headings } = Astro.props;
+
+const { pathname } = Astro.url;
+const currentPath = pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
+
+const isActive = (path: string) => {
+  const currentPathArray = currentPath.split("/").filter(p => p.trim());
+  const pathArray = path.split("/").filter(p => p.trim());
+  return currentPath === path || currentPathArray[0] === pathArray[0];
+};
+---
+
+<!-- Overlay background -->
+<div 
+  id="drawer-overlay" 
+  class="fixed inset-0 z-40 hidden bg-black/50 opacity-0 transition-opacity duration-300"
+></div>
+
+<!-- Drawer panel -->
+<div 
+  id="mobile-drawer" 
+  class="fixed top-0 right-0 z-50 h-full w-full max-w-sm translate-x-full overflow-y-auto bg-background p-6 shadow-2xl transition-transform duration-300 ease-in-out"
+>
+  <div class="flex items-center justify-between mb-8">
+    <span class="text-xl font-bold">{SITE.title}</span>
+    <button id="close-drawer-btn" class="p-2 text-skin-base hover:text-accent" aria-label="Close Menu">
+      <IconX class="h-6 w-6" />
+    </button>
+  </div>
+
+  <nav class="mb-8 flex flex-col space-y-4">
+    <a href="/posts" class={`text-lg font-medium hover:text-accent ${isActive("/posts") ? "text-accent" : ""}`}>
+      記事一覧
+    </a>
+    <a href="/tags" class={`text-lg font-medium hover:text-accent ${isActive("/tags") ? "text-accent" : ""}`}>
+      タグ
+    </a>
+    {SITE.showArchives && (
+      <a href="/archives" class={`text-lg font-medium hover:text-accent ${isActive("/archives") ? "text-accent" : ""}`}>
+        Archives
+      </a>
+    )}
+  </nav>
+
+  <hr class="border-border my-8" />
+
+  <!-- サイドバーの内容 -->
+  <div class="flex flex-col gap-6">
+    {isPost && (
+      <TableOfContents headings={headings} mode="collapsible" />
+    )}
+
+    {
+      category_id === "blue-protocol" ? (
+        <BlueProtocolSidebar />
+      ) : category_id === "physics" ? (
+        <PhysicsSidebar />
+      ) : (
+        <DefaultSidebar />
+      )
+    }
+  </div>
+</div>
+
+<script>
+  function setupDrawer() {
+    const menuBtn = document.getElementById("menu-btn");
+    const closeBtn = document.getElementById("close-drawer-btn");
+    const drawer = document.getElementById("mobile-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+
+    if (!menuBtn || !closeBtn || !drawer || !overlay) return;
+
+    const openDrawer = () => {
+      overlay.classList.remove("hidden");
+      // trigger reflow
+      void overlay.offsetWidth;
+      overlay.classList.remove("opacity-0");
+      drawer.classList.remove("translate-x-full");
+      document.body.style.overflow = "hidden"; // Prevent scrolling
+    };
+
+    const closeDrawer = () => {
+      overlay.classList.add("opacity-0");
+      drawer.classList.add("translate-x-full");
+      document.body.style.overflow = "";
+      
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+      }, 300); // Wait for transition
+    };
+
+    menuBtn.addEventListener("click", openDrawer);
+    closeBtn.addEventListener("click", closeDrawer);
+    overlay.addEventListener("click", closeDrawer);
+  }
+
+  setupDrawer();
+  document.addEventListener("astro:after-swap", setupDrawer);
+</script>

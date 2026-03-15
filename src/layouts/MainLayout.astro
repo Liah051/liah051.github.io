@@ -1,0 +1,60 @@
+---
+import Layout from "./Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import ProfileCard from "@/components/ProfileCard.astro";
+import DefaultSidebar from "@/components/sidebars/DefaultSidebar.astro";
+import BlueProtocolSidebar from "@/components/sidebars/BlueProtocol.astro";
+import PhysicsSidebar from "@/components/sidebars/Physics.astro";
+
+export interface Props {
+  title?: string;
+  author?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalURL?: string;
+  pubDatetime?: Date;
+  modDatetime?: Date | null;
+  scrollSmooth?: boolean;
+  category_id?: string;
+  isHome?: boolean;
+}
+
+const props = Astro.props;
+const { category_id, isHome } = Astro.props;
+---
+
+<Layout {...props}>
+  <Header category_id={category_id} />
+  
+  <div class="app-layout pb-12 pt-8">
+    <div class="flex flex-col md:flex-row md:justify-between items-start gap-12 lg:gap-16">
+      <!-- Main Content -->
+      <main id="main-content" class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] order-1">
+        <slot />
+      </main>
+
+      <!-- Sidebar -->
+      <aside class={`w-full flex-col gap-6 md:w-[252px] lg:w-[270px] flex-shrink-0 order-2 ${isHome ? "flex" : "hidden md:flex"}`}>
+        <slot name="sidebar">
+          {
+            category_id === "blue-protocol" ? (
+              <BlueProtocolSidebar />
+            ) : category_id === "physics" ? (
+              <PhysicsSidebar />
+            ) : (
+              <>
+                {isHome && <ProfileCard />}
+                <div class={isHome ? "hidden md:flex md:flex-col md:gap-6" : "w-full flex flex-col gap-6"}>
+                  { category_id || isHome ? <DefaultSidebar /> : null }
+                </div>
+              </>
+            )
+          }
+        </slot>
+      </aside>
+    </div>
+  </div>
+
+  <Footer />
+</Layout>

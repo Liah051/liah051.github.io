@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+import { SITE } from "../config";
+
+const title = `送信完了 | ${SITE.title}`;
+---
+
+<Layout title={title}>
+  <Header />
+  <Breadcrumb />
+  <main id="main-content" class="app-layout">
+    <section id="thanks" class="app-prose mb-28 max-w-app text-center">
+      <h1 class="text-2xl tracking-wider sm:text-3xl">送信が完了しました</h1>
+      <p class="mt-8 mb-12 text-foreground/90 leading-relaxed">
+        お問い合わせいただきありがとうございます。<br />
+        内容を確認の上、数日以内に返信させていただきます。
+      </p>
+
+      <div class="flex justify-center">
+        <button onclick="goBackCustom()" class="return-button">
+          元のページへ戻る
+        </button>
+      </div>
+
+      <script is:inline>
+        function goBackCustom() {
+          // 履歴が2つ以上遡れる場合は、お問い合わせ前のページに戻る
+          if (window.history.length > 2) {
+            window.history.go(-2);
+          } else {
+            // 履歴が足りない場合はトップページへ
+            window.location.href = "/";
+          }
+        }
+      </script>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  @reference "../styles/global.css";
+
+  .return-button {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-10 py-3 text-lg font-bold text-background transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-95;
+    text-decoration: none;
+  }
+
+  @media (max-width: 640px) {
+    .return-button {
+      @apply w-full;
+    }
+  }
+</style>

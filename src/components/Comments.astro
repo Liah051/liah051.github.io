@@ -1,0 +1,226 @@
+---
+export interface Props {
+  id: string;
+  url: string;
+  title: string;
+}
+
+const { id, url, title } = Astro.props;
+---
+
+<div class="mt-8 pt-8 border-t border-border w-full overflow-visible">
+  <h2 class="text-2xl font-semibold mb-6 text-skin-accent">コメント</h2>
+  <p class="text-xs text-skin-muted mb-4">
+    メールアドレスが公開されることはありません。<span class="text-skin-accent">*</span> が付いている欄は必須項目です
+  </p>
+  
+  <div id="comment-message" class="hidden mb-4 p-3 rounded text-sm text-center font-medium"></div>
+
+  <form id="comment-form" class="mb-10 space-y-4" 
+        data-app-id={import.meta.env.PUBLIC_CUSDIS_APP_ID} 
+        data-page-id={id} 
+        data-page-url={url} 
+        data-page-title={title}>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="space-y-1">
+        <label for="comment-author" class="text-sm font-medium text-skin-base">名前 <span class="text-skin-accent">*</span> </label>
+        <input 
+          type="text" 
+          id="comment-author" 
+          name="author" 
+          required 
+          class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+          placeholder="名無し"
+        />
+      </div>
+      <div class="space-y-1">
+        <label for="comment-email" class="text-sm font-medium text-skin-base">メールアドレス <span class="text-xs text-skin-muted font-normal">(非公開)</span></label>
+        <input 
+          type="email" 
+          id="comment-email" 
+          name="email" 
+          class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+          placeholder="email@example.com"
+        />
+      </div>
+    </div>
+    
+    <div class="space-y-1">
+      <label for="comment-content" class="text-sm font-medium text-skin-base">コメント <span class="text-skin-accent">*</span></label>
+      <textarea 
+        id="comment-content" 
+        name="content" 
+        required 
+        rows="4" 
+        class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
+        placeholder="コメントを入力..."
+      ></textarea>
+    </div>
+
+    <div class="flex justify-end">
+      <button 
+        type="submit" 
+        id="comment-submit"
+        class="bg-skin-accent text-skin-inverted border-2 border-skin-accent px-6 py-2 rounded font-semibold hover:bg-transparent hover:text-skin-accent active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      >
+        投稿する
+      </button>
+    </div>
+  </form>
+
+  <div id="comment-list" class="space-y-6">
+    <div class="text-center text-skin-muted py-4">コメントを読み込み中...</div>
+  </div>
+</div>
+
+<script>
+  function setupComments() {
+    const form = document.getElementById('comment-form') as HTMLFormElement;
+    const listContainer = document.getElementById('comment-list');
+    const messageEl = document.getElementById('comment-message');
+    const submitBtn = document.getElementById('comment-submit') as HTMLButtonElement;
+    
+    if (!form || !listContainer) return;
+    
+    const appId = form.dataset.appId;
+    const pageId = form.dataset.pageId;
+    const pageUrl = form.dataset.pageUrl;
+    const pageTitle = form.dataset.pageTitle;
+    
+    // UI Helpers
+    const showMessage = (msg: string, type: 'success' | 'error') => {
+      if (!messageEl) return;
+      messageEl.textContent = msg;
+      messageEl.className = `mb-4 p-3 rounded text-sm text-center font-medium ${
+        type === 'success' 
+          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      }`;
+      messageEl.classList.remove('hidden');
+      setTimeout(() => messageEl.classList.add('hidden'), 5000);
+    };
+
+    const formatDate = (dateStr: string) => {
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('ja-JP', { 
+          year: 'numeric', month: 'short', day: 'numeric', 
+          hour: '2-digit', minute: '2-digit' 
+        });
+      } catch (e) {
+        return dateStr;
+      }
+    };
+
+    const escapeHTML = (str: string) => {
+      const div = document.createElement('div');
+      div.innerText = str;
+      return div.innerHTML;
+    };
+
+    const renderComment = (comment: any) => {
+      const contentHtml = escapeHTML(comment.content || '').replace(/\n/g, '<br/>');
+      const author = escapeHTML(comment.by_nickname || comment.author || '名無し');
+      const date = formatDate(comment.createdAt || new Date().toISOString());
+
+      return `
+        <div class="p-5 border border-border rounded-lg bg-skin-fill/50 transition-colors">
+          <div class="flex items-center justify-between mb-3">
+            <div class="font-semibold text-skin-base">${author}</div>
+            <div class="text-sm text-skin-muted">${date}</div>
+          </div>
+          <div class="app-prose text-base leading-relaxed break-words mt-2 text-skin-base dark:text-gray-200">
+            ${contentHtml}
+          </div>
+        </div>
+      `;
+    };
+
+    const buildThread = (comments: any) => {
+      if (!comments || !Array.isArray(comments) || comments.length === 0) {
+        return '<div class="text-center text-skin-muted py-4">コメントはまだありません。</div>';
+      }
+      return comments.map(renderComment).join('');
+    };
+
+    // API calls
+    const fetchComments = async () => {
+      try {
+        const url = `https://cusdis.com/api/open/comments?appId=${appId}&pageId=${pageId}`;
+        
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`API fetch error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        let comments = [];
+        if (Array.isArray(data)) {
+          comments = data;
+        } else if (data && Array.isArray(data.data)) {
+          comments = data.data;
+        } else if (data && data.data && Array.isArray(data.data.data)) {
+          comments = data.data.data;
+        }
+        listContainer.innerHTML = buildThread(comments);
+      } catch (err) {
+        listContainer.innerHTML = '<div class="text-center text-red-500 py-4">コメントの読み込みに失敗しました。</div>';
+      }
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const author = (document.getElementById('comment-author') as HTMLInputElement).value.trim();
+      const email = (document.getElementById('comment-email') as HTMLInputElement).value.trim();
+      const content = (document.getElementById('comment-content') as HTMLTextAreaElement).value.trim();
+      
+      if (!author || !content) {
+        showMessage('必須項目を入力してください。', 'error');
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送信中...';
+      
+      try {
+        const payload = {
+            appId,
+            pageId,
+            title: pageTitle,
+            url: pageUrl,
+            author,
+            nickname: author,
+            email: email,
+            content
+        };
+
+        const res = await fetch('https://cusdis.com/api/open/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          showMessage('コメントを送信しました。管理者の承認待ちです...', 'success');
+          form.reset();
+        } else {
+          throw new Error('API post error');
+        }
+      } catch (err) {
+        showMessage('コメントの送信に失敗しました。時間をおいて再度お試しください。', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '投稿する';
+      }
+    });
+
+    fetchComments();
+  }
+
+  setupComments();
+  document.addEventListener("astro:after-swap", setupComments);
+</script>

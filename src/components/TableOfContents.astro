@@ -1,0 +1,68 @@
+---
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  headings?: MarkdownHeading[];
+  mode?: "collapsible" | "sticky";
+}
+
+const { headings = [], mode = "collapsible" } = Astro.props;
+
+// Filter out h1 typically, and map the remaining to an inductive structure
+// For a simple list, we will just use flat list with indentations based on depth
+const tocHeadings = headings.filter(heading => heading.depth > 1);
+
+const isCollapsible = mode === "collapsible";
+---
+
+{tocHeadings.length > 0 && (
+  <>
+    {isCollapsible ? (
+      <details class="group mb-8 rounded-xl border border-border bg-background p-4 shadow-sm w-full [&_summary::-webkit-details-marker]:hidden">
+        <summary class="relative flex cursor-pointer items-center justify-center font-bold outline-none py-2">
+          <h2 class="text-xl">目次</h2>
+  
+          <div class="absolute right-0 flex items-center">
+            <span class="text-sm opacity-80 group-open:hidden flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current -rotate-90" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg> Closed
+            </span>
+            <span class="text-sm opacity-80 hidden group-open:flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg> Open
+            </span>
+          </div>
+        </summary>
+        
+        <div class="mt-4 border-t border-border pt-4">
+          <ul class="flex flex-col gap-2">
+            {tocHeadings.map(heading => (
+              <li class={`ml-${(heading.depth - 2) * 4}`}>
+                <a
+                  href={`#${heading.slug}`}
+                  class="text-sm md:text-base text-skin-base dark:text-gray-200 hover:text-accent hover:underline transition-colors"
+                >
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    ) : (
+      <div class="sticky top-28 hidden rounded-xl border border-border bg-background p-5 shadow-sm md:block w-full max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        <h3 class="mb-4 text-lg font-bold">目次</h3>
+        <ul class="flex flex-col gap-2.5">
+          {tocHeadings.map(heading => (
+            <li class={`ml-${(heading.depth - 2) * 3}`}>
+              <a
+                href={`#${heading.slug}`}
+                class="text-sm text-skin-base dark:text-gray-200 hover:text-accent hover:underline transition-colors"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </>
+)}

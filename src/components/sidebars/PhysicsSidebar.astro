@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+
+// 物理カテゴリーの記事を取得
+const physicsPosts = await getCollection("blog", ({ data }) => {
+  return data.category_id === "physics" && data.draft !== true;
+});
+
+// グループごとに分類
+const groupedPosts = physicsPosts.reduce((acc, post) => {
+  const groupName = post.data.group || "その他";
+  if (!acc[groupName]) {
+    acc[groupName] = [];
+  }
+  acc[groupName].push(post);
+  return acc;
+}, {} as Record<string, typeof physicsPosts>);
+
+// グループの表示順（手動で並び替える場合はここを変更）
+const groupOrder = ["力学", "熱力学", "波動", "電磁気学", "原子", "その他"];
+const sortedGroups = Object.keys(groupedPosts).sort((a, b) => {
+  const indexA = groupOrder.indexOf(a);
+  const indexB = groupOrder.indexOf(b);
+  if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+  if (indexA === -1) return 1;
+  if (indexB === -1) return -1;
+  return indexA - indexB;
+});
+
+// 各グループ内の記事をorder順で並び替え
+Object.keys(groupedPosts).forEach(key => {
+  groupedPosts[key].sort((a, b) => {
+    const orderA = a.data.order ?? 999;
+    const orderB = b.data.order ?? 999;
+    return orderA - orderB;
+  });
+});
+---
+
+<div class="rounded-xl border border-border bg-background p-5 shadow-sm">
+  <h3 class="mb-4 text-lg font-bold">物理メニュー</h3>
+  <ul class="flex flex-col gap-3 text-sm">
+    {sortedGroups.map(group => (
+      <li>
+        <h4 class="font-semibold mb-2">{group}</h4>
+        <ul class="flex flex-col gap-2 pl-2">
+          {groupedPosts[group].map(post => (
+            <li>
+              <a href={`/posts/${post.id}/`} class="hover:text-accent hover:underline leading-tight">
+                {post.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</div>
