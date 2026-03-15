@@ -1,0 +1,63 @@
+---
+import { SITE } from "@/config";
+import Breadcrumbs from "@/components/Breadcrumb.astro";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import ProfileCard from "@/components/ProfileCard.astro";
+---
+
+<Layout title={`Profile | ${SITE.title}`}>
+  <Header />
+  <Breadcrumbs />
+
+  <main id="main-content" class="app-layout pb-12 mt-8">
+    <div class="grid grid-cols-1 items-start gap-12 md:grid-cols-[320px_1fr]">
+      <!-- Left Column: Profile Card -->
+      <aside class="flex w-full flex-col gap-6">
+        <ProfileCard />
+      </aside>
+
+      <!-- Right Column: Detailed Profile Info -->
+      <div
+        class="app-prose w-full min-w-0 rounded-xl border border-border bg-background p-6 shadow-sm md:p-8"
+      >
+        <h1 class="mb-6 text-2xl font-bold text-accent sm:text-3xl">
+          Liahについて
+        </h1>
+
+        <h2>基本情報</h2>
+        <ul>
+          <li><strong>所属:</strong> 〇〇大学工学部</li>
+          <li><strong>興味:</strong> ゲーム、プログラミング</li>
+        </ul>
+
+        <h2>テスト用エピソード</h2>
+        <p>
+          これはプロフィールページのテスト用テキストです。<br />
+          ここには本来、個人の経歴や興味のある分野についての詳細が記載されます。
+          現在は動作確認のためにダミーデータが表示されています。
+        </p>
+
+        <h2>スキルセット</h2>
+        <p>学んでいる技術スタックの例：</p>
+        <ul>
+          <li>
+            <strong>Frontend:</strong> HTML, CSS, JavaScript
+          </li>
+          <li>
+            <strong>Backend:</strong> Node.js, Python
+          </li>
+          <li><strong>Tools:</strong> Git, VS Code</li>
+        </ul>
+
+        <h2>趣味・関心</h2>
+        <p>
+          オフの時間は新しい技術の調査や、ゲーム、読書をして過ごしています。
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

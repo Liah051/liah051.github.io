@@ -1,0 +1,101 @@
+---
+import IconSearch from "@/assets/icons/IconSearch.svg";
+---
+
+<dialog
+  id="search-modal"
+  class="fixed inset-0 z-50 m-0 hidden h-full w-full bg-black/50 backdrop-blur-sm open:flex items-center justify-center opacity-0 transition-opacity duration-300 open:opacity-100"
+>
+  <div
+    id="search-container"
+    class="relative w-full max-w-lg mx-4 rounded-xl bg-background p-6 shadow-2xl transform scale-95 transition-transform duration-300"
+  >
+    <form action="/search" method="get" class="relative flex items-center">
+      <input
+        type="text"
+        name="q"
+        id="search-input"
+        placeholder="Search articles..."
+        class="w-full rounded-lg border border-border bg-skin-fill py-3 pl-4 pr-12 text-skin-base focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        autocomplete="off"
+        required
+      />
+      <button
+        type="submit"
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-skin-base hover:text-accent focus:outline-none"
+        aria-label="Submit Search"
+      >
+        <IconSearch class="h-6 w-6 stroke-current" />
+      </button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  function setupSearchModal() {
+    const searchBtn = document.getElementById("search-btn");
+    const searchModal = document.getElementById("search-modal") as HTMLDialogElement;
+    const searchContainer = document.getElementById("search-container");
+    const searchInput = document.getElementById("search-input") as HTMLInputElement;
+
+    if (!searchBtn || !searchModal || !searchContainer || !searchInput) return;
+
+    // 開く
+    searchBtn.addEventListener("click", () => {
+      searchModal.showModal();
+      searchModal.classList.remove("hidden");
+      
+      // Request animation frame to ensure transition plays
+      requestAnimationFrame(() => {
+        searchModal.classList.remove("opacity-0");
+        searchContainer.classList.remove("scale-95");
+        searchContainer.classList.add("scale-100");
+      });
+
+      searchInput.focus();
+      document.body.style.overflow = "hidden"; // 背景のスクロールロック
+    });
+
+    // 閉じる処理 (アニメーション付き)
+    const closeModal = () => {
+      searchModal.classList.add("opacity-0");
+      searchContainer.classList.remove("scale-100");
+      searchContainer.classList.add("scale-95");
+      
+      setTimeout(() => {
+        searchModal.close();
+        searchModal.classList.add("hidden");
+        document.body.style.overflow = "";
+      }, 300); // duration-300に合わせる
+    };
+
+    // 背景（オーバーレイ）クリックで閉じる
+    searchModal.addEventListener("click", (e) => {
+      const rect = searchContainer.getBoundingClientRect();
+      const isInDialog = 
+        rect.top <= e.clientY && 
+        e.clientY <= rect.top + rect.height && 
+        rect.left <= e.clientX && 
+        e.clientX <= rect.left + rect.width;
+        
+      if (!isInDialog) {
+        closeModal();
+      }
+    });
+
+    // Escキーで閉じる処理のオーバーライド（アニメーションを入れるため）
+    searchModal.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+  }
+
+  setupSearchModal();
+  document.addEventListener("astro:after-swap", setupSearchModal);
+</script>
+
+<style>
+  dialog::backdrop {
+    background: transparent;
+  }
+</style>

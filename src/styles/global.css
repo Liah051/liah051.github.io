@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "./typography.css";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root,
+html[data-theme="light"] {
+  --background: #fdfdfd;
+  --foreground: #282728;
+  --accent: #006cac;
+  --muted: #e6e6e6;
+  --border: #ece9e9;
+}
+
+html[data-theme="dark"] {
+  --background: #212737;
+  --foreground: #eaedf3;
+  --accent: #ff6b01;
+  --muted: #343f60;
+  --border: #ab4b08;
+}
+
+@theme inline {
+  --font-app: var(--font-google-sans-code);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+}
+
+@layer base {
+
+  /* '*' ではなく 'html, body, div, span, ...' と主要要素に限定するか、iframeを除外する */
+  *:not(iframe) {
+    @apply border-border outline-accent/75;
+    /* スクロールバーの設定をここから外すか、以下のように限定する */
+  }
+
+  html {
+    @apply overflow-y-scroll scroll-smooth;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+
+  /* iframeには絶対にスクロールバーを出さない
+     Cusdis内部の背景色不一致解消のため、mix-blend-modeやcolor-schemeも設定する */
+  iframe {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    color-scheme: light dark !important;
+  }
+
+  iframe::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  html {
+    @apply overflow-y-scroll scroll-smooth;
+  }
+
+  body {
+    @apply flex min-h-svh flex-col bg-background font-app text-lg text-foreground selection:bg-accent/75 selection:text-background;
+  }
+
+  a,
+  button {
+    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility max-w-app {
+  @apply max-w-6xl;
+}
+
+@utility app-layout {
+  @apply mx-auto w-full max-w-app px-4;
+}
+
+.active-nav {
+  @apply underline decoration-wavy decoration-2 underline-offset-8;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-background);
+}
+
+/* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
+/* Anything that has been anchored to should have extra scroll margin */
+:target {
+  scroll-margin-block: 1rem;
+}
+
+/* 数式を少しだけ強調したい場合 */
+html[data-theme="dark"] .katex {
+  color: var(--foreground);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+}

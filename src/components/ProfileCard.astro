@@ -1,0 +1,46 @@
+---
+import Socials from "./Socials.astro";
+---
+
+<div
+  class="flex flex-col items-center overflow-hidden rounded-xl border border-border bg-background shadow-md"
+>
+  <!-- Header Background Image -->
+  <div
+    class="h-32 w-full bg-cover bg-center"
+    style="background-image: url('https://images.unsplash.com/photo-1534796636918-9ce896c21e33?q=80&w=1470&auto=format&fit=crop');"
+  >
+  </div>
+
+  <!-- Avatar -->
+  <div class="-mt-16 mb-2 rounded-full border-4 border-background bg-muted">
+    <img
+      src="https://api.dicebear.com/7.x/notionists/svg?seed=Test&backgroundColor=b6e3f4"
+      alt="Test User Profile"
+      class="h-32 w-32 rounded-full object-cover"
+    />
+  </div>
+
+  <!-- Profile Info -->
+  <div class="flex w-full flex-col items-center px-6 pb-6 text-center">
+    <h3 class="text-xl font-bold text-accent">Liah</h3>
+
+    <div class="mt-4 flex flex-col items-center space-y-1 text-sm opacity-90">
+      <p>これはテスト用のアカウントです</p>
+      <p>趣味はゲームです</p>
+      <hr class="my-2 w-full border-dashed" />
+      <p class="text-xs">テスト用のタグライン</p>
+    </div>
+
+    <!-- Actions -->
+    <a
+      href="/profile"
+      class="mt-6 mb-4 w-full rounded-md bg-accent px-4 py-2 font-semibold text-background transition-opacity hover:opacity-80 disabled:opacity-50"
+    >
+      プロフィール
+    </a>
+
+    <!-- Socials / GitHub icon directly fetched from Constants implicitly via Socials component -->
+    <Socials />
+  </div>
+</div>

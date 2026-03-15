@@ -1,0 +1,94 @@
+---
+import IconSearch from "@/assets/icons/IconSearch.svg";
+import IconMoon from "@/assets/icons/IconMoon.svg";
+import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
+import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
+import IconArchive from "@/assets/icons/IconArchive.svg";
+import { SITE } from "@/config";
+import MobileDrawer from "./MobileDrawer.astro";
+import SearchModal from "./SearchModal.astro";
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  category_id?: string;
+  isPost?: boolean;
+  headings?: MarkdownHeading[];
+}
+
+const { category_id, isPost, headings } = Astro.props;
+
+const { pathname } = Astro.url;
+const currentPath =
+  pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
+
+const isActive = (path: string) => {
+  const currentPathArray = currentPath.split("/").filter(p => p.trim());
+  const pathArray = path.split("/").filter(p => p.trim());
+  return currentPath === path || currentPathArray[0] === pathArray[0];
+};
+---
+
+<a
+  id="skip-to-content"
+  href="#main-content"
+  class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+>
+  Skip to content
+</a>
+
+<header class="sticky top-0 z-40 w-full bg-background/95 backdrop-blur-sm border-b border-border">
+  <div class="app-layout flex items-center justify-between py-2 sm:py-3">
+    
+    <!-- 左側：サイトタイトル -->
+    <a href="/" class="text-xl font-bold whitespace-nowrap sm:text-2xl hover:text-accent transition-colors">
+      {SITE.title}
+    </a>
+
+    <!-- 右側：ナビゲーション・アイコン群 -->
+    <div class="flex items-center gap-2 sm:gap-6">
+      
+      <!-- PC版メニュー (sm以上で表示) -->
+      <nav class="hidden sm:flex items-center gap-6 text-[1.1rem] font-medium">
+        <a href="/posts" class={`hover:text-accent transition-colors ${isActive("/posts") ? "active-nav text-accent" : ""}`}>
+          記事一覧
+        </a>
+        <a href="/tags" class={`hover:text-accent transition-colors ${isActive("/tags") ? "active-nav text-accent" : ""}`}>
+          タグ
+        </a>
+        {SITE.showArchives && (
+          <a href="/archives" class={`hover:text-accent transition-colors flex items-center gap-1 ${isActive("/archives") ? "active-nav text-accent" : ""}`}>
+            <IconArchive class="w-5 h-5 hidden sm:inline-block" />
+          </a>
+        )}
+      </nav>
+
+      <div class="flex items-center gap-1 sm:gap-2">
+        <!-- 共通アイコン：検索ボタン (クリックでSearchModalを開く) -->
+        <button id="search-btn" class="p-2 hover:text-accent transition-colors" aria-label="Search">
+          <IconSearch class="w-6 h-6 stroke-current" />
+        </button>
+
+        <!-- 共通アイコン：ダークモード切替 -->
+        {SITE.lightAndDarkMode && (
+          <button id="theme-btn" class="relative p-2 w-10 h-10 hover:text-accent transition-colors" aria-label="Toggle Theme">
+            <IconMoon class="absolute inset-0 m-auto scale-100 dark:scale-0 transition-transform duration-200" />
+            <IconSunHigh class="absolute inset-0 m-auto scale-0 dark:scale-100 transition-transform duration-200" />
+          </button>
+        )}
+
+        <!-- モバイル版ハンバーガーメニュー (sm未満で表示) -->
+        <!-- クリックでMobileDrawerを開く -->
+        <button id="menu-btn" class="sm:hidden p-2 hover:text-accent transition-colors" aria-label="Menu">
+          <IconMenuDeep class="w-7 h-7 stroke-current" />
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<!-- モバイル表示時のドロワーコンポーネント -->
+<MobileDrawer category_id={category_id} isPost={isPost} headings={headings} />
+
+<!-- 検索用のオーバーレイモーダル -->
+<SearchModal />

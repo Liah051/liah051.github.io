@@ -1,0 +1,100 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import PhysicsSidebar from "@/components/sidebars/PhysicsSidebar.astro";
+import { getCollection } from "astro:content";
+
+// 物理カテゴリーの記事を取得
+const physicsPosts = await getCollection("blog", ({ data }) => {
+  return data.category_id === "physics" && data.draft !== true;
+});
+
+// グループごとに分類
+const groupedPosts = physicsPosts.reduce((acc, post) => {
+  const groupName = post.data.group || "その他";
+  if (!acc[groupName]) {
+    acc[groupName] = [];
+  }
+  acc[groupName].push(post);
+  return acc;
+}, {} as Record<string, typeof physicsPosts>);
+
+// 手動でのグループ順序設定
+const groupOrder = ["力学", "熱力学", "波動", "電磁気学", "原子", "その他"];
+const sortedGroups = Object.keys(groupedPosts).sort((a, b) => {
+  const indexA = groupOrder.indexOf(a);
+  const indexB = groupOrder.indexOf(b);
+  if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+  if (indexA === -1) return 1;
+  if (indexB === -1) return -1;
+  return indexA - indexB;
+});
+
+// 各グループ内の記事をorder順で並び替え
+Object.keys(groupedPosts).forEach(key => {
+  groupedPosts[key].sort((a, b) => {
+    const orderA = a.data.order ?? 999;
+    const orderB = b.data.order ?? 999;
+    return orderA - orderB;
+  });
+});
+
+const groupDescriptions: Record<string, string> = {
+  "力学": "力学とは〜（ダミー説明文）物体の運動とその原因となる力についての学問です。",
+  "熱力学": "熱力学とは〜（ダミー説明文）熱現象を巨視的な立場から扱う分野です。",
+  "波動": "波動とは〜（ダミー説明文）波の性質や振動について学ぶ分野です。",
+  "電磁気学": "電磁気学とは〜（ダミー説明文）電気や磁気に関する現象を扱う分野です。",
+  "原子": "原子物理とは〜（ダミー説明文）ミクロな世界の物理法則について学ぶ分野です。",
+  "その他": "その他の物理関連記事です。"
+};
+---
+
+<Layout title="高校物理 | カテゴリー">
+  <Header />
+  <main class="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row gap-8">
+    <div class="content-area w-full md:w-3/4">
+      <h1 class="text-3xl font-bold mb-4">高校物理</h1>
+      <p class="mb-10 opacity-80 leading-relaxed">
+        （ダミーテキスト）高校物理の各分野について、基礎から応用までわかりやすく解説しています。
+        このページではカテゴリー「物理（physics）」に属する記事をグループごとに一覧表示しています。
+      </p>
+
+      <div class="space-y-12">
+        {sortedGroups.map(group => (
+          <section class="group-section">
+            <h2 class="text-2xl font-semibold mb-3 border-b border-skin-line pb-2">{group}</h2>
+            <p class="mb-6 opacity-80">{groupDescriptions[group] || "説明文が設定されていません。"}</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {groupedPosts[group].map(post => (
+                <a href={`/posts/${post.id}/`} class="flex items-start gap-4 p-4 border border-skin-line rounded-lg hover:border-skin-accent transition">
+                  <div class="image-container w-24 h-24 flex-shrink-0 bg-skin-card rounded overflow-hidden">
+                    {post.data.thumbnail ? (
+                      <img 
+                        src={typeof post.data.thumbnail === 'string' ? post.data.thumbnail : post.data.thumbnail?.src} 
+                        alt={post.data.title} 
+                        class="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div class="w-full h-full flex items-center justify-center text-xs opacity-50">No Image</div>
+                    )}
+                  </div>
+                  <div class="info-container flex-1">
+                    <h3 class="font-bold text-lg leading-tight mb-2 hover:text-skin-accent">{post.data.title}</h3>
+                    <p class="text-sm opacity-70 line-clamp-2">{post.data.description}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+    
+    <div class="sidebar-area w-full md:w-1/4">
+      <PhysicsSidebar />
+    </div>
+  </main>
+  <Footer />
+</Layout>
