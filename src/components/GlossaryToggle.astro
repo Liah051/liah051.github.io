@@ -1,0 +1,64 @@
+---
+import Lightbulb from "@lucide/astro/icons/lightbulb";
+---
+
+<button
+  class="glossary-toggle p-2 transition-colors duration-300 hover:bg-accent/10 rounded-full group outline-none"
+  aria-label="Toggle Glossary"
+  title="用語解説の表示切り替え"
+>
+  <Lightbulb
+    class="glossary-icon w-6 h-6 transition-all duration-300 pointer-events-none"
+  />
+</button>
+
+<script>
+  function initGlossary() {
+    const toggleButtons = document.querySelectorAll(".glossary-toggle");
+    const html = document.documentElement;
+    const STORAGE_KEY = "isGlossaryEnabled";
+
+    // 初期化と状態同期
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    const isEnabled = savedState === null ? true : savedState === "true";
+    
+    updateState(isEnabled);
+
+    toggleButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const currentState = html.getAttribute("data-glossary-hidden") !== "true";
+        updateState(!currentState);
+      });
+    });
+
+    function updateState(enabled: boolean) {
+      if (enabled) {
+        html.removeAttribute("data-glossary-hidden");
+      } else {
+        html.setAttribute("data-glossary-hidden", "true");
+      }
+      localStorage.setItem(STORAGE_KEY, enabled.toString());
+      
+      const icons = document.querySelectorAll(".glossary-icon");
+      icons.forEach(icon => {
+        if (enabled) {
+          icon.classList.add("text-yellow-400", "dark:text-orange-400");
+          icon.classList.remove("text-gray-400", "dark:text-white");
+        } else {
+          icon.classList.remove("text-yellow-400", "dark:text-orange-400");
+          icon.classList.add("text-gray-400", "dark:text-white");
+        }
+      });
+    }
+  }
+
+  // Astro View Transitions 対応
+  document.addEventListener("astro:page-load", initGlossary);
+</script>
+
+<style>
+  /* アイコンのアニメーション */
+  .glossary-toggle:hover .glossary-icon {
+    transform: scale(1.1);
+  }
+</style>

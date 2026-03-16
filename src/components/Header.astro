@@ -8,6 +8,7 @@ import { SITE } from "@/config";
 import MobileDrawer from "./MobileDrawer.astro";
 import SearchModal from "./SearchModal.astro";
 import type { MarkdownHeading } from "astro";
+import GlossaryToggle from "./GlossaryToggle.astro";
 
 export interface Props {
   category_id?: string;
@@ -31,7 +32,7 @@ const isActive = (path: string) => {
 <a
   id="skip-to-content"
   href="#main-content"
-  class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+  class="absolute inset-s-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
 >
   Skip to content
 </a>
@@ -55,14 +56,16 @@ const isActive = (path: string) => {
         <a href="/tags" class={`hover:text-accent transition-colors ${isActive("/tags") ? "active-nav text-accent" : ""}`}>
           タグ
         </a>
-        {SITE.showArchives && (
-          <a href="/archives" class={`hover:text-accent transition-colors flex items-center gap-1 ${isActive("/archives") ? "active-nav text-accent" : ""}`}>
-            <IconArchive class="w-5 h-5 hidden sm:inline-block" />
-          </a>
-        )}
       </nav>
 
       <div class="flex items-center gap-1 sm:gap-2">
+        {SITE.showArchives && (
+          <a href="/archives" class={`p-2 hover:text-accent transition-colors flex items-center ${isActive("/archives") ? "active-nav text-accent" : ""}`} aria-label="Archives">
+            <IconArchive class="w-6 h-6 stroke-current" />
+          </a>
+        )}
+        <GlossaryToggle />
+
         <!-- 共通アイコン：検索ボタン (クリックでSearchModalを開く) -->
         <button id="search-btn" class="p-2 hover:text-accent transition-colors" aria-label="Search">
           <IconSearch class="w-6 h-6 stroke-current" />

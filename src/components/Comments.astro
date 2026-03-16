@@ -34,6 +34,7 @@ const { id, url, title } = Astro.props;
           required 
           class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           placeholder="名無し"
+          autocomplete="name"
         />
       </div>
       <div class="space-y-1">
@@ -46,6 +47,7 @@ const { id, url, title } = Astro.props;
           name="email" 
           class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           placeholder="email@example.com"
+          autocomplete="email"
         />
       </div>
     </div>
@@ -61,6 +63,7 @@ const { id, url, title } = Astro.props;
         rows="4" 
         class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
         placeholder="コメントを入力..."
+        autocomplete="off"
       ></textarea>
     </div>
 
