@@ -1,0 +1,76 @@
+---
+import { getGlossary } from "@/utils/glossary";
+
+const termFromSlot = await Astro.slots.render("default");
+const glossaryEntries = await getGlossary();
+const entry = glossaryEntries.find((e) => e.data.term === termFromSlot.trim());
+
+const { description, url } = entry?.data || {};
+---
+
+{
+  entry ? (
+    <span class="glossary-word-container relative inline-block group cursor-help">
+      <span class="glossary-word transition-colors group-hover:text-accent">
+        <slot />
+      </span>
+      <span class="glossary-tooltip invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[250px] p-3 bg-card text-card-foreground text-sm rounded-lg shadow-xl border border-border z-50 pointer-events-none group-hover:pointer-events-auto">
+        <span class="block font-bold mb-1">{termFromSlot}</span>
+        <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
+        <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
+          詳しく見る →
+        </a>
+        <span class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-card" />
+      </span>
+    </span>
+  ) : (
+    <slot />
+  )
+}
+
+<style>
+  .glossary-word {
+    /* カスタムドット下線 */
+    background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+    background-position: bottom;
+    background-size: 6px 1px;
+    background-repeat: repeat-x;
+    padding-bottom: 2px;
+  }
+
+  /* ツールチップへの架け橋（隙間を埋める） */
+  .glossary-word-container::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    height: 12px; /* ツールチップとの隙間をカバー */
+    display: none;
+  }
+  .glossary-word-container:hover::after {
+    display: block;
+  }
+
+  .glossary-tooltip {
+    /* 不透明な背景色 */
+    background-color: var(--background);
+  }
+  :global(html[data-theme="dark"]) .glossary-tooltip {
+    background-color: var(--background);
+    border-color: var(--border);
+  }
+
+  :global(html[data-glossary-hidden="true"]) .glossary-word {
+    background-image: none !important;
+  }
+  
+  :global(html[data-glossary-hidden="true"]) .glossary-tooltip,
+  :global(html[data-glossary-hidden="true"]) .glossary-word-container::after {
+    display: none !important;
+  }
+
+  :global(html[data-glossary-hidden="true"]) .glossary-word-container {
+    cursor: default !important;
+  }
+</style>

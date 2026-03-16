@@ -27,7 +27,7 @@ if (typeof thumbnail === "string") {
 }
 
 // Fallback image if no thumbnail
-const defaultThumbnail = "https://images.unsplash.com/photo-1542435503-956c22396d09?q=80&w=1080&auto=format&fit=crop"; 
+const defaultThumbnail = "https://images.unsplash.com/photo-1499781366052-3569173a1b5d?q=80&w=1080&auto=format&fit=crop"; 
 ---
 
 <li class="my-6">
@@ -46,7 +46,7 @@ const defaultThumbnail = "https://images.unsplash.com/photo-1542435503-956c22396
           src={thumbnailUrl || defaultThumbnail} 
           alt={title} 
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 bg-muted" 
-          loading="lazy" 
+          loading="lazy"
         />
       )}
     </a>

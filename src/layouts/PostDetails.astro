@@ -14,6 +14,8 @@ import BlueProtocolSidebar from "@/components/sidebars/BlueProtocol.astro";
 import Comments from "@/components/Comments.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
 import PhysicsSidebar from "@/components/sidebars/PhysicsSidebar.astro";
+import Word from "@/components/Word.astro";
+
 
 // ... [既存のインポートを維持、手動でマージするのではなくインポート部分全体を編集すると長くなるので、最初の方に追加します]
 import { getPath } from "@/utils/getPath";
@@ -77,17 +79,36 @@ const layoutProps = {
 
 /* ========== Prev/Next Posts ========== */
 
-const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
-  id,
-  title,
-  filePath,
-}));
+const { group } = post.data;
 
-const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
+let prevPost: CollectionEntry<"blog"> | null = null;
+let nextPost: CollectionEntry<"blog"> | null = null;
 
-const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
-const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+if (category_id && group) {
+  // Logic based on Category, Group, and Order
+  const filteredPosts = posts
+    .filter(p => p.data.category_id === category_id && p.data.group === group)
+    .sort((a, b) => {
+      const orderA = a.data.order ?? 999;
+      const orderB = b.data.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.data.pubDatetime.getTime() - b.data.pubDatetime.getTime();
+    });
+
+  const currentIndex = filteredPosts.findIndex(p => p.id === post.id);
+  if (currentIndex > 0) prevPost = filteredPosts[currentIndex - 1];
+  if (currentIndex !== -1 && currentIndex < filteredPosts.length - 1)
+    nextPost = filteredPosts[currentIndex + 1];
+} else {
+  // Fallback to default date-based sorting (maintaining existing logic order but correcting labels)
+  const currentIndex = posts.findIndex(p => p.id === post.id);
+  // In a DESC sorted list (Newest first):
+  // currentIndex - 1 is Newer (Next)
+  // currentIndex + 1 is Older (Previous)
+  if (currentIndex > 0) nextPost = posts[currentIndex - 1];
+  if (currentIndex !== -1 && currentIndex < posts.length - 1)
+    prevPost = posts[currentIndex + 1];
+}
 ---
 
 <Layout {...layoutProps}>
@@ -105,7 +126,8 @@ const nextPost =
     -->
     <div class="flex flex-col md:flex-row md:justify-between items-start md:items-stretch gap-18 lg:gap-24">
       <!-- Left Column: Main Content -->
-      <div class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] md:-translate-x-0">
+      <div class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] md:translate-x-0">
+
         <h1
           transition:name={slugifyStr(title.replaceAll(".", "-"))}
           class="inline-block text-2xl font-bold text-accent sm:text-3xl"
@@ -113,7 +135,8 @@ const nextPost =
           {title}
         </h1>
         <div class="my-2 flex items-center gap-2">
-          <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+          <Datetime pubDatetime={pubDatetime} modDatetime={modDatetime} timezone={timezone} size="lg" />
+
           <span
             aria-hidden="true"
             class:list={[
@@ -121,7 +144,8 @@ const nextPost =
               { hidden: !SITE.editPost.enabled || hideEditPost },
             ]}>|</span
           >
-          <EditPost {hideEditPost} {post} class="max-sm:hidden" />
+          <EditPost hideEditPost={hideEditPost} post={post} class="max-sm:hidden" />
+
         </div>
 
         <div class="mt-8">
@@ -132,12 +156,14 @@ const nextPost =
           id="article"
           class="app-prose w-full prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
         >
-          <Content />
+          <Content components={{ Word }} />
+
         </article>
 
         <hr class="my-8 border-dashed" />
 
-        <EditPost class="sm:hidden" {hideEditPost} {post} />
+        <EditPost class="sm:hidden" hideEditPost={hideEditPost} post={post} />
+
 
         <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
           {
@@ -159,7 +185,8 @@ const nextPost =
 
       <!-- Right Column: Sidebar -->
       <aside
-        class="hidden md:flex w-full flex-col gap-6 pb-8 md:order-last md:pb-0 md:w-[252px] lg:w-[270px] flex-shrink-0"
+        class="hidden md:flex w-full flex-col gap-6 pb-8 md:order-last md:pb-0 md:w-[252px] lg:w-[270px] shrink-0"
+
       >
         {
           category_id === "blue-protocol" ? (
@@ -187,7 +214,7 @@ const nextPost =
             <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
             <div>
               <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
+              <div class="text-sm text-accent/85">{prevPost.data.title}</div>
             </div>
           </a>
         )
@@ -200,7 +227,7 @@ const nextPost =
           >
             <div>
               <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
+              <div class="text-sm text-accent/85">{nextPost.data.title}</div>
             </div>
             <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
           </a>

@@ -25,22 +25,22 @@ const title = `お問い合わせ | ${SITE.title}`;
       >
         <div class="form-group">
           <label for="name">お名前 <span class="required">必須</span></label>
-          <input type="text" id="name" name="お名前" required placeholder="山田 太郎" />
+          <input type="text" id="name" name="お名前" required placeholder="山田 太郎" autocomplete="name" />
         </div>
 
         <div class="form-group">
           <label for="email">メールアドレス <span class="required">必須</span></label>
-          <input type="email" id="email" name="Email" required placeholder="example@email.com" />
+          <input type="email" id="email" name="Email" required placeholder="example@email.com" autocomplete="email" />
         </div>
 
         <div class="form-group">
           <label for="subject">件名 <span class="required">必須</span></label>
-          <input type="text" id="subject" name="件名" required placeholder="お問い合わせ内容の要約" />
+          <input type="text" id="subject" name="件名" required placeholder="お問い合わせ内容の要約" autocomplete="off" />
         </div>
 
         <div class="form-group">
           <label for="message">お問い合わせ内容 <span class="required">必須</span></label>
-          <textarea id="message" name="お問い合わせ内容" required rows="6" placeholder="こちらにご記入ください"></textarea>
+          <textarea id="message" name="お問い合わせ内容" required rows="6" placeholder="こちらにご記入ください" autocomplete="off"></textarea>
         </div>
 
         <div class="form-submit">
