@@ -10,28 +10,38 @@ permissions:
   pages: write
   id-token: write
 
-# Node.js 24への強制移行に同意する環境変数を追加
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: github-pages
     steps:
-      - name: Checkout your repository using git
+      - name: Checkout your repository
         uses: actions/checkout@v4
-      
-      - name: Install, build, and upload your site
-        uses: withastro/action@v3
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install dependencies
+        # ここで矛盾を無視するオプションを確実に実行します
+        run: npm install --legacy-peer-deps
+
+      - name: Build Astro
+        # 公開用の環境変数を渡しながらビルド
+        run: npm run build
         env:
           PUBLIC_CONTACT_FORM_ACTION: ${{ vars.PUBLIC_CONTACT_FORM_ACTION }}
           PUBLIC_CUSDIS_APP_ID: ${{ vars.PUBLIC_CUSDIS_APP_ID }}
           PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          package-manager: npm
-          # ここに魔法の言葉を追加！ 依存関係の矛盾を無視してインストールします。
-          install-command: npm install --legacy-peer-deps
+          path: ./dist
 
   deploy:
     needs: build
