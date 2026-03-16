@@ -2,15 +2,20 @@
 import Lightbulb from "@lucide/astro/icons/lightbulb";
 ---
 
-<button
-  class="glossary-toggle p-2 transition-colors duration-300 hover:bg-accent/10 rounded-full group outline-none"
-  aria-label="Toggle Glossary"
-  title="用語解説の表示切り替え"
->
-  <Lightbulb
-    class="glossary-icon w-6 h-6 transition-all duration-300 pointer-events-none"
-  />
-</button>
+<div class="header-tooltip-container relative group">
+  <button
+    class="glossary-toggle p-2 transition-colors duration-300 hover:bg-accent/10 rounded-full group outline-none"
+    aria-label="Toggle Glossary"
+  >
+    <Lightbulb
+      class="glossary-icon w-6 h-6 transition-all duration-300 pointer-events-none"
+    />
+  </button>
+  <span id="glossary-tooltip" class="header-tooltip">
+    用語解説を隠す
+    <span class="tooltip-arrow" />
+  </span>
+</div>
 
 <script>
   function initGlossary() {
@@ -49,6 +54,15 @@ import Lightbulb from "@lucide/astro/icons/lightbulb";
           icon.classList.add("text-gray-400", "dark:text-white");
         }
       });
+
+      // ツールチップのテキスト更新
+      const glossaryTooltip = document.querySelector("#glossary-tooltip");
+      if (glossaryTooltip) {
+        const tooltipText = glossaryTooltip.childNodes[0];
+        if (tooltipText) {
+          tooltipText.textContent = enabled ? "用語解説を隠す" : "用語解説を表示";
+        }
+      }
     }
   }
 
@@ -60,5 +74,43 @@ import Lightbulb from "@lucide/astro/icons/lightbulb";
   /* アイコンのアニメーション */
   .glossary-toggle:hover .glossary-icon {
     transform: scale(1.1);
+  }
+
+  /* Header.astro と同様のスタイル。本来はグローバル化すべきだが、今回は各コンポーネントに閉じる方針を継続 */
+  .header-tooltip-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .header-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    z-index: 50;
+    
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.1s, visibility 0.1s;
+  }
+
+  .header-tooltip-container:hover .header-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  :global(html[data-theme="dark"]) .header-tooltip {
+    background-color: #ffffff;
+    color: #000000;
   }
 </style>
