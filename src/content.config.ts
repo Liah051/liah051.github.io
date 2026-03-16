@@ -24,6 +24,8 @@ const blog = defineCollection({
       category_id: z.string(),
       group: z.string().optional(),
       order: z.number().default(999).optional(),
+      wordlist: z.boolean().default(false).optional(),
+      terms: z.array(z.string()).optional(),
     }),
 });
 
@@ -32,7 +34,7 @@ const glossary = defineCollection({
   schema: z.object({
     term: z.string(),
     description: z.string(),
-    url: z.string().optional().default("#"),
+    url: z.string().optional(),
   }),
 });
 

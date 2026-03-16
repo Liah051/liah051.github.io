@@ -15,6 +15,7 @@ import Comments from "@/components/Comments.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
 import PhysicsSidebar from "@/components/sidebars/PhysicsSidebar.astro";
 import Word from "@/components/Word.astro";
+import PostFooterStack from "@/components/PostFooterStack.astro";
 
 
 // ... [既存のインポートを維持、手動でマージするのではなくインポート部分全体を編集すると長くなるので、最初の方に追加します]
@@ -76,39 +77,6 @@ const layoutProps = {
   ogImage,
   scrollSmooth: true,
 };
-
-/* ========== Prev/Next Posts ========== */
-
-const { group } = post.data;
-
-let prevPost: CollectionEntry<"blog"> | null = null;
-let nextPost: CollectionEntry<"blog"> | null = null;
-
-if (category_id && group) {
-  // Logic based on Category, Group, and Order
-  const filteredPosts = posts
-    .filter(p => p.data.category_id === category_id && p.data.group === group)
-    .sort((a, b) => {
-      const orderA = a.data.order ?? 999;
-      const orderB = b.data.order ?? 999;
-      if (orderA !== orderB) return orderA - orderB;
-      return a.data.pubDatetime.getTime() - b.data.pubDatetime.getTime();
-    });
-
-  const currentIndex = filteredPosts.findIndex(p => p.id === post.id);
-  if (currentIndex > 0) prevPost = filteredPosts[currentIndex - 1];
-  if (currentIndex !== -1 && currentIndex < filteredPosts.length - 1)
-    nextPost = filteredPosts[currentIndex + 1];
-} else {
-  // Fallback to default date-based sorting (maintaining existing logic order but correcting labels)
-  const currentIndex = posts.findIndex(p => p.id === post.id);
-  // In a DESC sorted list (Newest first):
-  // currentIndex - 1 is Newer (Next)
-  // currentIndex + 1 is Older (Previous)
-  if (currentIndex > 0) nextPost = posts[currentIndex - 1];
-  if (currentIndex !== -1 && currentIndex < posts.length - 1)
-    prevPost = posts[currentIndex + 1];
-}
 ---
 
 <Layout {...layoutProps}>
@@ -165,7 +133,10 @@ if (category_id && group) {
         <EditPost class="sm:hidden" hideEditPost={hideEditPost} post={post} />
 
 
-        <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
+
+        <PostFooterStack post={post} posts={posts} />
+
+        <ul class="mt-8 mb-8 flex flex-wrap gap-4 sm:my-8">
           {
             tags.map(tag => (
               <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />
@@ -203,90 +174,45 @@ if (category_id && group) {
       </aside>
     </div>
 
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={getPath(prevPost.id, prevPost.filePath)}
-            class="flex w-full gap-1 hover:opacity-75"
-          >
-            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.data.title}</div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={getPath(nextPost.id, nextPost.filePath)}
-            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
-          >
-            <div>
-              <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.data.title}</div>
-            </div>
-            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
-          </a>
-        )
-      }
-    </div>
   </main>
   <Footer />
 </Layout>
 
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
-  function createProgressBar() {
-    // Create the main container div
+  /** Create a progress indicator at the top */
+  function setupProgressBar() {
+    // Check if progress bar already exists to avoid duplicates
+    if (document.querySelector(".progress-container")) return;
+
     const progressContainer = document.createElement("div");
     progressContainer.className =
       "progress-container fixed top-0 z-[60] h-1 w-full bg-background";
 
-    // Create the progress bar div
     const progressBar = document.createElement("div");
     progressBar.className = "progress-bar h-1 w-0 bg-accent";
     progressBar.id = "myBar";
 
-    // Append the progress bar to the progress container
     progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
     document.body.appendChild(progressContainer);
-  }
-  createProgressBar();
-
-  /** Update the progress bar
-   *  when user scrolls */
-  function updateScrollProgress() {
-    document.addEventListener("scroll", () => {
-      const winScroll =
-        document.body.scrollTop || document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
+    
+    // Use a single listener for scroll updates
+    window.addEventListener("scroll", () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      const myBar = document.getElementById("myBar");
+      if (myBar) {
+        myBar.style.width = scrolled + "%";
       }
-    });
+    }, { passive: true });
   }
-  updateScrollProgress();
 
-  /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
+  /** Attaches links to headings */
   function addHeadingLinks() {
-    const headings = Array.from(
-      document.querySelectorAll("h2, h3, h4, h5, h6")
-    );
+    const headings = document.querySelectorAll("h2[id], h3[id], h4[id], h5[id], h6[id]");
     for (const heading of headings) {
+      if (heading.querySelector(".heading-link")) continue;
+      
       heading.classList.add("group");
       const link = document.createElement("a");
       link.className =
@@ -300,61 +226,56 @@ if (category_id && group) {
       heading.appendChild(link);
     }
   }
-  addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
+  /** Copy buttons for code blocks */
   function attachCopyButtons() {
     const copyButtonLabel = "Copy";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     for (const codeBlock of codeBlocks) {
+      if (codeBlock.querySelector(".copy-code")) continue;
+
       const wrapper = document.createElement("div");
       wrapper.style.position = "relative";
 
-      // Check if --file-name-offset custom property exists
       const computedStyle = getComputedStyle(codeBlock);
       const hasFileNameOffset =
         computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
 
-      // Determine the top positioning class
-      const topClass = hasFileNameOffset
-        ? "top-(--file-name-offset)"
-        : "-top-3";
+      const topClass = hasFileNameOffset ? "top-(--file-name-offset)" : "-top-3";
 
       const copyButton = document.createElement("button");
-      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium transition-all hover:bg-muted/80`;
       copyButton.innerHTML = copyButtonLabel;
       codeBlock.setAttribute("tabindex", "0");
       codeBlock.appendChild(copyButton);
 
-      // wrap codebock with relative parent element
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
+      if (codeBlock.parentNode) {
+        codeBlock.parentNode.insertBefore(wrapper, codeBlock);
+        wrapper.appendChild(codeBlock);
+      }
 
       copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
+        const code = codeBlock.querySelector("code");
+        const text = code?.innerText || "";
+        try {
+          await navigator.clipboard.writeText(text);
+          copyButton.innerText = "Copied";
+          setTimeout(() => { copyButton.innerText = copyButtonLabel; }, 700);
+        } catch (err) {
+          console.error("Failed to copy:", err);
+        }
       });
     }
-
-    async function copyCode(block, button) {
-      const code = block.querySelector("code");
-      const text = code?.innerText;
-
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = "Copied";
-
-      setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
-    }
   }
+
+  // Initialize features
+  setupProgressBar();
+  addHeadingLinks();
   attachCopyButtons();
 
-  /* Go to page start after page swap */
-  document.addEventListener("astro:after-swap", () =>
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
-  );
+  // Handle scroll reset after transition
+  document.addEventListener("astro:after-swap", () => {
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+  }, { once: true });
 </script>

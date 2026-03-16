@@ -9,7 +9,7 @@ tags:
   - Physics
   - Math
 description: "アインシュタインの特殊相対性理論やシュレーディンガー方程式など、物理学の基本的な数式が KaTeX を使って綺麗に表示されるかをテストします。"
-category_id: "Physics"
+category_id: "physics"
 group: "力学"
 order: 1
 thumbnail: "https://placehold.co/400x400.jpg"

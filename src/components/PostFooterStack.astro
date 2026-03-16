@@ -1,0 +1,322 @@
+---
+import { type CollectionEntry } from "astro:content";
+import { getGlossary } from "@/utils/glossary";
+import { getPath } from "@/utils/getPath";
+import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
+import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import { Lightbulb, ThumbsUp, Frown, ExternalLink } from "@lucide/astro";
+
+type Props = {
+  post: CollectionEntry<"blog">;
+  posts: CollectionEntry<"blog">[];
+};
+
+const { post, posts } = Astro.props;
+const { category_id, group, wordlist, terms } = post.data;
+
+// normalize for comparison
+const targetCategory = category_id?.toLowerCase();
+
+// 1. Glossary Review (Optimized Frontmatter-based)
+let uniqueTerms: any[] = [];
+if (terms && terms.length > 0) {
+  const allGlossary = await getGlossary();
+  // Use Map for $O(1)$ lookup
+  const glossaryMap = new Map(allGlossary.map(e => [e.data.term, e]));
+  uniqueTerms = terms
+    .map(term => glossaryMap.get(term))
+    .filter(Boolean);
+}
+
+// 2. Optimized Series & Navigation Logic
+let seriesPosts: CollectionEntry<"blog">[] = [];
+let prevPost: CollectionEntry<"blog"> | null = null;
+let nextPost: CollectionEntry<"blog"> | null = null;
+let currentPosition = 0;
+
+if (targetCategory && group) {
+  // Calculate series once
+  seriesPosts = posts
+    .filter(p => p.data.category_id?.toLowerCase() === targetCategory && p.data.group === group)
+    .sort((a, b) => {
+      const orderA = a.data.order ?? 999;
+      const orderB = b.data.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.data.pubDatetime.getTime() - b.data.pubDatetime.getTime();
+    });
+}
+
+if (targetCategory && group) {
+  const currentIndex = seriesPosts.findIndex(p => p.id === post.id);
+  if (currentIndex !== -1) {
+    currentPosition = currentIndex + 1;
+    if (currentIndex > 0) prevPost = seriesPosts[currentIndex - 1];
+    if (currentIndex < seriesPosts.length - 1)
+      nextPost = seriesPosts[currentIndex + 1];
+  }
+} else {
+  // Fallback date-based navigation (Older/Newer)
+  const sortedByDate = posts.slice().sort((a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime());
+  const currentIndex = sortedByDate.findIndex(p => p.id === post.id);
+  if (currentIndex !== -1) {
+    if (currentIndex > 0) nextPost = sortedByDate[currentIndex - 1];
+    if (currentIndex < sortedByDate.length - 1) prevPost = sortedByDate[currentIndex + 1];
+  }
+}
+---
+
+<div class="post-footer-stack mt-16 flex flex-col gap-12 border-t border-border pt-12">
+  {/* 1. Glossary Review */}
+  {
+    uniqueTerms.length > 0 && (
+      <section class="glossary-review">
+        <h3 class="mb-6 text-xl font-bold flex items-center gap-2">
+          <span class="text-2xl">📖</span> 用語おさらい
+        </h3>
+        <div class="grid gap-4 sm:grid-cols-2">
+          {uniqueTerms.map(term => {
+            const hasLink = term.data.url && term.data.url.length > 0;
+            return (
+              <div class="flex flex-col rounded-lg border border-border p-4 bg-card/50 h-full">
+                <div class="mb-1">
+                  {hasLink ? (
+                    <a 
+                      href={term.data.url} 
+                      class="inline-flex items-center gap-1.5 font-bold text-accent hover:text-accent/80 hover:underline decoration-accent/30 underline-offset-4 transition-colors"
+                      target={term.data.url.startsWith("http") ? "_blank" : undefined}
+                      rel={term.data.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                    >
+                      {term.data.term}
+                      <ExternalLink size={16} class="shrink-0" />
+                    </a>
+                  ) : (
+                    <span class="font-bold text-foreground/80">{term.data.term}</span>
+                  )}
+                </div>
+                <p class="text-sm text-muted-foreground leading-relaxed">{term.data.description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    )
+  }
+
+  {/* 2. Reactions */}
+  <section class="reactions flex flex-col items-center gap-6 py-10 rounded-3xl bg-background border border-border/50">
+    <h3 class="text-lg font-medium text-muted-foreground/80">この記事はどうでしたか？</h3>
+    <div class="flex gap-4 sm:gap-10">
+      <button
+        class="reaction-btn group transition-all duration-300 flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent active:scale-95"
+        data-reaction="naruhodo"
+      >
+        <div class="icon-wrapper p-3 rounded-full transition-colors group-hover:bg-yellow-100/50 dark:group-hover:bg-yellow-900/20">
+          <Lightbulb size={28} class="text-muted-foreground transition-colors group-hover:text-yellow-500" />
+        </div>
+        <span class="text-xs font-medium text-muted-foreground group-hover:text-foreground">なるほど</span>
+      </button>
+      <button
+        class="reaction-btn group transition-all duration-300 flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent active:scale-95"
+        data-reaction="iine"
+      >
+        <div class="icon-wrapper p-3 rounded-full transition-colors group-hover:bg-blue-100/50 dark:group-hover:bg-blue-900/20">
+          <ThumbsUp size={28} class="text-muted-foreground transition-colors group-hover:text-blue-500" />
+        </div>
+        <span class="text-xs font-medium text-muted-foreground group-hover:text-foreground">いいね</span>
+      </button>
+      <button
+        class="reaction-btn group transition-all duration-300 flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent active:scale-95"
+        data-reaction="muzukashii"
+      >
+        <div class="icon-wrapper p-3 rounded-full transition-colors group-hover:bg-red-100/50 dark:group-hover:bg-red-900/20">
+          <Frown size={28} class="text-muted-foreground transition-colors group-hover:text-red-500" />
+        </div>
+        <span class="text-xs font-medium text-muted-foreground group-hover:text-foreground">むずかしい</span>
+      </button>
+    </div>
+  </section>
+
+  {/* 3. Navigation */}
+  <nav class="grid grid-cols-1 gap-6 sm:grid-cols-2" aria-label="Post navigation">
+    {
+      prevPost && (
+        <a
+          href={getPath(prevPost.id, prevPost.filePath)}
+          class="group flex w-full items-center gap-4 rounded-xl border border-border p-4 transition-all hover:bg-muted/50"
+        >
+          <IconChevronLeft class="h-6 w-6 flex-none text-muted-foreground transition-transform group-hover:-translate-x-1" />
+          <div class="min-w-0">
+            <span class="text-xs text-muted-foreground">{seriesPosts.length > 0 ? "前の記事" : "Older Post"}</span>
+            <div class="truncate font-medium text-accent">{prevPost.data.title}</div>
+          </div>
+        </a>
+      )
+    }
+    {
+      nextPost ? (
+        <a
+          href={getPath(nextPost.id, nextPost.filePath)}
+          class="group flex w-full items-center justify-end gap-4 rounded-xl border border-border p-4 transition-all hover:bg-muted/50 sm:col-start-2"
+        >
+          <div class="text-right min-w-0">
+            <span class="text-xs text-muted-foreground">{seriesPosts.length > 0 ? "次の記事" : "Newer Post"}</span>
+            <div class="truncate font-medium text-accent">{nextPost.data.title}</div>
+          </div>
+          <IconChevronRight class="h-6 w-6 flex-none text-muted-foreground transition-transform group-hover:translate-x-1" />
+        </a>
+      ) : (
+        <div class="hidden sm:block"></div>
+      )
+    }
+  </nav>
+
+  {/* 4. Series Progress */}
+  {
+    seriesPosts.length > 1 && (
+      <section class="series-progress rounded-xl border border-border bg-card overflow-hidden">
+        <div class="border-b border-border bg-muted/50 px-6 py-4 flex justify-between items-center">
+          <h3 class="font-bold">
+            <span class="text-accent">#{group}</span> シリーズの進捗
+          </h3>
+          <span class="text-sm font-medium bg-accent/10 text-accent px-2 py-1 rounded">
+            {currentPosition} / {seriesPosts.length}
+          </span>
+        </div>
+        <ul class="divide-y divide-border">
+          {seriesPosts.map((p, index) => {
+            const isCurrent = p.id === post.id;
+            return (
+              <li class:list={["relative", { "bg-accent/5": isCurrent }]}>
+                <a
+                  href={getPath(p.id, p.filePath)}
+                  class:list={[
+                    "flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/30",
+                    { "pointer-events-none": isCurrent }
+                  ]}
+                >
+                  <span class:list={[
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    isCurrent ? "bg-accent text-white" : "bg-muted text-muted-foreground"
+                  ]}>
+                    {index + 1}
+                  </span>
+                  <span class:list={["grow truncate", isCurrent ? "font-bold text-foreground" : "text-muted-foreground"]}>
+                    {p.data.title}
+                  </span>
+                  {isCurrent && (
+                    <span class="shrink-0 text-xs font-bold text-accent">読み終えた！</span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )
+  }
+</div>
+
+<style>
+  .reaction-btn.active {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+    transform: scale(1.05);
+  }
+
+  /* Specific colors for active states */
+  .reaction-btn[data-reaction="naruhodo"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #facc15 10%, transparent);
+  }
+  :global(html[data-theme="dark"]) .reaction-btn[data-reaction="naruhodo"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #facc15 20%, transparent);
+  }
+  .reaction-btn[data-reaction="naruhodo"].active svg {
+    color: #eab308;
+  }
+  .reaction-btn[data-reaction="naruhodo"].active span {
+    color: var(--foreground);
+  }
+
+  .reaction-btn[data-reaction="iine"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #60a5fa 10%, transparent);
+  }
+  :global(html[data-theme="dark"]) .reaction-btn[data-reaction="iine"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #60a5fa 20%, transparent);
+  }
+  .reaction-btn[data-reaction="iine"].active svg {
+    color: #3b82f6;
+  }
+  .reaction-btn[data-reaction="iine"].active span {
+    color: var(--foreground);
+  }
+
+  .reaction-btn[data-reaction="muzukashii"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #f87171 10%, transparent);
+  }
+  :global(html[data-theme="dark"]) .reaction-btn[data-reaction="muzukashii"].active .icon-wrapper {
+    background-color: color-mix(in srgb, #f87171 20%, transparent);
+  }
+  .reaction-btn[data-reaction="muzukashii"].active svg {
+    color: #ef4444;
+  }
+  .reaction-btn[data-reaction="muzukashii"].active span {
+    color: var(--foreground);
+  }
+  
+  /* Bounce animation on click */
+  @keyframes reaction-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1.1); }
+  }
+  .reaction-pop {
+    animation: reaction-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  (() => {
+    // Guards to prevent errors and ensure idempotency
+    const postId = document.body?.dataset.postId || window.location.pathname;
+    if (!postId) return;
+
+    const storageKey = `reaction-${postId}`;
+    const buttons = document.querySelectorAll('.reaction-btn');
+    if (buttons.length === 0) return;
+
+    const savedReactions = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    
+    buttons.forEach(btn => {
+      const type = btn.getAttribute('data-reaction');
+      if (!type) return;
+
+      if (savedReactions[type]) {
+        btn.classList.add('active');
+      }
+      
+      const handleClick = (e) => {
+        const isActive = btn.classList.toggle('active');
+        
+        // Animation cleanup and restart
+        btn.classList.remove('reaction-pop');
+        void btn.offsetWidth; // Trigger reflow for animation restart
+        btn.classList.add('reaction-pop');
+        
+        // Save to localStorage
+        const reactions = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        if (isActive) {
+          reactions[type] = true;
+        } else {
+          delete reactions[type];
+        }
+        localStorage.setItem(storageKey, JSON.stringify(reactions));
+      };
+
+      // Remove existing listener if any (for safety, though data-astro-rerun handles it)
+      btn.removeEventListener('click', btn._handleClick);
+      btn._handleClick = handleClick;
+      btn.addEventListener('click', handleClick);
+    });
+  })();
+</script>
