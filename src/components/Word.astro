@@ -14,23 +14,77 @@ const { description, url } = entry?.data || {};
       <span class="glossary-word transition-colors group-hover:text-accent">
         <slot />
       </span>
-      <span class="glossary-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[250px] p-3 bg-card text-card-foreground text-sm rounded-lg shadow-xl border border-border z-50 pointer-events-none group-hover:pointer-events-auto">
-        <span class="block font-bold mb-1">{termFromSlot}</span>
-        <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
-        {
-          url && url.length > 0 && (
-            <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
-              詳しく見る →
-            </a>
-          )
-        }
-        <span class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-card" />
+      {/* ツールチップコンテナ：影を一体化するために filter: drop-shadow を使用 */}
+      <span class="glossary-tooltip absolute bottom-full mb-3 z-50 pointer-events-none group-hover:pointer-events-auto opacity-0 transition-opacity duration-300 overflow-visible">
+        <span class="glossary-tooltip-box block w-max max-w-[250px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none">
+          <span class="block font-bold mb-1">{termFromSlot}</span>
+          <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
+          {
+            url && url.length > 0 && (
+              <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
+                詳しく見る →
+              </a>
+            )
+          }
+        </span>
       </span>
     </span>
   ) : (
     <slot />
   )
 }
+
+<script is:inline data-astro-rerun>
+  (() => {
+    // 既に初期化済みの場合はスキップ（イベントリスナーの重複防止）
+    if (window.glossaryPositioningInitialized) return;
+    window.glossaryPositioningInitialized = true;
+
+    const adjustTooltip = (container) => {
+      const tooltip = container.querySelector('.glossary-tooltip');
+      if (!tooltip) return;
+
+      // 1. まず中央揃えのデフォルト状態にする
+      tooltip.style.transform = 'translateX(-50%)';
+
+      // 2. レイアウトを確定させて位置を計測
+      void tooltip.offsetWidth; 
+      const rect = tooltip.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const margin = 12;
+
+      // 3. はみ出し判定
+      let shift = 0;
+      if (rect.left < margin) {
+        shift = margin - rect.left;
+      } else if (rect.right > viewportWidth - margin) {
+        shift = (viewportWidth - margin) - rect.right;
+      }
+
+      // 4. 必要に応じて補正適用
+      if (shift !== 0) {
+        // メインボックスをシフト
+        tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`;
+      }
+    };
+
+    // デリゲートされたイベントリスナーで効率的かつ確実に処理
+    document.addEventListener('mouseover', (e) => {
+      const container = e.target.closest('.glossary-word-container');
+      if (container) {
+        adjustTooltip(container);
+      }
+    });
+
+    // タッチデバイス対応
+    document.addEventListener('touchstart', (e) => {
+      const container = e.target.closest('.glossary-word-container');
+      if (container) {
+        adjustTooltip(container);
+      }
+    }, { passive: true });
+  })();
+</script>
 
 <style>
   .glossary-word {
@@ -42,54 +96,62 @@ const { description, url } = entry?.data || {};
     padding-bottom: 2px;
   }
 
-  /* ツールチップの表示制御 */
-  .glossary-tooltip {
-    background-color: var(--background);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s, visibility 0.3s, pointer-events 0.3s;
-    transition-delay: 0.3s; /* マウスが離れた時の猶予（黄金比への調整） */
+  /* ツールチップの不透明度とフィルタ */
+.glossary-tooltip {
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+  /* デフォルトでセンターに配置 */
+  left: 50%;
+  transform: translateX(-50%); 
+  
+  /* transformをtransitionに入れないことで「スライド」を防止 */
+  transition: opacity 0.3s, visibility 0.3s; 
+  transition-delay: 0.3s;
+  visibility: hidden;
+}
+
+  .glossary-tooltip-box {
+    background-color: var(--background); /* 完全に不透明なテーマ背景を使用 */
+    opacity: 1 !important;
   }
 
+  /* ダークモードの影 */
+  :global(html[data-theme="dark"]) .glossary-tooltip {
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+  }
+
+  /* ホバー時の表示（visibilityを制御してJS의計算を可能にする） */
   .glossary-word-container:hover .glossary-tooltip {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto;
-    transition: none; /* 表示するときは一瞬で */
+    transition: opacity 0.2s;
+    transition-delay: 0s;
   }
 
-  /* ツールチップへの架け橋（隙間を埋める） */
+  /* ツールチップへの架け橋 */
   .glossary-word-container::after {
     content: "";
     position: absolute;
     bottom: 100%;
     left: 50%;
-    width: 300%; /* 斜め移動を考慮して巨大化 */
-    height: 20px;
+    width: 300%;
+    height: 24px;
     transform: translateX(-50%);
-    
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.3s, visibility 0.3s;
-    transition-delay: 0.3s; /* 猶予期間 */
-    background-color: transparent; /* 視認不能な橋 */
+    transition-delay: 0.3s;
+    background-color: transparent;
     z-index: 40;
   }
   
   .glossary-word-container:hover {
-    z-index: 60; /* 新しい吹き出しが古いものの上に重なるように */
+    z-index: 60;
   }
 
   .glossary-word-container:hover::after {
     visibility: visible;
     opacity: 1;
-    transition: none; /* 表示するときは一瞬で */
-  }
-
-  :global(html[data-theme="dark"]) .glossary-tooltip {
-    background-color: var(--background);
-    border-color: var(--border);
+    transition: none;
   }
 
   :global(html[data-glossary-hidden="true"]) .glossary-word {
