@@ -5,6 +5,7 @@ import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import Layout from "@/layouts/Layout.astro";
 import ProfileCard from "@/components/ProfileCard.astro";
+import Word from "@/components/Word.astro";
 ---
 
 <Layout title={`Profile | ${SITE.title}`}>
@@ -13,12 +14,10 @@ import ProfileCard from "@/components/ProfileCard.astro";
 
   <main id="main-content" class="app-layout pb-12 mt-8">
     <div class="grid grid-cols-1 items-start gap-12 md:grid-cols-[320px_1fr]">
-      <!-- Left Column: Profile Card -->
       <aside class="flex w-full flex-col gap-6">
         <ProfileCard />
       </aside>
 
-      <!-- Right Column: Detailed Profile Info -->
       <div
         class="app-prose w-full min-w-0 rounded-xl border border-border bg-background p-6 shadow-sm md:p-8"
       >
@@ -26,34 +25,56 @@ import ProfileCard from "@/components/ProfileCard.astro";
           Liahについて
         </h1>
 
-        <h2>基本情報</h2>
-        <ul>
-          <li><strong>所属:</strong> 〇〇大学工学部</li>
-          <li><strong>興味:</strong> ゲーム、プログラミング</li>
+        <ul class="mb-8 list-none pl-0">
+          <li>・工学部の情報工学科に通う大学2年生</li>
+          <li>・普段はゲームに没頭したり、ラノベを読み耽ったりしている、根っからのインドア派</li>
+          <li>・大学の長期休みがあまりにも長すぎて、さすがにゲームをし続けるのに罪悪感を感じ、ブログを自作し、塾講師のバイトを始めてみた</li>
         </ul>
 
-        <h2>テスト用エピソード</h2>
+        <h2 class="text-xl font-bold border-b border-border pb-2 mb-4">暗記への苦手意識と、そこから生まれた学習法</h2>
         <p>
-          これはプロフィールページのテスト用テキストです。<br />
-          ここには本来、個人の経歴や興味のある分野についての詳細が記載されます。
-          現在は動作確認のためにダミーデータが表示されています。
+          私は記憶力が人一倍悪いです。
+          2桁の足し算ですら、紙に書かないと途中で数字が頭から消えてしまい、無意識に違う数字を思い浮かべてしまうほど記憶力が悪く、暗算が苦手です。
+          英単語も1週間本気でやって7割覚えられれば良い方で、いわゆる暗記科目にはずっと苦労してきました。
+        </p>
+        <p>
+          その代わり、物事の原理や仕組みを理解して、一つの流れとして捉えることには自信があります。
+          中学、高校時代はゲームやラノベにどっぷり浸かり、休日にはスクリーンタイムが17時間を超えることもありました。
+        </p>
+        <p>
+          勉強は全く頭に入らなかったのに、ゲームならなぜか仕様や確率、ダメージ計算式といったシステムは自然と頭に入りますし、ラノベも固有名詞こそ覚えられませんが、読んだことがある作品なら、あらすじを少し聞くだけでどんな話だったかを鮮明に思い浮かべられました。
+        </p>
+        <p>
+          「勉強も、ゲームの仕様や物語の流れと同じように理解して、論理的に捉えれば、暗記に頼らず攻略できるはずだ」。この確信が、私の学習スタイルの原点になっています。
         </p>
 
-        <h2>スキルセット</h2>
-        <p>学んでいる技術スタックの例：</p>
-        <ul>
-          <li>
-            <strong>Frontend:</strong> HTML, CSS, JavaScript
-          </li>
-          <li>
-            <strong>Backend:</strong> Node.js, Python
-          </li>
-          <li><strong>Tools:</strong> Git, VS Code</li>
-        </ul>
-
-        <h2>趣味・関心</h2>
+        <h2 class="text-xl font-bold border-b border-border pb-2 mb-4">東大受験と、物理満点の記録</h2>
         <p>
-          オフの時間は新しい技術の調査や、ゲーム、読書をして過ごしています。
+          この「原理を理解することへの全振り」が最も活きたのが、物理でした。
+          東大模試では常に9割前後を維持し、本番の試験でも物理は満点を取ることができました。
+        </p>
+        <p>
+          これだけ物理ができれば、さすがに東大に受かるだろうと思っていました。しかし、そこに大きな落とし穴がありました。
+          その年の物理が例年よりはるかに簡単だったのです。「物理で差をつけて他をカバーする」という戦略が崩れ、焦りから他科目で自滅してしまいました。
+        </p>
+        <p>
+          今振り返っても、受験はメンタルがすべてだと思います。
+          試験会場には<Word>成績がインフレしている「化け物」</Word>もいますが、真の相手は合格最低点付近にいる層です。
+          どんなハプニング（例えば<Word>化学の試験で古文が出題されるような事態</Word>）が起きても、「自分は他の人とは次元が違うから大丈夫だ」
+          と笑って流せるくらいのメンタルを維持できた人が、合格を掴み取れます。
+          試験本番では、今まで頑張ってきた自分を、最後の一秒まで信じてあげてください。
+        </p>
+
+        <h2 class="text-xl font-bold border-b border-border pb-2 mb-4">このブログの目的</h2>
+        <p>
+          せっかく受験期に極めた物理や数学の知識も、大学に入ると使う機会が減り、少しずつ色褪せてしまいます。それがもったいないと思ったのが、執筆の動機です。
+        </p>
+        <p>
+          教科書はコストの問題があって最低限のことしか書かれず、ネットにある企業による解説は、クレームを避けるために正しいことのみを書いて言葉足らずで分かりにくい、
+          あるいは公式の成立過程を説明せずに、公式だけを与えてよく分からないまま暗記させるものが多いと感じています。
+        </p>
+        <p>
+          このブログでは、私のように暗記が苦手な人に向けて、原理から理解することで覚えることを最小限にし、本質を掴ませることで応用が利くような解説を目指していきます。
         </p>
       </div>
     </div>

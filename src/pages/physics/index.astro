@@ -69,7 +69,7 @@ const groupDescriptions: Record<string, string> = {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               {groupedPosts[group].map(post => (
                 <a href={`/posts/${post.id}/`} class="flex items-start gap-4 p-4 border border-skin-line rounded-lg hover:border-skin-accent transition">
-                  <div class="image-container w-24 h-24 flex-shrink-0 bg-skin-card rounded overflow-hidden">
+                  <div class="image-container w-24 h-24 shrink-0 bg-skin-card rounded overflow-hidden">
                     {post.data.thumbnail ? (
                       <img 
                         src={typeof post.data.thumbnail === 'string' ? post.data.thumbnail : post.data.thumbnail?.src} 
