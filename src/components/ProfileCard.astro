@@ -1,5 +1,6 @@
 ---
 import Socials from "./Socials.astro";
+import profileIcon from "../assets/images/profileicon.png";
 ---
 
 <div
@@ -15,8 +16,8 @@ import Socials from "./Socials.astro";
   <!-- Avatar -->
   <div class="-mt-16 mb-2 rounded-full border-4 border-background bg-muted">
     <img
-      src="https://api.dicebear.com/7.x/notionists/svg?seed=Test&backgroundColor=b6e3f4"
-      alt="Test User Profile"
+      src={profileIcon.src}
+      alt="Liah Profile Icon"
       class="h-32 w-32 rounded-full object-cover"
     />
   </div>
@@ -26,10 +27,11 @@ import Socials from "./Socials.astro";
     <h3 class="text-xl font-bold text-accent">Liah</h3>
 
     <div class="mt-4 flex flex-col items-center space-y-1 text-sm opacity-90">
-      <p>これはテスト用のアカウントです</p>
-      <p>趣味はゲームです</p>
+      <p>情報工学科の大学2年生です。</p>
+      <p>趣味はゲームと読書です。</p>
       <hr class="my-2 w-full border-dashed" />
-      <p class="text-xs">テスト用のタグライン</p>
+      <p class="text-xs">大学での学びや、趣味のプログラミング、</p>
+      <p class="text-xs">ゲームの攻略をメインに発信しています。</p>
     </div>
 
     <!-- Actions -->
