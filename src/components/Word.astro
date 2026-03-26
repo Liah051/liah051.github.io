@@ -1,11 +1,20 @@
 ---
 import { getGlossary } from "@/utils/glossary";
 
+export interface Props {
+  id?: string;
+}
+
+const { id } = Astro.props;
 const termFromSlot = await Astro.slots.render("default");
 const glossaryEntries = await getGlossary();
-const entry = glossaryEntries.find((e) => e.data.term === termFromSlot.trim());
 
-const { description, url } = entry?.data || {};
+const entry = id
+  ? glossaryEntries.find((e) => e.id === id)
+  : glossaryEntries.find((e) => e.data.term === termFromSlot.trim());
+
+const { description, url, image } = entry?.data || {};
+const displayTitle = entry?.data.term || termFromSlot;
 ---
 
 {
@@ -16,16 +25,25 @@ const { description, url } = entry?.data || {};
       </span>
       {/* ツールチップコンテナ：影を一体化するために filter: drop-shadow を使用 */}
       <span class="glossary-tooltip absolute bottom-full mb-3 z-50 pointer-events-none group-hover:pointer-events-auto opacity-0 transition-opacity duration-300 overflow-visible">
-        <span class="glossary-tooltip-box block w-max max-w-[250px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none">
-          <span class="block font-bold mb-1">{termFromSlot}</span>
-          <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
-          {
-            url && url.length > 0 && (
-              <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
-                詳しく見る →
-              </a>
-            )
-          }
+        <span class="glossary-tooltip-box block w-max max-w-[280px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none">
+          <span class="block font-bold mb-2">{displayTitle}</span>
+          <span class="flex gap-3 items-start">
+            {
+              image && (
+                <img src={image} alt={displayTitle} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" />
+              )
+            }
+            <span class="flex-1 min-w-0">
+              <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
+              {
+                url && url.length > 0 && (
+                  <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
+                    詳しく見る →
+                  </a>
+                )
+              }
+            </span>
+          </span>
         </span>
       </span>
     </span>

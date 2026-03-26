@@ -78,7 +78,7 @@ if (targetCategory && group) {
             const hasLink = term.data.url && term.data.url.length > 0;
             return (
               <div class="flex flex-col rounded-lg border border-border p-4 bg-card/50 h-full">
-                <div class="mb-1">
+                <div class="mb-2">
                   {hasLink ? (
                     <a 
                       href={term.data.url} 
@@ -93,7 +93,12 @@ if (targetCategory && group) {
                     <span class="font-bold text-foreground/80">{term.data.term}</span>
                   )}
                 </div>
-                <p class="text-sm text-muted-foreground leading-relaxed">{term.data.description}</p>
+                <div class="flex gap-4 items-start">
+                  {term.data.image && (
+                    <img src={term.data.image} alt={term.data.term} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" />
+                  )}
+                  <p class="flex-1 min-w-0 text-sm text-muted-foreground leading-relaxed">{term.data.description}</p>
+                </div>
               </div>
             );
           })}
