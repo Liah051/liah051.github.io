@@ -35,6 +35,7 @@ const glossary = defineCollection({
     term: z.string(),
     description: z.string(),
     url: z.string().optional(),
+    image: z.string().optional(),
   }),
 });
 
