@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import Datetime from "@/components/Datetime.astro";
+import { SITE } from "@/config";
+
+const logs = await getCollection("logs");
+
+// Sort logs by date in descending order
+const sortedLogs = logs.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<Layout title={`活動記録 | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle="活動記録" pageDesc="日々の活動や更新の記録です。">
+    <ul class="space-y-8">
+      {
+        sortedLogs.map(({ data }) => (
+          <li class="my-6">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <Datetime pubDatetime={data.date} />
+              </div>
+              <h2 class="text-xl font-bold text-accent">
+                {data.title}
+              </h2>
+              {data.description && (
+                <p class="mt-2 text-sm opacity-90 leading-relaxed text-foreground">
+                  {data.description}
+                </p>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </Main>
+  <Footer />
+</Layout>

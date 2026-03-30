@@ -39,4 +39,13 @@ const glossary = defineCollection({
   }),
 });
 
-export const collections = { blog, glossary };
+const logs = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/logs" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    description: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, glossary, logs };

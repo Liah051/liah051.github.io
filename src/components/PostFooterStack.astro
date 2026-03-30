@@ -21,10 +21,11 @@ const targetCategory = category_id?.toLowerCase();
 let uniqueTerms: any[] = [];
 if (terms && terms.length > 0) {
   const allGlossary = await getGlossary();
-  // Use Map for $O(1)$ lookup
-  const glossaryMap = new Map(allGlossary.map(e => [e.data.term, e]));
+  // Use Maps for $O(1)$ lookup
+  const idMap = new Map(allGlossary.map(e => [e.id, e]));
+  const termMap = new Map(allGlossary.map(e => [e.data.term, e]));
   uniqueTerms = terms
-    .map(term => glossaryMap.get(term))
+    .map(term => idMap.get(term) || termMap.get(term))
     .filter(Boolean);
 }
 
