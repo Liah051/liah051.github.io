@@ -1,0 +1,16 @@
+---
+title: ""
+pubDatetime: 
+modDatetime: 
+description: ""
+author: "" # 省略した場合はサイトのデフォルト管理者が設定されます
+featured:  # trueにするとトップページなどで「おすすめ」枠として強調表示されます
+draft:true  # trueにすると下書き扱いになり、本番環境には表示されません
+tags:
+  - ""
+category_id: "" # サイドバーを切り替えるためのID（MobileDrawerやMainLayoutで設定したもの）
+group: "" # 続き物の記事（シリーズ）としてまとめたい場合のグループ名
+order:  # シリーズ内での表示順序（数字が小さいほど先頭）
+---
+
+ここに本文を記述します。

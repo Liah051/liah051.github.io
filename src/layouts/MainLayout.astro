@@ -3,9 +3,7 @@ import Layout from "./Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import ProfileCard from "@/components/ProfileCard.astro";
-import DefaultSidebar from "@/components/sidebars/DefaultSidebar.astro";
-import BlueProtocolSidebar from "@/components/sidebars/BlueProtocol.astro";
-import PhysicsSidebar from "@/components/sidebars/Physics.astro";
+import { SIDEBAR_MAP, DefaultSidebar } from "@/components/sidebars";
 
 export interface Props {
   title?: string;
@@ -22,6 +20,8 @@ export interface Props {
 
 const props = Astro.props;
 const { category_id, isHome } = Astro.props;
+
+const SelectedSidebar = (category_id && SIDEBAR_MAP[category_id]) || DefaultSidebar;
 ---
 
 <Layout {...props}>
@@ -35,18 +35,16 @@ const { category_id, isHome } = Astro.props;
       </main>
 
       <!-- Sidebar -->
-      <aside class={`w-full flex-col gap-6 md:w-[252px] lg:w-[270px] flex-shrink-0 order-2 ${isHome ? "flex" : "hidden md:flex"}`}>
+      <aside class={`w-full flex-col gap-6 md:w-[252px] lg:w-[270px] shrink-0 order-2 ${isHome ? "flex" : "hidden md:flex"}`}>
         <slot name="sidebar">
           {
-            category_id === "blue-protocol" ? (
-              <BlueProtocolSidebar />
-            ) : category_id === "physics" ? (
-              <PhysicsSidebar />
+            (category_id && SIDEBAR_MAP[category_id]) ? (
+              <SelectedSidebar />
             ) : (
               <>
                 {isHome && <ProfileCard />}
                 <div class={isHome ? "hidden md:flex md:flex-col md:gap-6" : "w-full flex flex-col gap-6"}>
-                  { category_id || isHome ? <DefaultSidebar /> : null }
+                  { category_id || isHome ? <SelectedSidebar /> : null }
                 </div>
               </>
             )

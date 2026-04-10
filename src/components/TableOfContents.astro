@@ -38,7 +38,7 @@ const isCollapsible = mode === "collapsible";
               <li class={`ml-${(heading.depth - 2) * 4}`}>
                 <a
                   href={`#${heading.slug}`}
-                  class="text-sm md:text-base text-skin-base dark:text-gray-200 hover:text-accent hover:underline transition-colors"
+                  class="text-sm md:text-base text-foreground hover:text-accent hover:underline transition-colors"
                 >
                   {heading.text}
                 </a>
@@ -55,7 +55,7 @@ const isCollapsible = mode === "collapsible";
             <li class={`ml-${(heading.depth - 2) * 3}`}>
               <a
                 href={`#${heading.slug}`}
-                class="text-sm text-skin-base dark:text-gray-200 hover:text-accent hover:underline transition-colors"
+                class="text-sm text-foreground hover:text-accent hover:underline transition-colors"
               >
                 {heading.text}
               </a>

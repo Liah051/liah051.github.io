@@ -1,0 +1,170 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import Card from "@/components/Card.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { SITE } from "@/config";
+
+const CATEGORIES = [
+  {
+    id: "physics",
+    title: "高校物理",
+    description: "力学から原子物理まで、直感的な理解を助ける解説記事集です。",
+    thumbnail: "/dummy-image.jpg", // 適切なパスに書き換えてください
+    href: "/physics",
+  },
+  /* // 今後カテゴリーを追加する際のテンプレート（コメントアウト状態で残す）:
+  { 
+    id: "math", 
+    title: "数学", 
+    description: "基礎から応用まで。論理の積み重ねを楽しみましょう。", 
+    thumbnail: "/dummy-image.jpg", 
+    href: "/tags/math" 
+  },
+  { 
+    id: "tech", 
+    title: "テック", 
+    description: "プログラミングやIT技術に関する記事です。", 
+    thumbnail: "/dummy-image.jpg", 
+    href: "/tags/tech" 
+  },
+  { 
+    id: "gaming", 
+    title: "ゲーム", 
+    description: "ゲームのプレイ記録やレビューです。", 
+    thumbnail: "/dummy-image.jpg", 
+    href: "/tags/gaming" 
+  },
+  */
+];
+
+// Fetch all posts (excluding drafts)
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+// Get IDs of active categories
+const activeCategoryIds = CATEGORIES.map(c => c.id);
+
+// Filter "Other" posts: posts that don't belong to any active category
+const otherPosts = posts.filter(post => {
+  return (
+    !post.data.category_id || !activeCategoryIds.includes(post.data.category_id)
+  );
+});
+
+// Sort the "Other" posts
+const sortedOtherPosts = getSortedPosts(otherPosts);
+
+// Count posts per category to handle "Coming Soon" state
+const categoryPostCounts = CATEGORIES.reduce(
+  (acc, category) => {
+    acc[category.id] = posts.filter(
+      post => post.data.category_id === category.id
+    ).length;
+    return acc;
+  },
+  {} as Record<string, number>
+);
+---
+
+<Layout title={`Posts | ${SITE.title}`}>
+  <Header />
+  <Main
+    pageTitle="記事一覧"
+    pageDesc="カテゴリーまたは新着順から記事を探せます。"
+  >
+    <!-- カテゴリーセクション -->
+    <section class="mb-14">
+      <h2 class="border-skin-line mb-6 border-b pb-2 text-2xl font-bold">
+        カテゴリーから探す
+      </h2>
+
+      <div class="flex flex-wrap items-start gap-8 sm:gap-10">
+        {
+          CATEGORIES.map(category => {
+            const count = categoryPostCounts[category.id] || 0;
+            const isComingSoon = count === 0;
+
+            if (isComingSoon) {
+              return (
+                <div 
+                  class="group border-skin-line bg-skin-card relative mx-auto flex flex-col overflow-hidden rounded-lg border opacity-70 cursor-not-allowed sm:mx-0"
+                  style="width: 100%; max-width: 260px;"
+                >
+                  <div class="relative flex aspect-video w-full items-center justify-center bg-muted overflow-hidden">
+                    <img
+                      src={category.thumbnail}
+                      alt={category.title}
+                      class="h-full w-full object-cover grayscale"
+                    />
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                      <span class="rounded border border-white px-3 py-1 text-xs font-bold tracking-widest text-white">
+                        COMING SOON
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex flex-1 flex-col p-4">
+                    <h3 class="mb-1.5 text-lg font-bold">{category.title}</h3>
+                    <p class="flex-1 text-xs leading-relaxed opacity-80">
+                      {category.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <a
+                href={category.href}
+                class="group border-skin-line bg-skin-card hover:border-skin-accent relative mx-auto flex flex-col overflow-hidden rounded-lg border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:mx-0"
+                style="width: 100%; max-width: 260px;"
+              >
+                <div class="aspect-video w-full bg-muted overflow-hidden">
+                  <img
+                    src={category.thumbnail}
+                    alt={category.title}
+                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div class="flex flex-1 flex-col p-4">
+                  <h3 class="group-hover:text-skin-accent mb-1.5 text-lg font-bold transition-colors">
+                    {category.title}
+                  </h3>
+                  <p class="flex-1 text-xs leading-relaxed opacity-80">
+                    {category.description}
+                  </p>
+                  <div class="border-skin-line mt-3 flex items-center justify-between border-t pt-3 text-xs opacity-80">
+                    <span>{count} 記事</span>
+                    <span class="transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+
+          })
+        }
+      </div>
+    </section>
+
+    <!-- その他の最新記事セクション -->
+    {
+      sortedOtherPosts.length > 0 && (
+        <section>
+          <h2 class="border-skin-line mb-6 border-b pb-2 text-2xl font-bold">
+            その他の最新記事
+          </h2>
+          <ul>
+            {sortedOtherPosts.map(data => (
+              <Card {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </Main>
+  <Footer />
+</Layout>

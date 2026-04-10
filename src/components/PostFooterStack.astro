@@ -188,11 +188,11 @@ if (targetCategory && group) {
             {currentPosition} / {seriesPosts.length}
           </span>
         </div>
-        <ul class="divide-y divide-border">
+        <ul id="series-progress-list" class="divide-y divide-border max-h-[320px] overflow-y-auto custom-scrollbar">
           {seriesPosts.map((p, index) => {
             const isCurrent = p.id === post.id;
             return (
-              <li class:list={["relative", { "bg-accent/5": isCurrent }]}>
+              <li class:list={["relative series-item", { "bg-accent/5 is-active": isCurrent }]}>
                 <a
                   href={getPath(p.id, p.filePath)}
                   class:list={[
@@ -279,10 +279,37 @@ if (targetCategory && group) {
   .reaction-pop {
     animation: reaction-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
+
+  /* Custom scrollbar for series list */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
 </style>
 
 <script is:inline data-astro-rerun>
   (() => {
+    // Scroll active series item into view within the list
+    const seriesContainer = document.getElementById('series-progress-list');
+    const activeSeriesItem = seriesContainer?.querySelector('.is-active');
+    if (seriesContainer && activeSeriesItem) {
+      const itemTop = activeSeriesItem.offsetTop;
+      const itemHeight = activeSeriesItem.offsetHeight;
+      const containerHeight = seriesContainer.clientHeight;
+      // Subtract header height or offsets if any, here we just center it within the container
+      seriesContainer.scrollTop = itemTop - (containerHeight / 2) + (itemHeight / 2);
+    }
+
     // Guards to prevent errors and ensure idempotency
     const postId = document.body?.dataset.postId || window.location.pathname;
     if (!postId) return;
