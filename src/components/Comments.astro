@@ -9,8 +9,8 @@ const { id, url, title } = Astro.props;
 ---
 
 <div class="mt-8 pt-8 border-t border-border w-full overflow-visible">
-  <h2 class="text-2xl font-semibold mb-6 text-skin-accent">コメント</h2>
-  <p class="text-xs text-skin-muted mb-4 flex items-center gap-2">
+  <h2 class="text-2xl font-semibold mb-6 text-accent">コメント</h2>
+  <p class="text-xs text-foreground/70 mb-4 flex items-center gap-2">
     メールアドレスが公開されることはありません。
   </p>
   
@@ -24,7 +24,7 @@ const { id, url, title } = Astro.props;
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-1">
-        <label for="comment-author" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+        <label for="comment-author" class="text-sm font-semibold text-foreground flex items-center gap-2">
           名前 <span class="required">必須</span>
         </label>
         <input 
@@ -32,20 +32,20 @@ const { id, url, title } = Astro.props;
           id="comment-author" 
           name="author" 
           required 
-          class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+          class="w-full bg-muted/50 border border-border rounded px-4 py-2 text-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           placeholder="名無し"
           autocomplete="name"
         />
       </div>
       <div class="space-y-1">
-        <label for="comment-email" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+        <label for="comment-email" class="text-sm font-semibold text-foreground flex items-center gap-2">
           メールアドレス <span class="private">非公開</span>
         </label>
         <input 
           type="email" 
           id="comment-email" 
           name="email" 
-          class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+          class="w-full bg-muted/50 border border-border rounded px-4 py-2 text-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           placeholder="email@example.com"
           autocomplete="email"
         />
@@ -53,7 +53,7 @@ const { id, url, title } = Astro.props;
     </div>
     
     <div class="space-y-1">
-      <label for="comment-content" class="text-sm font-semibold text-skin-base flex items-center gap-2">
+      <label for="comment-content" class="text-sm font-semibold text-foreground flex items-center gap-2">
         コメント <span class="required">必須</span>
       </label>
       <textarea 
@@ -61,7 +61,7 @@ const { id, url, title } = Astro.props;
         name="content" 
         required 
         rows="4" 
-        class="w-full bg-skin-fill border border-border rounded px-4 py-2 text-skin-base focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
+        class="w-full bg-muted/50 border border-border rounded px-4 py-2 text-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-y"
         placeholder="コメントを入力..."
         autocomplete="off"
       ></textarea>
@@ -79,7 +79,7 @@ const { id, url, title } = Astro.props;
   </form>
 
   <div id="comment-list" class="space-y-6">
-    <div class="text-center text-skin-muted py-4">コメントを読み込み中...</div>
+    <div class="text-center text-foreground/70 py-4">コメントを読み込み中...</div>
   </div>
 </div>
 
@@ -134,12 +134,12 @@ const { id, url, title } = Astro.props;
       const date = formatDate(comment.createdAt || new Date().toISOString());
 
       return `
-        <div class="p-5 border border-border rounded-lg bg-skin-fill/50 transition-colors">
+        <div class="p-5 border border-border rounded-lg bg-muted/25 transition-colors">
           <div class="flex items-center justify-between mb-3">
-            <div class="font-semibold text-skin-base">${author}</div>
-            <div class="text-sm text-skin-muted">${date}</div>
+            <div class="font-semibold text-foreground">${author}</div>
+            <div class="text-sm text-foreground/70">${date}</div>
           </div>
-          <div class="app-prose text-base leading-relaxed break-words mt-2 text-skin-base dark:text-gray-200">
+          <div class="app-prose text-base leading-relaxed break-words mt-2 text-foreground">
             ${contentHtml}
           </div>
         </div>
@@ -148,7 +148,7 @@ const { id, url, title } = Astro.props;
 
     const buildThread = (comments: any) => {
       if (!comments || !Array.isArray(comments) || comments.length === 0) {
-        return '<div class="text-center text-skin-muted py-4">コメントはまだありません。</div>';
+        return '<div class="text-center text-foreground/70 py-4">コメントはまだありません。</div>';
       }
       return comments.map(renderComment).join('');
     };

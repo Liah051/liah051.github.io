@@ -1,0 +1,29 @@
+■ サイドバーの追加手順（一括管理方式）
+
+新しくカテゴリ専用のサイドバーを追加する場合、以下の手順で作業を行ってください。
+サイドバーの管理は `src/components/sidebars/index.ts` で一括して行っています。
+
+1. サイドバー用コンポーネントの作成
+   場所: src/components/sidebars/
+   作成例: `NewCategorySidebar.astro` のようなファイル名で、サイドバーのレイアウトを作成します（既存の `Physics.astro` などを参考にしてください）。
+
+2. index.ts への登録
+   ファイル: src/components/sidebars/index.ts
+   このファイルを開き、以下の2ステップで登録します。
+
+   - 先頭で作成したコンポーネントをインポートします
+     `import NewCategorySidebar from "./NewCategorySidebar.astro";`
+   
+   - `SIDEBAR_MAP` の連想配列に、`category_id` をキーにしてコンポーネントを追加します
+     例:
+     ```ts
+     export const SIDEBAR_MAP: Record<string, any> = {
+       physics: PhysicsSidebar,
+       "new-category": NewCategorySidebar, // <- 追加
+     };
+     ```
+
+上記の2ステップのみで完了します！
+各レイアウトファイル（`MobileDrawer.astro`, `MainLayout.astro`, `PostDetails.astro`）は、この `index.ts` から `SIDEBAR_MAP` を自動的にインポートしているため、個別のファイルを編集する必要はありません。
+
+登録がない場合、または `category_id` がマッチしない場合は、自動的に `DefaultSidebar` が表示されます。

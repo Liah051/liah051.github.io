@@ -10,7 +10,7 @@ import { SITE } from "@/config";
 const logs = await getCollection("logs");
 
 // Sort logs by date in descending order
-const sortedLogs = logs.sort(
+const sortedLogs = [...logs].sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 ---

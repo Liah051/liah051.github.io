@@ -9,11 +9,9 @@ import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
-import DefaultSidebar from "@/components/sidebars/DefaultSidebar.astro";
-import BlueProtocolSidebar from "@/components/sidebars/BlueProtocol.astro";
+import { SIDEBAR_MAP, DefaultSidebar } from "@/components/sidebars";
 import Comments from "@/components/Comments.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
-import PhysicsSidebar from "@/components/sidebars/PhysicsSidebar.astro";
 import Word from "@/components/Word.astro";
 import PostFooterStack from "@/components/PostFooterStack.astro";
 
@@ -66,6 +64,8 @@ if (!ogImageUrl && SITE.dynamicOgImage) {
 const ogImage = ogImageUrl
   ? new URL(ogImageUrl, Astro.url.origin).href
   : undefined;
+
+const SelectedSidebar = (category_id && SIDEBAR_MAP[category_id]) || DefaultSidebar;
 
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
@@ -159,15 +159,7 @@ const layoutProps = {
         class="hidden md:flex w-full flex-col gap-6 pb-8 md:order-last md:pb-0 md:w-[252px] lg:w-[270px] shrink-0"
 
       >
-        {
-          category_id === "blue-protocol" ? (
-            <BlueProtocolSidebar />
-          ) : category_id === "physics" ? (
-            <PhysicsSidebar />
-          ) : (
-            <DefaultSidebar />
-          )
-        }
+        <SelectedSidebar />
 
         <!-- Table of Contents -->
         <TableOfContents headings={headings} mode="sticky" />
