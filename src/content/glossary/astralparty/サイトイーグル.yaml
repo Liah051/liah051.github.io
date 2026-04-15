@@ -1,0 +1,8 @@
+﻿term: "イーグルアイ"
+description: |
+  攻撃時、目標に<StatusIcon name="Mark"/>を1つ付与し、攻撃目標の<StatusIcon name="Mark"/>スタック数の2倍分、攻撃力が上昇。
+url: ""
+image:
+  type: "chip"
+  item: "サイト"
+  rarity: "金"

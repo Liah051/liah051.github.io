@@ -1,0 +1,8 @@
+﻿term: "トンポーロウ"
+description: |
+  ターン終了時、周囲4マス以内の全員の<StatusIcon name="Heal"/>スタック+1、HP+1。
+url: ""
+image:
+  type: "chip"
+  item: "トンポー"
+  rarity: "金"

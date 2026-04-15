@@ -1,0 +1,8 @@
+﻿term: "魔法の矢袋"
+description: |
+  <StatusIcon name="Mark"/>されたモンスターに対してカードを使用した場合、使用したカードを手札に戻し、目標のモンスターに<StatusIcon name="Mark"/>を1つ付与。(1ターンに1度のみ)
+url: ""
+image:
+  type: "chip"
+  item: "矢袋"
+  rarity: "紫"

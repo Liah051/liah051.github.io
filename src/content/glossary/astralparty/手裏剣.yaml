@@ -1,0 +1,8 @@
+﻿term: "忍術手裏剣"
+description: |
+  カード使用数+1、ダメージ系効果カードを使用した場合、目標モンスターに<StatusIcon name="Mark"/>スタック数と同じ数のダメージを追加で与える。
+url: ""
+image:
+  type: "chip"
+  item: "手裏剣"
+  rarity: "金"

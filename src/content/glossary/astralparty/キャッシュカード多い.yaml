@@ -1,0 +1,8 @@
+﻿term: "キャッシュカード-残高多い"
+description: |
+  <StatusIcon name="Starlight"/>スタック+7。
+url: ""
+image:
+  type: "chip"
+  item: "キャッシュカード"
+  rarity: "紫"

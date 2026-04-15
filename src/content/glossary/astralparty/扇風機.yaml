@@ -1,0 +1,8 @@
+﻿term: "手持ち扇風機-小"
+description: |
+  スキル使用後、6マス以内のモンスターに<StatusIcon name="Mark"/>を1つ付与。
+url: ""
+image:
+  type: "chip"
+  item: "扇風機"
+  rarity: "青"

@@ -5,6 +5,7 @@ import { getPath } from "@/utils/getPath";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { Lightbulb, ThumbsUp, Frown, ExternalLink } from "@lucide/astro";
+import GlossaryDescription from "./GlossaryDescription.astro";
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -98,7 +99,7 @@ if (targetCategory && group) {
                   {term.data.image && (
                     <img src={term.data.image} alt={term.data.term} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" />
                   )}
-                  <p class="flex-1 min-w-0 text-sm text-muted-foreground leading-relaxed">{term.data.description}</p>
+                  <p class="flex-1 min-w-0 text-sm text-muted-foreground leading-relaxed"><GlossaryDescription text={term.data.description} /></p>
                 </div>
               </div>
             );

@@ -1,0 +1,8 @@
+﻿term: "キャッシュカード-アンリミテッド"
+description: |
+  <StatusIcon name="Starlight"/>スタック+3、全キャラクターのラウンドボーナス+3。
+url: ""
+image:
+  type: "chip"
+  item: "キャッシュカード"
+  rarity: "金"

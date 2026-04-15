@@ -1,0 +1,7 @@
+﻿term: "鯉のぬいぐるみ"
+description: "スキル使用後、反撃を1スタック得る。反撃時、攻撃力+1、防御力+1。"
+url: ""
+image:
+  type: "chip"
+  item: "鯉ぬい"
+  rarity: "紫"

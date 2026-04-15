@@ -1,0 +1,8 @@
+﻿term: "スターコインハンマー"
+description: |
+  <StatusIcon name="Starlight"/>スタック+5、<StatusIcon name="Starlight"/>スタックが10以上なら、攻撃時にスターコインの数の30%分、攻撃力が上昇し、スターコインを6消費する。
+url: ""
+image:
+  type: "chip"
+  item: "スタハン"
+  rarity: "金"

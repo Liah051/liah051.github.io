@@ -1,0 +1,116 @@
+---
+import { Image } from "astro:assets";
+
+export interface Props {
+  item: string;
+  rarity?: string;
+  size?: number | string;
+}
+
+const { item, rarity = "金", size = 64 } = Astro.props;
+
+// 動的インポート
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/images/astralparty/chips/**/*.{png,jpg,jpeg,webp}",
+  { eager: true }
+);
+
+const bgPath = `/src/assets/images/astralparty/chips/bg/${rarity}背景.png`;
+const fgPath = `/src/assets/images/astralparty/chips/icon/${item}.png`;
+
+const bgImage = images[bgPath]?.default;
+const fgImage = images[fgPath]?.default;
+
+const chipWidth =
+  typeof size === "number" ? size : bgImage ? bgImage.width : 64;
+const chipHeight =
+  typeof size === "number" ? size : bgImage ? bgImage.height : 64;
+---
+
+<span
+  class="aspa-chip-container"
+  style={`width: ${typeof size === "number" ? size + "px" : size || "64px"}; height: ${typeof size === "number" ? size + "px" : size || "64px"};`}
+>
+  {
+    bgImage ? (
+      <Image
+        src={bgImage}
+        alt={`背景: ${rarity}`}
+        width={chipWidth}
+        height={chipHeight}
+        class="chip-bg"
+      />
+    ) : (
+      <div class="chip-bg-placeholder" />
+    )
+  }
+  {
+    fgImage && (
+      <Image
+        src={fgImage}
+        alt={item}
+        width={chipWidth}
+        height={chipHeight}
+        class="chip-fg"
+      />
+    )
+  }
+</span>
+
+<style>
+  .aspa-chip-container {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    box-sizing: border-box;
+  }
+  .chip-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+  .chip-fg {
+    position: absolute;
+    top: 7%;
+    left: 7%;
+    width: 86%;
+    height: 86%;
+    object-fit: contain;
+    display: block !important;
+    pointer-events: none; /* 長押しなどの判定を背景に透過させる */
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+  .chip-bg-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-muted, #e6e6e6);
+    border-radius: 4px;
+    opacity: 0.5;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+</style>

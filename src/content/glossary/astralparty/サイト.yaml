@@ -1,0 +1,8 @@
+﻿term: "スタンダードサイト"
+description: |
+  攻撃力+2。攻撃時、目標に<StatusIcon name="Mark"/>を1つ付与。 
+url: ""
+image:
+  type: "chip"
+  item: "サイト"
+  rarity: "紫"

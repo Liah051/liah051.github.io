@@ -1,0 +1,7 @@
+﻿term: "会員推薦状"
+description: "ラウンドボーナスカード数+1。"
+url: ""
+image:
+  type: "chip"
+  item: "会員カード"
+  rarity: "青"

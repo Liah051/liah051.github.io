@@ -1,5 +1,7 @@
 ---
 import { getGlossary } from "@/utils/glossary";
+import SmartImage from "./SmartImage.astro";
+import GlossaryDescription from "./GlossaryDescription.astro";
 
 export interface Props {
   id?: string;
@@ -19,22 +21,29 @@ const displayTitle = entry?.data.term || termFromSlot;
 
 {
   entry ? (
-    <span class="glossary-word-container relative inline-block group cursor-help transition-all duration-300">
+    <span class="glossary-word-container relative inline group cursor-help transition-all duration-300">
       <span class="glossary-word transition-colors group-hover:text-accent">
         <slot />
       </span>
       {/* ツールチップコンテナ：影を一体化するために filter: drop-shadow を使用 */}
       <span class="glossary-tooltip absolute bottom-full mb-3 z-50 pointer-events-none group-hover:pointer-events-auto opacity-0 transition-opacity duration-300 overflow-visible">
-        <span class="glossary-tooltip-box block w-max max-w-[280px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none">
+        <span class="glossary-tooltip-box inline-block w-max max-w-[280px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none overflow-hidden">
           <span class="block font-bold mb-2">{displayTitle}</span>
-          <span class="flex gap-3 items-start">
+          <span class="flex gap-3 items-center" style="display: flex;">
             {
               image && (
-                <img src={image} alt={displayTitle} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" />
+                <SmartImage 
+                  image={image} 
+                  alt={displayTitle} 
+                  class={typeof image === 'object' && 'type' in image && image.type === 'chip' 
+                    ? "shrink-0" 
+                    : "shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted overflow-hidden"} 
+                  size={64} 
+                />
               )
             }
             <span class="flex-1 min-w-0">
-              <span class="block mb-2 text-muted-foreground leading-relaxed">{description}</span>
+              <span class="block mb-2 text-muted-foreground leading-relaxed"><GlossaryDescription text={description || ""} /></span>
               {
                 url && url.length > 0 && (
                   <a href={url} class="text-accent hover:underline flex items-center gap-1 font-medium">
@@ -143,6 +152,10 @@ const displayTitle = entry?.data.term || termFromSlot;
     visibility: visible;
     transition: opacity 0.2s;
     transition-delay: 0s;
+    /* absoluteな位置関係を維持 */
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
   }
 
   /* ツールチップへの架け橋 */

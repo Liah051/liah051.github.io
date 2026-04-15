@@ -1,0 +1,8 @@
+﻿term: "バッファーシールド"
+description: |
+  攻撃を受けるたびに<StatusIcon name="Heal"/>スタック+2、スターコイン+3。
+url: ""
+image:
+  type: "chip"
+  item: "バフシ"
+  rarity: "青"

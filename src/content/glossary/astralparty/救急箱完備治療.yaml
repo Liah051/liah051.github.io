@@ -1,0 +1,8 @@
+﻿term: "救急箱-完備治療"
+description: |
+  ターン開始時、<StatusIcon name="Heal"/>スタック+3。
+url: ""
+image:
+  type: "chip"
+  item: "救急箱"
+  rarity: "金"

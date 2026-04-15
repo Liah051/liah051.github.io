@@ -1,0 +1,7 @@
+﻿term: "サンドクッキー-ウマすぎ"
+description: "HP上限+5、ターン開始時、HPが半分以下の場合、反撃を1スタック得る。"
+url: ""
+image:
+  type: "chip"
+  item: "クッキー"
+  rarity: "金"

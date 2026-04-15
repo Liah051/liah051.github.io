@@ -1,0 +1,8 @@
+term: "カッターナイフ-シャープ"
+description: |
+  HPが満タンの時、攻撃力+4、攻撃時に<StatusIcon name="Heal"/>スタック数と同じ数だけ攻撃力が上昇。
+url: ""
+image:
+  type: "chip"
+  item: "カッターナイフ"
+  rarity: "金"

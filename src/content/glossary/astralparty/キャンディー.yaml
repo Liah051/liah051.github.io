@@ -1,0 +1,8 @@
+﻿term: "おいしいキャンディー"
+description: |
+  カードを出すたびに<StatusIcon name="Heal"\>+1。カードを出す直前にHPが満タンの場合、<StatusIcon name="Heal"\>スタック数-4、カード使用数+1。
+url: ""
+image:
+  type: "chip"
+  item: "キャンディー"
+  rarity: "紫"

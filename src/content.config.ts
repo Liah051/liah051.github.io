@@ -16,7 +16,7 @@ const blog = defineCollection({
       draft: z.boolean().optional(),
       tags: z.array(z.string()).default(["others"]),
       ogImage: image().or(z.string()).optional(),
-      thumbnail: image().or(z.string()).optional(),
+      thumbnail: image().or(z.string()).or(z.object({ type: z.string(), item: z.string(), rarity: z.string().optional() })).optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
       hideEditPost: z.boolean().optional(),
@@ -35,7 +35,7 @@ const glossary = defineCollection({
     term: z.string(),
     description: z.string(),
     url: z.string().optional(),
-    image: z.string().optional(),
+    image: z.string().or(z.object({ type: z.string(), item: z.string(), rarity: z.string().optional() })).optional(),
   }),
 });
 

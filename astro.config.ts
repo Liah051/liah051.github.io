@@ -2,6 +2,8 @@ import { defineConfig, envField, fontProviders } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
+import d2 from 'astro-d2';
+
 
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
@@ -23,6 +25,16 @@ export default defineConfig({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
     }),
     mdx(),
+    d2({
+      theme: {
+        default: '0',    // 明るいテーマ
+        dark: '200',     // ダークモード用テーマ
+      },
+      inline: true,      // SVGをHTMLに直接埋め込む
+      experimental: {
+        useD2js: true,    // WASM版のD2を使用（アダプティブ・ダークモードに対応）
+      },
+    }),
   ],
   markdown: {
     remarkPlugins: [
