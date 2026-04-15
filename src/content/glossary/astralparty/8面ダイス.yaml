@@ -1,0 +1,8 @@
+term: "8面ダイス"
+description: |
+  ダイスの出目が8の場合、スターコイン+8。累計移動距離が8につき、<StatusIcon name="Starlight"/>スタック+1。
+url: ""
+image:
+  type: "chip"
+  item: "8面ダイス"
+  rarity: "青"

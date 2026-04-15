@@ -1,0 +1,8 @@
+﻿term: "ビタミン剤"
+description: |
+  カードを獲得するたびに<StatusIcon name="Heal"/>スタック+1。
+url: ""
+image:
+  type: "chip"
+  item: "眠剤"
+  rarity: "紫"

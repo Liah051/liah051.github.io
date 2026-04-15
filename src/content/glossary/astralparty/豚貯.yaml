@@ -1,0 +1,7 @@
+﻿term: "豚の貯金箱"
+description: "効果カードを2枚使うごとに、スターコイン+3。"
+url: ""
+image:
+  type: "chip"
+  item: "豚貯"
+  rarity: "青"

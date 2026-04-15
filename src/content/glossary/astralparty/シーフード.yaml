@@ -1,0 +1,7 @@
+﻿term: "シーフードスープ"
+description: "戦闘中のダイスも出目は1か6になる。"
+url: ""
+image:
+  type: "chip"
+  item: "シーフード"
+  rarity: "青"

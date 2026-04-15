@@ -1,0 +1,7 @@
+﻿term: "荒波の御守り"
+description: "効果カード使用時、1ダメージを受ける。カードを獲得時、HPを1回復する。"
+url: ""
+image:
+  type: "chip"
+  item: "御守り"
+  rarity: "青"

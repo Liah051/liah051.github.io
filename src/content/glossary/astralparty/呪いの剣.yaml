@@ -1,0 +1,7 @@
+﻿term: "呪いの剣"
+description: "ターン開始時に青き呪いを得る。モンスターを撃破するたびに、攻撃力+1。"
+url: ""
+image:
+  type: "chip"
+  item: "呪いの剣"
+  rarity: "青"

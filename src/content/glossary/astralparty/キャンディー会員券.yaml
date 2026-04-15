@@ -1,0 +1,7 @@
+﻿term: "キャンディー会員証"
+description: "奇怪飴カードの値段を3コインにする。奇怪飴カードを使用時、CT-1。"
+url: ""
+image:
+  type: "chip"
+  item: "キャンディー会員証"
+  rarity: "金"

@@ -1,0 +1,7 @@
+﻿term: "蛇のぬいぐるみ"
+description: "ダメージを受けるとき、このターンで受けるダメージ-2、攻撃力+2。"
+url: ""
+image:
+  type: "chip"
+  item: "蛇ぬい"
+  rarity: "紫"

@@ -1,0 +1,7 @@
+﻿term: "無限の蛇"
+description: "ターン開始時、手札が8枚になるまでドローする。カード使用数+1。"
+url: ""
+image:
+  type: "chip"
+  item: "無限の蛇"
+  rarity: "金"

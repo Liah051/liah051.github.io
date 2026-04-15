@@ -1,0 +1,38 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import AspaChip from "./AspaChip.astro";
+
+export interface Props {
+  image: string | { type: string; item: string; rarity?: string } | ImageMetadata | undefined;
+  alt?: string;
+  size?: number | string;
+  class?: string;
+}
+
+const { image, alt = "", size, class: className } = Astro.props;
+
+let imgType: "string" | "chip" | "metadata" | "none" = "none";
+
+if (typeof image === "string") {
+  imgType = "string";
+} else if (image && typeof image === "object") {
+  if ("type" in image && (image as any).type === "chip") {
+    imgType = "chip";
+  } else if ("src" in image) {
+    imgType = "metadata";
+  }
+}
+---
+
+{
+  imgType === "chip" ? (
+    <span class={className ? `${className} inline-flex items-center justify-center` : "inline-flex items-center justify-center"} style={size ? `width: ${typeof size === 'number' ? size + 'px' : size}; height: ${typeof size === 'number' ? size + 'px' : size}; margin: 0 !important; padding: 0 !important; line-height: 0; box-sizing: border-box;` : "margin: 0 !important; padding: 0 !important; line-height: 0; box-sizing: border-box;"}>
+      <AspaChip item={(image as any).item} rarity={(image as any).rarity} size={size} />
+    </span>
+  ) : imgType === "metadata" ? (
+    <Image src={image as ImageMetadata} alt={alt} width={(image as ImageMetadata).width} height={(image as ImageMetadata).height} class={className} />
+  ) : imgType === "string" ? (
+    <img src={image as string} alt={alt} class={className} width={size} height={size} loading="lazy" />
+  ) : null
+}

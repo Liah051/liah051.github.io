@@ -1,0 +1,7 @@
+﻿term: "スマートウォッチ"
+description: "ターン終了時、手札が5枚未満ならカードを1枚得る。"
+url: ""
+image:
+  type: "chip"
+  item: "スマートウォッチ"
+  rarity: "紫"

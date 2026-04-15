@@ -1,0 +1,8 @@
+﻿term: "友情バッジ"
+description: |
+  味方に治癒や振り込みを行った際に、自身と相手の<StatusIcon name="Heal"/>スタック+2。
+url: ""
+image:
+  type: "chip"
+  item: "バッジ"
+  rarity: "紫"

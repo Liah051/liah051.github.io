@@ -1,0 +1,8 @@
+﻿term: "標的"
+description: |
+  攻撃力+1、ターン開始時、4マス以内の行動順が一番早いモンスターに<StatusIcon name="Mark"/>を1つ付与。
+url: ""
+image:
+  type: "chip"
+  item: "標的"
+  rarity: "青"

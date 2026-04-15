@@ -1,0 +1,8 @@
+﻿term: "スプレー缶"
+description: |
+  効果カードでモンスターにダメージを与えた後、目標モンスターに<StatusIcon name="Mark"/>を1つ付与。
+url: ""
+image:
+  type: "chip"
+  item: "スプレー"
+  rarity: "青"

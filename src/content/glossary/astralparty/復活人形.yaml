@@ -1,0 +1,7 @@
+﻿term: "復活人形"
+description: "撃破された後、進捗バーへの影響をなくし、攻撃力、防御力、最大HP+1。"
+url: ""
+image:
+  type: "chip"
+  item: "復活人形"
+  rarity: "紫"

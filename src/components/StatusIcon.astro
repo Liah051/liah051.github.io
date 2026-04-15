@@ -1,0 +1,40 @@
+---
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  name: string;
+  alt?: string;
+}
+
+const { name, alt = "" } = Astro.props;
+
+// 動的に画像をインポート
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/astralparty/status/*.{png,webp}');
+
+// 指定された名前に一致する画像パスを検索
+let imagePath = Object.keys(images).find((path) => {
+  const fileName = path.split('/').pop();
+  return fileName === `${name}.png` || fileName === `${name}.webp`;
+});
+
+if (!imagePath) {
+  throw new Error(`Status icon "${name}" not found. Please check if the file exists in src/assets/images/astralparty/status/`);
+}
+
+const imageModule = await images[imagePath]();
+const image = imageModule.default;
+---
+
+<img src={image.src} alt={alt || name} class="status-icon" /><style>
+  .status-icon {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -0.25em;
+    margin: 0 !important;
+    object-fit: contain;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+</style>

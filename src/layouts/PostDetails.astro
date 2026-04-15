@@ -13,6 +13,8 @@ import { SIDEBAR_MAP, DefaultSidebar } from "@/components/sidebars";
 import Comments from "@/components/Comments.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
 import Word from "@/components/Word.astro";
+import StatusIcon from "@/components/StatusIcon.astro";
+import AspaChip from "@/components/AspaChip.astro";
 import PostFooterStack from "@/components/PostFooterStack.astro";
 
 
@@ -124,7 +126,7 @@ const layoutProps = {
           id="article"
           class="app-prose w-full prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
         >
-          <Content components={{ Word }} />
+          <Content components={{ Word, StatusIcon, AspaChip }} />
 
         </article>
 

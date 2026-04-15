@@ -1,0 +1,8 @@
+﻿term: "懐中電灯-強光"
+description: |
+  戦闘でモンスターにヒットするたびに、<StatusIcon name="Starlight"/>スタック+1。
+url: ""
+image:
+  type: "chip"
+  item: "懐中電灯"
+  rarity: "紫"

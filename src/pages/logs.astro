@@ -26,11 +26,9 @@ const sortedLogs = [...logs].sort(
               <div class="flex items-center gap-2">
                 <Datetime pubDatetime={data.date} />
               </div>
-              <h2 class="text-xl font-bold text-accent">
-                {data.title}
-              </h2>
+              <h2 class="text-xl font-bold text-accent">{data.title}</h2>
               {data.description && (
-                <p class="mt-2 text-sm opacity-90 leading-relaxed text-foreground">
+                <p class="mt-2 text-sm leading-relaxed text-foreground opacity-90 whitespace-pre-wrap">
                   {data.description}
                 </p>
               )}

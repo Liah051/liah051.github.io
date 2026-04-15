@@ -1,0 +1,7 @@
+﻿term: "マジックトーム"
+description: "カードを3枚使うごとに、その3枚目に使ったカードを手札に加える。"
+url: ""
+image:
+  type: "chip"
+  item: "トーム"
+  rarity: "紫"

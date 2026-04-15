@@ -5,6 +5,7 @@ import { slugifyStr } from "@/utils/slugify";
 import { getPath } from "@/utils/getPath";
 import Datetime from "./Datetime.astro";
 import type { ImageMetadata } from "astro";
+import SmartImage from "./SmartImage.astro";
 
 type Props = {
   variant?: "h2" | "h3";
@@ -14,17 +15,7 @@ const { variant: Heading = "h2", id, data, filePath } = Astro.props;
 
 const { title, description, thumbnail, ...props } = data;
 
-// Handle thumbnail resolution
-let thumbnailUrl: string | undefined;
-let isRemoteImage = false;
-
-if (typeof thumbnail === "string") {
-  thumbnailUrl = thumbnail;
-  isRemoteImage = true;
-} else if (thumbnail?.src) {
-  thumbnailUrl = thumbnail.src;
-  isRemoteImage = false;
-}
+// Handled by SmartImage component
 
 // Fallback image if no thumbnail
 const defaultThumbnail = "https://images.unsplash.com/photo-1499781366052-3569173a1b5d?q=80&w=1080&auto=format&fit=crop"; 
@@ -33,22 +24,12 @@ const defaultThumbnail = "https://images.unsplash.com/photo-1499781366052-356917
 <li class="my-6">
   <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start group">
     <a href={getPath(id, filePath)} class="shrink-0 w-full sm:w-48 h-32 sm:h-32 overflow-hidden rounded-lg bg-muted block">
-      {thumbnail && !isRemoteImage ? (
-        <Image 
-          src={thumbnail as ImageMetadata} 
-          alt={title} 
-          width={400} 
-          height={300} 
-          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-        />
-      ) : (
-        <img 
-          src={thumbnailUrl || defaultThumbnail} 
-          alt={title} 
-          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 bg-muted" 
-          loading="lazy"
-        />
-      )}
+      <SmartImage 
+        image={thumbnail || defaultThumbnail} 
+        alt={title} 
+        size={"100%"}
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 bg-muted" 
+      />
     </a>
     
     <div class="flex-1 min-w-0 pt-1">

@@ -202,5 +202,30 @@ const structuredData = {
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
+    <script is:inline>
+      function patchD2Themes() {
+        const d2Svgs = Array.from(document.querySelectorAll("svg")).filter(
+          svg => svg.hasAttribute("d2version") || svg.innerHTML.includes("d2-")
+        );
+        
+        d2Svgs.forEach(svg => {
+          const styles = svg.querySelectorAll("style");
+          if (styles.length === 0) return;
+          
+          const mediaQueryRegex = /@media[^{]*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/g;
+          
+          styles.forEach(style => {
+            if (mediaQueryRegex.test(style.textContent)) {
+              style.textContent = style.textContent.replace(
+                mediaQueryRegex,
+                'html[data-theme="dark"]'
+              );
+            }
+          });
+        });
+      }
+      patchD2Themes();
+      document.addEventListener("astro:after-swap", patchD2Themes);
+    </script>
   </body>
 </html>

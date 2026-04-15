@@ -1,0 +1,8 @@
+﻿term: "懐中電灯-爆閃"
+description: |
+  モンスターを攻撃時コイン+1、<StatusIcon name="Starlight"/>スタック3つごとに攻撃力+1。
+url: ""
+image:
+  type: "chip"
+  item: "懐中電灯"
+  rarity: "金"

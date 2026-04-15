@@ -1,0 +1,39 @@
+---
+import StatusIcon from "./StatusIcon.astro";
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+
+// <StatusIcon name="..."/> パターンを解析して、テキストとコンポーネントに分割する
+const STATUS_ICON_REGEX = /<StatusIcon\s+name="([^"]+)"\s*\/>/g;
+
+type Segment = { type: "text"; value: string } | { type: "icon"; name: string };
+
+const segments: Segment[] = [];
+let lastIndex = 0;
+let match: RegExpExecArray | null;
+
+while ((match = STATUS_ICON_REGEX.exec(text)) !== null) {
+  // マッチ前のテキスト部分を追加
+  if (match.index > lastIndex) {
+    segments.push({ type: "text", value: text.slice(lastIndex, match.index) });
+  }
+  // StatusIcon コンポーネントを追加
+  segments.push({ type: "icon", name: match[1] });
+  lastIndex = match.index + match[0].length;
+}
+
+// 残りのテキストを追加
+if (lastIndex < text.length) {
+  segments.push({ type: "text", value: text.slice(lastIndex) });
+}
+---
+
+{segments.map(seg =>
+  seg.type === "icon"
+    ? <StatusIcon name={seg.name} />
+    : <Fragment set:html={seg.value} />
+)}

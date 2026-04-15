@@ -1,0 +1,7 @@
+﻿term: "タイマー"
+description: "改造を得る時、追加で1スタック獲得する。改造スタック2つにつき、攻撃力+1。"
+url: ""
+image:
+  type: "chip"
+  item: "タイマー"
+  rarity: "青"
