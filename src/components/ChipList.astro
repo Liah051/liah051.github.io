@@ -1,0 +1,629 @@
+---
+import { getCollection, render } from "astro:content";
+import SmartImage from "@/components/SmartImage.astro";
+import GlossaryDescription from "@/components/GlossaryDescription.astro";
+import Word from "@/components/Word.astro";
+import InlineImage from "@/components/InlineImage.astro";
+import Text from "@/components/Text.astro";
+
+// 1. 全 glossary エントリーの取得
+const allGlossary = await getCollection("glossary");
+
+// 2. astralparty/chips/ で始まるエントリーのみフィルタリング
+const apEntries = allGlossary.filter(entry => entry.id.startsWith("astralparty/chips/"));
+
+// 3. 各エントリーを並列で render 処理し、表示用データを構築
+const chips = await Promise.all(
+  apEntries.map(async (entry) => {
+    let ContentComponent = null;
+    try {
+      const rendered = await render(entry);
+      ContentComponent = rendered.Content;
+    } catch (e) {
+      console.warn(`Failed to render entry ${entry.id}:`, e);
+    }
+
+    // 属性の判別ロジック
+    let element = "無属性";
+    const desc = entry.data.description || "";
+    if (desc.includes('name="Starlight"') || desc.includes('alt="スターライト"')) {
+      element = "スターライト";
+    } else if (desc.includes('name="Mark"') || desc.includes('alt="マーク"')) {
+      element = "マーク";
+    } else if (desc.includes('name="Heal"') || desc.includes('alt="ヒール"')) {
+      element = "ヒール";
+    }
+
+    // レア度の取得
+    let rarity = "無";
+    if (
+      entry.data.image &&
+      typeof entry.data.image === "object" &&
+      "rarity" in entry.data.image
+    ) {
+      rarity = entry.data.image.rarity || "無";
+    }
+
+    return {
+      entry,
+      Content: ContentComponent,
+      element,
+      rarity,
+      map: entry.data.map || "共通",
+    };
+  })
+);
+
+// 4. レア度順でソート
+const rarityOrder: Record<string, number> = { "金": 3, "紫": 2, "青": 1, "無": 0 };
+const sortedChips = [...chips].sort((a, b) => {
+  const rA = rarityOrder[a.rarity] ?? -1;
+  const rB = rarityOrder[b.rarity] ?? -1;
+  if (rA !== rB) return rB - rA;
+  return a.entry.data.term.localeCompare(b.entry.data.term, "ja");
+});
+---
+
+<!-- 検索＆フィルターコントロールパネル (Glassmorphism & Glow) -->
+<div class="filters-container mb-8 p-6 bg-card/60 border border-border/80 rounded-2xl shadow-sm backdrop-blur-md relative overflow-hidden">
+  <div class="absolute -right-16 -top-16 w-32 h-32 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -left-16 -bottom-16 w-32 h-32 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+  
+  <div class="relative z-10 flex flex-col gap-6">
+    <!-- 検索入力 -->
+    <div class="relative w-full">
+      <input
+        type="text"
+        id="chips-search-input"
+        placeholder="チップ名や説明文で検索..."
+        class="w-full pl-11 pr-4 py-3 bg-muted/20 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300 placeholder:text-muted-foreground/50 text-base"
+      />
+      <div class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 text-sm">
+      <!-- 属性フィルター -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="font-bold text-muted-foreground mr-2 shrink-0">属性:</span>
+        <button class="filter-btn filter-element active" data-element="all">すべて</button>
+        <button class="filter-btn filter-element" data-element="スターライト">スターライト</button>
+        <button class="filter-btn filter-element" data-element="マーク">マーク</button>
+        <button class="filter-btn filter-element" data-element="ヒール">ヒール</button>
+        <button class="filter-btn filter-element" data-element="無属性">無属性</button>
+      </div>
+
+      <!-- レア度 & マップフィルター -->
+      <div class="flex flex-col md:flex-row md:items-center gap-4 border-t border-border/40 pt-4">
+        <!-- レア度フィルター -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <span class="font-bold text-muted-foreground mr-2 shrink-0">レア度:</span>
+          <button class="filter-btn filter-rarity active" data-rarity="all">すべて</button>
+          <button class="filter-btn filter-rarity" data-rarity="金">金</button>
+          <button class="filter-btn filter-rarity" data-rarity="紫">紫</button>
+          <button class="filter-btn filter-rarity" data-rarity="青">青</button>
+        </div>
+
+        <!-- マップフィルター -->
+        <div class="flex flex-wrap items-center gap-2 md:border-l md:border-border md:pl-6 pt-4 md:pt-0">
+          <span class="font-bold text-muted-foreground mr-2 shrink-0">マップ:</span>
+          <button class="filter-btn filter-map active" data-map="all">すべて</button>
+          <button class="filter-btn filter-map" data-map="共通">共通</button>
+          <button class="filter-btn filter-map" data-map="夢想号">夢想号</button>
+          <button class="filter-btn filter-map" data-map="御魂の祭">御魂の祭</button>
+          <button class="filter-btn filter-map" data-map="水郷古鎮">水郷古鎮</button>
+          <button class="filter-btn filter-map" data-map="魔法学院">魔法学院</button>
+          <button class="filter-btn filter-map" data-map="龍宮遊園地">龍宮遊園地</button>
+          <button class="filter-btn filter-map" data-map="幽魂路地">幽魂路地</button>
+          <button class="filter-btn filter-map" data-map="龍星の中庭">龍星の中庭</button>
+          <button class="filter-btn filter-map" data-map="運動会">運動会</button>
+        </div>
+      </div>
+
+      <!-- 解説一括操作 -->
+      <div class="flex flex-wrap items-center gap-2 border-t border-border/40 pt-4">
+        <span class="font-bold text-muted-foreground mr-2 shrink-0">解説表示:</span>
+        <button id="btn-expand-all" class="action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+          すべて開く
+        </button>
+        <button id="btn-collapse-all" class="action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/></svg>
+          すべて閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- チップグリッド -->
+<div id="chips-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
+  {sortedChips.map(({ entry, Content, element, rarity, map }) => (
+    <div
+      id={entry.data.term}
+      class="chip-card group relative p-6 bg-card border rounded-2xl flex flex-col justify-between transition-all duration-300"
+      data-term={entry.data.term}
+      data-description={entry.data.description || ""}
+      data-element={element}
+      data-rarity={rarity}
+      data-map={map}
+    >
+      <!-- レア度別の光るバックグラウンド -->
+      <div class="card-glow-bg absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 dark:group-hover:opacity-[0.15] transition-opacity duration-500 pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col h-full">
+        <!-- カードヘッダー -->
+        <div class="flex gap-4 items-start mb-4">
+          <div class="chip-image-wrapper shrink-0 p-1 rounded-xl bg-muted/30 border border-border/50 group-hover:scale-[1.05] transition-transform duration-300">
+            <SmartImage
+              image={entry.data.image}
+              alt={entry.data.term}
+              size={64}
+            />
+          </div>
+          <div class="flex-1 min-w-0">
+            <!-- 目次汚染回避のため、h3 ではなく div (role="heading") に変更 -->
+            <div role="heading" aria-level="3" class="text-xl font-bold truncate group-hover:text-accent transition-colors duration-300">
+              <a href={`#${entry.data.term}`} class="hover:underline focus:outline-none">
+                {entry.data.term}
+              </a>
+            </div>
+            <div class="flex gap-2 mt-1.5 flex-wrap">
+              <span class={`badge badge-rarity badge-${rarity}`}>
+                {rarity}
+              </span>
+              <span class={`badge badge-element badge-${element}`}>
+                {element}
+              </span>
+              {map !== "共通" && (
+                <span class="badge badge-map">
+                  {map}専用
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <!-- 簡易説明 -->
+        <div class="text-lg text-foreground/90 leading-relaxed bg-muted/20 border border-border/20 rounded-xl p-3 mb-4">
+          <GlossaryDescription text={entry.data.description || ""} />
+        </div>
+
+        <!-- Markdown詳細情報 (Contentが存在する場合のみレンダリング) or Spacer -->
+        {Content && entry.body && entry.body.trim().length > 0 ? (
+          <div class="accordion-container mt-auto pt-4 border-t border-border/40 flex-1 flex flex-col">
+            <button
+              class="accordion-toggle w-full text-left py-2 px-3 bg-muted/20 hover:bg-muted/40 border border-border/40 rounded-xl flex items-center justify-between text-xs font-semibold text-muted-foreground hover:text-foreground transition-all duration-200 shrink-0"
+              aria-expanded="false"
+            >
+              <span class="toggle-label-text">▼ 詳しい解説を表示</span>
+              <svg class="chevron-icon w-3 h-3 transform transition-transform duration-200 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="accordion-content-wrapper grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-in-out">
+              <div class="accordion-inner overflow-hidden">
+                <div class="chip-markdown prose prose-lg max-w-none dark:prose-invert pt-4">
+                  <Content components={{ word: Word, inlineimage: InlineImage, Word, InlineImage, Text }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div class="flex-1"></div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  /* フィルターボタンデザイン */
+  .filter-btn {
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+    border: 1px solid transparent;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    cursor: pointer;
+  }
+  .filter-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    transform: translateY(-1px);
+  }
+  .filter-btn.active {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  html[data-theme="dark"] .filter-btn.active {
+    box-shadow: 0 4px 12px rgba(255, 107, 1, 0.25);
+  }
+
+  /* バッジスタイル */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    line-height: 1;
+  }
+
+  /* レア度バッジ配色 */
+  .badge-rarity.badge-金 {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: #eab308;
+    border-color: rgba(234, 179, 8, 0.3);
+  }
+  .badge-rarity.badge-紫 {
+    background-color: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+  .badge-rarity.badge-青 {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  .badge-rarity.badge-無 {
+    background-color: rgba(156, 163, 175, 0.1);
+    color: #9ca3af;
+    border-color: rgba(156, 163, 175, 0.3);
+  }
+
+  /* 属性バッジ配色 */
+  .badge-element.badge-スターライト {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  .badge-element.badge-マーク {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  .badge-element.badge-ヒール {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  .badge-element.badge-無属性 {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+
+  /* マップ専用バッジ配色 (プレミアムなピンクラデーション) */
+  .badge-map {
+    background: linear-gradient(90deg, rgba(236, 72, 153, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%);
+    color: #f43f5e;
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.1);
+  }
+
+  /* チップカード基本デザイン */
+  .chip-card {
+    border-color: var(--color-border);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .chip-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  }
+  /* ツールチップ展開時に隣のカードに隠れないように最前面へ */
+  .chip-card:has(.glossary-word-container:hover),
+  .chip-card:has(.glossary-word-container.is-active) {
+    z-index: 50;
+  }
+  
+  html[data-theme="dark"] .chip-card:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  /* レア度別プレミアム背景 & グロー効果 */
+  .chip-card[data-rarity="金"] {
+    background: linear-gradient(135deg, var(--color-background), rgba(234, 179, 8, 0.02));
+  }
+  .chip-card[data-rarity="金"]:hover {
+    border-color: rgba(234, 179, 8, 0.5);
+  }
+  .chip-card[data-rarity="金"] .card-glow-bg {
+    background: radial-gradient(circle at center, rgba(234, 179, 8, 0.25) 0%, transparent 70%);
+  }
+
+  .chip-card[data-rarity="紫"] {
+    background: linear-gradient(135deg, var(--color-background), rgba(168, 85, 247, 0.02));
+  }
+  .chip-card[data-rarity="紫"]:hover {
+    border-color: rgba(168, 85, 247, 0.5);
+  }
+  .chip-card[data-rarity="紫"] .card-glow-bg {
+    background: radial-gradient(circle at center, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  }
+
+  .chip-card[data-rarity="青"] {
+    background: linear-gradient(135deg, var(--color-background), rgba(59, 130, 246, 0.02));
+  }
+  .chip-card[data-rarity="青"]:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  .chip-card[data-rarity="青"] .card-glow-bg {
+    background: radial-gradient(circle at center, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  }
+
+  /* アンカーリンク直飛びハイライトアニメーション */
+  @keyframes highlightGlow {
+    0% {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(255, 107, 1, 0.3);
+      transform: scale(1.02) translateY(-2px);
+    }
+    50% {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 25px 8px rgba(255, 107, 1, 0.5);
+      transform: scale(1.02) translateY(-2px);
+    }
+    100% {
+      border-color: inherit;
+      box-shadow: none;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .highlight-card {
+    animation: highlightGlow 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 20;
+  }
+
+  /* 一括操作ボタンデザイン */
+  .action-btn {
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    font-weight: 500;
+    font-size: 0.8rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .action-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    border-color: transparent;
+    transform: translateY(-1px);
+  }
+
+  /* アコーディオンデザイン */
+  .accordion-content-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.3s ease-in-out, opacity 0.25s ease-in-out;
+  }
+  .accordion-content-wrapper.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .accordion-inner {
+    overflow: hidden;
+  }
+  .chevron-icon {
+    transition: transform 0.2s ease-in-out;
+  }
+  .chevron-icon.is-rotated {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  (() => {
+    // フィルター用要素の取得
+    const searchInput = document.getElementById("chips-search-input");
+    const elementButtons = document.querySelectorAll(".filter-element");
+    const rarityButtons = document.querySelectorAll(".filter-rarity");
+    const mapButtons = document.querySelectorAll(".filter-map");
+    const cards = document.querySelectorAll(".chip-card");
+
+    if (!searchInput) return;
+
+    let activeElement = "all";
+    let activeRarity = "all";
+    let activeMap = "all";
+    let ignoreHash = false; // 検索・フィルター操作時はハッシュの強制表示を無視する
+
+    // アコーディオン開閉状態制御のヘルパー関数
+    function setAccordionState(card, isOpen) {
+      const toggle = card.querySelector(".accordion-toggle");
+      if (!toggle) return;
+      const content = card.querySelector(".accordion-content-wrapper");
+      if (!content) return;
+      const textSpan = toggle.querySelector(".toggle-label-text");
+      const svg = toggle.querySelector(".chevron-icon");
+      const inner = card.querySelector(".accordion-inner");
+      
+      if (isOpen) {
+        toggle.setAttribute("aria-expanded", "true");
+        content.classList.add("is-open");
+        if (textSpan) textSpan.textContent = "▲ 詳しい解説を閉じる";
+        if (svg) svg.classList.add("is-rotated");
+        
+        // 開くときは、アニメーションが完了する 300ms 後に overflow: visible にする
+        if (inner) {
+          if (card._overflowTimeout) clearTimeout(card._overflowTimeout);
+          card._overflowTimeout = setTimeout(() => {
+            if (content.classList.contains("is-open")) {
+              inner.style.overflow = "visible";
+            }
+          }, 300);
+        }
+      } else {
+        toggle.setAttribute("aria-expanded", "false");
+        content.classList.remove("is-open");
+        if (textSpan) textSpan.textContent = "▼ 詳しい解説を表示";
+        if (svg) svg.classList.remove("is-rotated");
+        
+        // 閉じるときは即座に overflow: hidden に戻してコンテンツをクリップする
+        if (inner) {
+          if (card._overflowTimeout) clearTimeout(card._overflowTimeout);
+          inner.style.overflow = "hidden";
+        }
+      }
+    }
+
+    // フィルタリング処理関数
+    function filterChips() {
+      const query = searchInput.value.toLowerCase().trim();
+      const hashId = (!ignoreHash && window.location.hash) ? decodeURIComponent(window.location.hash.substring(1)) : null;
+
+      cards.forEach((card) => {
+        const term = card.dataset.term.toLowerCase();
+        const desc = card.dataset.description.toLowerCase();
+        const elem = card.dataset.element;
+        const rarity = card.dataset.rarity;
+        const map = card.dataset.map;
+
+        // 条件判定
+        const matchesQuery = term.includes(query) || desc.includes(query);
+        const matchesElement = activeElement === "all" || elem === activeElement;
+        const matchesRarity = activeRarity === "all" || rarity === activeRarity;
+        const matchesMap = activeMap === "all" || map === activeMap;
+
+        // ハッシュ直飛び（アンカーリンク）の要素は無視フラグがオフのときのみ常に表示する
+        const isTargetedHash = hashId && card.id === hashId;
+
+        if (isTargetedHash || (matchesQuery && matchesElement && matchesRarity && matchesMap)) {
+          card.style.display = ""; // flex/grid 等の元のレイアウトに戻す
+          card.style.opacity = "1";
+          card.style.transform = "scale(1)";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+
+    // 個別アコーディオンの開閉クリックイベント登録
+    cards.forEach((card) => {
+      const toggle = card.querySelector(".accordion-toggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          const content = card.querySelector(".accordion-content-wrapper");
+          const isOpen = content.classList.contains("is-open");
+          setAccordionState(card, !isOpen);
+        });
+      }
+    });
+
+    // 一括開閉制御の登録
+    const btnExpandAll = document.getElementById("btn-expand-all");
+    const btnCollapseAll = document.getElementById("btn-collapse-all");
+
+    if (btnExpandAll) {
+      btnExpandAll.addEventListener("click", () => {
+        cards.forEach((card) => {
+          if (card.style.display !== "none") {
+            setAccordionState(card, true);
+          }
+        });
+      });
+    }
+
+    if (btnCollapseAll) {
+      btnCollapseAll.addEventListener("click", () => {
+        cards.forEach((card) => {
+          if (card.style.display !== "none") {
+            setAccordionState(card, false);
+          }
+        });
+      });
+    }
+
+    // 検索入力の監視
+    searchInput.addEventListener("input", () => {
+      ignoreHash = true;
+      filterChips();
+    });
+
+    // 属性フィルターボタンの監視
+    elementButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        elementButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeElement = btn.dataset.element;
+        ignoreHash = true;
+        filterChips();
+      });
+    });
+
+    // レア度フィルターボタンの監視
+    rarityButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        rarityButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeRarity = btn.dataset.rarity;
+        ignoreHash = true;
+        filterChips();
+      });
+    });
+
+    // マップフィルターボタンの監視
+    mapButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        mapButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeMap = btn.dataset.map;
+        ignoreHash = true;
+        filterChips();
+      });
+    });
+
+    // ハッシュ位置への滑らかなスクロールとハイライト＆自動展開
+    function handleAnchorNavigation() {
+      if (!window.location.hash) return;
+      const hashId = decodeURIComponent(window.location.hash.substring(1));
+      const targetCard = document.getElementById(hashId);
+
+      if (targetCard) {
+        // ハッシュ直飛び時は強制表示できるように無視フラグをリセット
+        ignoreHash = false;
+        filterChips();
+
+        // スクロール先の表示位置調整（ヘッダー等の粘着位置を考慮）
+        setTimeout(() => {
+          targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+          
+          // 強調エフェクトを適用
+          targetCard.classList.add("highlight-card");
+          
+          // 対象カードのアコーディオンを開く
+          setAccordionState(targetCard, true);
+          
+          // アニメーション完了後にクラスを自動削除
+          setTimeout(() => {
+            targetCard.classList.remove("highlight-card");
+          }, 2500);
+        }, 100);
+      }
+    }
+
+    // イベントリスナーの登録
+    handleAnchorNavigation();
+    window.addEventListener("hashchange", handleAnchorNavigation);
+  })();
+</script>

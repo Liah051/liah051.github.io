@@ -1,0 +1,114 @@
+---
+interface Props {
+  labels: string[];
+}
+
+const { labels } = Astro.props;
+---
+
+<div class="tabs-container my-8" data-labels={JSON.stringify(labels)}>
+  <div class="tabs-list flex flex-wrap gap-1 border-b border-border mb-6 overflow-x-auto no-scrollbar">
+    {labels.map((label, index) => (
+      <button
+        type="button"
+        role="tab"
+        aria-selected={index === 0 ? "true" : "false"}
+        class:list={[
+          "tab-button px-5 py-2.5 text-sm transition-all border-b-4 -mb-[2px] whitespace-nowrap rounded-t-md",
+          index === 0 
+            ? "border-accent text-accent font-bold bg-accent/10" 
+            : "border-transparent text-foreground/60 hover:text-foreground hover:bg-muted/50"
+        ]}
+        data-index={index}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+  <div class="tabs-panel relative">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script>
+  function setupTabs() {
+    const containers = document.querySelectorAll('.tabs-container');
+    
+    containers.forEach(container => {
+      const buttons = container.querySelectorAll('.tab-button');
+      const panel = container.querySelector('.tabs-panel');
+      if (!panel) return;
+      const contents = Array.from(panel.children);
+
+      // Initialize: Hide everything except the first tab (or aria-selected one)
+      let activeIndex = Array.from(buttons).findIndex(btn => btn.getAttribute('aria-selected') === 'true');
+      if (activeIndex === -1) activeIndex = 0;
+
+      contents.forEach((content, i) => {
+        (content as HTMLElement).style.display = i === activeIndex ? 'block' : 'none';
+        (content as HTMLElement).style.opacity = i === activeIndex ? '1' : '0';
+      });
+
+      // Avoid adding multiple listeners to the same button
+      buttons.forEach(button => {
+        // Simple way to remove old listeners during view transitions if needed
+        // but here we just ensure we only attach it if it doesn't have one
+        if (button.getAttribute('data-has-listener')) return;
+
+        button.addEventListener('click', () => {
+          const index = parseInt(button.getAttribute('data-index') || '0');
+          const currentContainer = button.closest('.tabs-container');
+          if (!currentContainer) return;
+
+          const groupButtons = currentContainer.querySelectorAll('.tab-button');
+          const groupPanel = currentContainer.querySelector('.tabs-panel');
+          if (!groupPanel) return;
+          const groupContents = Array.from(groupPanel.children);
+
+          // 1. Update Buttons in this group
+          groupButtons.forEach((btn, i) => {
+            const isSelected = i === index;
+            btn.setAttribute('aria-selected', isSelected.toString());
+            
+            if (isSelected) {
+              btn.classList.add('border-accent', 'text-accent', 'font-bold', 'bg-accent/10');
+              btn.classList.remove('border-transparent', 'text-foreground/60', 'hover:bg-muted/50');
+            } else {
+              btn.classList.remove('border-accent', 'text-accent', 'font-bold', 'bg-accent/10');
+              btn.classList.add('border-transparent', 'text-foreground/60', 'hover:bg-muted/50');
+            }
+          });
+
+          // 2. Update Contents in this group
+          groupContents.forEach((content, i) => {
+            if (i === index) {
+              (content as HTMLElement).style.display = 'block';
+              setTimeout(() => { (content as HTMLElement).style.opacity = '1'; }, 10);
+            } else {
+              (content as HTMLElement).style.display = 'none';
+              (content as HTMLElement).style.opacity = '0';
+            }
+          });
+        });
+        
+        button.setAttribute('data-has-listener', 'true');
+      });
+    });
+  }
+
+  // Initialize
+  setupTabs();
+  
+  // Re-initialize after Astro view transitions
+  document.addEventListener('astro:after-swap', setupTabs);
+</script>

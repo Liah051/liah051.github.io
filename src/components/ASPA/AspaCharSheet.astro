@@ -1,0 +1,399 @@
+---
+import InlineImage from "@/components/InlineImage.astro";
+import { Image } from "astro:assets";
+// 型の定義を追加
+interface Props {
+  name: string;
+  alias: string;
+  icon: string;
+  baseStats: {
+    atk: number;
+    def: number;
+    hp: number;
+  };
+  passive: {
+    name: string;
+    desc: string;
+  };
+  skill: {
+    name: string;
+    ct: string;
+    desc: string;
+  };
+  potential?: string; // 「あれば」なのでオプショナル型
+  pveLevels: string[];
+  starStats: {
+    level: number;
+    atk: number;
+    def: number;
+    hp: number;
+    movement: number;
+  }[];
+}
+
+// Astro.props に型を適用
+const {
+  name,
+  alias,
+  icon,
+  baseStats,
+  passive,
+  skill,
+  potential,
+  pveLevels,
+  starStats,
+} = Astro.props;
+
+// 画像を動的インポートで解決（Astro の最適化を利用するため）
+const charImages = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/images/astralparty/characters/**/*.{png,jpg,jpeg,webp}",
+  { eager: true }
+);
+
+// name（例: "ミミ"）からパスを生成。拡張子が分からない場合は jpg を優先。
+let resolvedImage = charImages[`/src/assets/images/astralparty/characters/${name}.jpg`]?.default 
+                 || charImages[`/src/assets/images/astralparty/characters/${name}.png`]?.default;
+
+// PvEレベル5と6は全キャラ共通のためデフォルト値を設定
+const displayPveLevels = [...(pveLevels || [])];
+if (!displayPveLevels[4] || displayPveLevels[4] === "Lv5") {
+  displayPveLevels[4] = "強化チップを2回再抽選できます。";
+}
+if (!displayPveLevels[5] || displayPveLevels[5] === "Lv6") {
+  displayPveLevels[5] = "スターレベル上昇时、強化チップ抽選回数+1。";
+}
+
+// 説明テキスト内の <InlineImage name="..." alt="..." /> をパースしてコンポーネント化するヘルパー
+const parseDesc = (desc: string) => {
+  if (!desc) return [];
+  const regex = /<InlineImage\s+name="([^"]+)"(?:\s+alt="([^"]*)")?\s*\/?>/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = regex.exec(desc)) !== null) {
+    const textPart = desc.substring(lastIndex, match.index);
+    if (textPart) {
+      parts.push({ type: 'text', content: textPart });
+    }
+    parts.push({
+      type: 'image',
+      name: match[1],
+      alt: match[2] || match[1]
+    });
+    lastIndex = regex.lastIndex;
+  }
+  
+  const tailText = desc.substring(lastIndex);
+  if (tailText) {
+    parts.push({ type: 'text', content: tailText });
+  }
+  
+  return parts;
+};
+---
+
+<div class="char-container">
+  <div class="header-grid">
+    <div class="icon-box">
+      {resolvedImage ? (
+        <Image src={resolvedImage} alt={name} width={120} height={120} />
+      ) : (
+        <img src={icon} alt={name} />
+      )}
+    </div>
+    <div class="info-box">
+      <div class="alias">{alias}</div>
+      <div class="name">{name}</div>
+      <div class="base-stats">
+        <span><strong>攻撃:</strong> {baseStats.atk}</span>
+        <span><strong>防御:</strong> {baseStats.def}</span>
+        <span><strong>HP:</strong> {baseStats.hp}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="skill-section">
+    <div class="skill-row">
+      <div class="label">パッシブ</div>
+      <div class="content">
+        <strong>{passive.name}</strong><br />
+        {
+          parseDesc(passive.desc).map(part => (
+            part.type === 'text' ? (
+              part.content
+            ) : (
+              <InlineImage name={part.name} alt={part.alt} />
+            )
+          ))
+        }
+      </div>
+    </div>
+    <div class="skill-row">
+      <div class="label">スキル (CT:{skill.ct})</div>
+      <div class="content"><strong>{skill.name}</strong><br />{
+        parseDesc(skill.desc).map(part => (
+          part.type === 'text' ? (
+            part.content
+          ) : (
+            <InlineImage name={part.name} alt={part.alt} />
+          )
+        ))
+      }</div>
+    </div>
+    {
+      potential && (
+        <div class="skill-row">
+          <div class="label">潜在能力<InlineImage name="潜在能力" alt="潜在能力"/></div>
+          <div class="content">{
+            parseDesc(potential).map(part => (
+              part.type === 'text' ? (
+                part.content
+              ) : (
+                <InlineImage name={part.name} alt={part.alt} />
+              )
+            ))
+          }</div>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="bottom-tables">
+    <div class="table-wrapper">
+      <h3>PvEレベルの強化内容</h3>
+      <table>
+        <thead><tr><th style="width: 9%;">Lv</th><th style="width: 91%;">内容</th></tr></thead>
+        <tbody>
+          {
+            displayPveLevels
+              .filter(desc => desc && desc.trim() !== "")
+              .map((desc, i) => (
+                <tr>
+                  <td>{i + 1}</td>
+                  <td>
+                    {
+                      parseDesc(desc).map(part => (
+                        part.type === 'text' ? (
+                          part.content
+                        ) : (
+                          <InlineImage name={part.name} alt={part.alt} />
+                        )
+                      ))
+                    }
+                  </td>
+                </tr>
+              ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrapper">
+      <h3>スターレベル別の基礎ステータス</h3>
+      <table>
+        <thead>
+          <tr><th>★</th><th>攻撃</th><th>防御</th><th>HP</th><th>移動</th></tr>
+        </thead>
+        <tbody>
+          {
+            starStats.map((s, i) => (
+              <tr>
+                <td>{s.level}</td>
+                <td>{s.atk}</td>
+                <td>{s.def}</td>
+                <td>{s.hp}</td>
+                <td>{s.movement}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── 既存の変数はそのまま ── */
+  .char-container {
+    --aspa-bg: #ffffff;
+    --aspa-text: #333333;
+    --aspa-border: #444444;
+    --aspa-header-bg: #f4f4f4;
+    --aspa-label-bg: #e9ecef;
+    --aspa-table-border: #eeeeee;
+    --aspa-alias-color: #666666;
+    --aspa-stat-border: #cccccc;
+    --aspa-th-bg: #f8f9fa;
+    --aspa-h3-bg: #444444;
+    --aspa-h3-text: #ffffff;
+    --label-width: 120px;
+  }
+
+  :global([data-theme="dark"]) .char-container {
+    /* 全体の背景：記事の背景よりわずかに浮き上がらせる */
+    --aspa-bg: #1e2433;
+    --aspa-text: #eaedf3;
+
+    /* 境界線：少し青みを入れた明るい色に */
+    --aspa-border: var(--border);
+    --aspa-table-border: rgba(255, 255, 255, 0.08);
+
+    /* ヘッダー（名前部分）：ここを少し暗くして落ち着かせる */
+    --aspa-header-bg: #1e2433;
+
+    /* ラベル列（パッシブ、スキル）：ここを少し明るくして見出し感を出す */
+    --aspa-label-bg: #2d3748;
+    --aspa-stat-border: rgba(255, 255, 255, 0.1);
+
+    /* 文字色のアクセント */
+    --aspa-alias-color: #94a3b8; /* 二つ名を少し青白いグレーに */
+
+    /* テーブル見出し */
+    --aspa-th-bg: #2d3748;
+    --aspa-h3-bg: #334155;
+    --aspa-h3-text: #f8fafc;
+  }
+
+  .char-container {
+    border: 2px solid var(--aspa-border);
+    border-radius: 8px;
+    background: var(--aspa-bg);
+    color: var(--aspa-text);
+    overflow: hidden;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+    max-width: 800px;
+    /* ↓ 追加：これがないと目次などの高さに引き伸ばされます */
+    align-self: flex-start;
+    height: fit-content;
+  }
+
+  /* ...ヘッダー系... */
+  .header-grid {
+    display: flex;
+    background: var(--aspa-header-bg);
+    border-bottom: 2px solid var(--aspa-border);
+  }
+  .icon-box {
+    width: var(--label-width);
+    height: var(--label-width);
+    border-right: 2px solid var(--aspa-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .icon-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .info-box {
+    padding: 10px 10px 0 10px; /* 下側の余白を削減 */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .alias {
+    font-size: 0.8rem;
+    color: var(--aspa-alias-color);
+    line-height: 1.2;
+    margin-top: -5px; /* 上に5px移動 */
+    margin-bottom: 7px; /* 二つ名と名前の間に少し余白を追加 */
+  }
+  .name {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin-bottom: 12px; /* 10px分下に移動するため拡大 */
+    line-height: 1.2;
+    color: var(--aspa-text);
+  }
+  .base-stats {
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid var(--aspa-stat-border);
+    padding-top: 5px;
+  } /* 修正：ptをpadding-topへ */
+
+  /* ...スキル系... */
+  .skill-section {
+    border-bottom: 2px solid var(--aspa-border);
+  }
+  .skill-row {
+    display: flex;
+    border-bottom: 1px solid var(--aspa-table-border);
+  }
+  .skill-row:last-child {
+    border-bottom: none;
+  }
+  .label {
+    width: var(--label-width);
+    background: var(--aspa-label-bg);
+    padding: 8px;
+    font-weight: bold;
+    border-right: 1px solid var(--aspa-stat-border);
+    flex-shrink: 0;
+  }
+  .content {
+    padding: 8px;
+    flex: 1;
+  }
+
+  /* ...テーブル系修正... */
+  .bottom-tables {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* 上揃えにして縦に伸ばさない */
+    gap: 0;
+  }
+  .table-wrapper {
+    flex: 1;
+    min-width: 300px;
+    border-right: 1px solid var(--aspa-border);
+    background: var(--aspa-bg); /* 背景を明示して隙間漏れを防ぐ */
+  }
+  .table-wrapper:last-child {
+    border-right: none;
+  }
+
+  h3 {
+    font-size: 0.9rem;
+    background: var(--aspa-h3-bg) !important;
+    color: var(--aspa-h3-text) !important;
+    margin: 0 !important;
+    padding: 5px 10px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-weight: 800;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 !important; /* 外部CSSによるマージンを強制リセット */
+    table-layout: fixed; /* レイアウトを安定させる */
+  }
+
+  th,
+  td {
+    border: 1px solid var(--aspa-table-border);
+    padding: 6px;
+    text-align: left;
+  }
+  th {
+    background: var(--aspa-th-bg);
+  }
+
+  @media (max-width: 600px) {
+    .table-wrapper {
+      min-width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--aspa-border);
+    }
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import type { ImageMetadata } from "astro";
+import AspaChip from "./ASPA/AspaChip.astro";
+
+interface Props {
+  name?: string;
+  item?: string;
+  rarity?: string;
+  alt?: string;
+}
+
+const { name, item, rarity, alt } = Astro.props;
+const displayAlt = alt !== undefined ? alt : (item || name || "");
+
+let image;
+if (name && !item) {
+  // ★ 修正ポイント：検索対象を /status/ から /astralparty/ 全体に広げ、サブフォルダも探すようにする
+  const images = import.meta.glob<{ default: ImageMetadata }>(
+    "/src/assets/images/astralparty/**/*.{png,webp,jpg,jpeg}"
+  );
+
+  // 指定された名前に一致する画像パスを検索
+  let imagePath = Object.keys(images).find(path => {
+    const fileNameWithExt = path.split("/").pop(); // 例: "atk.png"
+    const fileName = fileNameWithExt?.split(".").slice(0, -1).join("."); // 例: "atk"
+
+    // ファイル名が name と一致するかチェック
+    return fileName === name;
+  });
+
+  if (!imagePath) {
+    // エラーメッセージも少し汎用的に修正
+    throw new Error(
+      `Icon "${name}" not found in /src/assets/images/astralparty/`
+    );
+  }
+
+  const imageModule = await images[imagePath]();
+  image = imageModule.default;
+}
+---
+
+{
+  item ? (
+    <span class="inline-image-chip">
+      <AspaChip item={item} rarity={rarity} size="1.2em" alt={displayAlt} />
+    </span>
+  ) : (
+    image && <img src={image.src} alt={displayAlt} class="inline-image" />
+  )
+}
+
+<style>
+  .inline-image,
+  .inline-image-chip {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    margin: 0 !important;
+  }
+
+  .inline-image {
+    vertical-align: -0.2em;
+  }
+
+  .inline-image-chip {
+    vertical-align: 0.1em;
+  }
+
+  .inline-image {
+    object-fit: contain;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .inline-image-chip {
+    line-height: 0;
+  }
+</style>

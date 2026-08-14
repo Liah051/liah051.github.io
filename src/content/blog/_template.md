@@ -11,6 +11,7 @@ tags:
 category_id: "" # サイドバーを切り替えるためのID（MobileDrawerやMainLayoutで設定したもの）
 group: "" # 続き物の記事（シリーズ）としてまとめたい場合のグループ名
 order:  # シリーズ内での表示順序（数字が小さいほど先頭）
+draft: true
 ---
 
 ここに本文を記述します。

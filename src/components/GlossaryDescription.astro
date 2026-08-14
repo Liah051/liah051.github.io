@@ -1,5 +1,6 @@
 ---
-import StatusIcon from "./StatusIcon.astro";
+import InlineImage from "./InlineImage.astro";
+import { marked } from "marked";
 
 interface Props {
   text: string;
@@ -7,33 +8,55 @@ interface Props {
 
 const { text } = Astro.props;
 
-// <StatusIcon name="..."/> パターンを解析して、テキストとコンポーネントに分割する
-const STATUS_ICON_REGEX = /<StatusIcon\s+name="([^"]+)"\s*\/>/g;
+// 属性をパースしてオブジェクトにするヘルパー
+const parseAttributes = (attrStr: string) => {
+  const attrs: Record<string, string> = {};
+  const regex = /([\w-]+)="([^"]*)"/g;
+  let match;
+  while ((match = regex.exec(attrStr)) !== null) {
+    attrs[match[1]] = match[2];
+  }
+  return attrs;
+};
 
-type Segment = { type: "text"; value: string } | { type: "icon"; name: string };
+// <InlineImage .../> パターンを解析して、テキストとコンポーネントに分割する
+// name="..." 以外（item, rarity等）も取得できるように正規表現を拡張
+const INLINE_IMAGE_REGEX = /<InlineImage\s+([^>]+)\s*\/>/g;
+
+type Segment =
+  | { type: "text"; html: string }
+  | { type: "icon"; props: Record<string, string> };
 
 const segments: Segment[] = [];
 let lastIndex = 0;
 let match: RegExpExecArray | null;
 
-while ((match = STATUS_ICON_REGEX.exec(text)) !== null) {
+while ((match = INLINE_IMAGE_REGEX.exec(text)) !== null) {
   // マッチ前のテキスト部分を追加
   if (match.index > lastIndex) {
-    segments.push({ type: "text", value: text.slice(lastIndex, match.index) });
+    const rawText = text.slice(lastIndex, match.index);
+    const html = await marked.parseInline(rawText);
+    segments.push({ type: "text", html });
   }
-  // StatusIcon コンポーネントを追加
-  segments.push({ type: "icon", name: match[1] });
+  // InlineImage の属性をパースして追加
+  segments.push({ type: "icon", props: parseAttributes(match[1]) });
   lastIndex = match.index + match[0].length;
 }
 
 // 残りのテキストを追加
 if (lastIndex < text.length) {
-  segments.push({ type: "text", value: text.slice(lastIndex) });
+  const rawText = text.slice(lastIndex);
+  const html = await marked.parseInline(rawText);
+  segments.push({ type: "text", html });
 }
 ---
 
-{segments.map(seg =>
-  seg.type === "icon"
-    ? <StatusIcon name={seg.name} />
-    : <Fragment set:html={seg.value} />
-)}
+{
+  segments.map(seg =>
+    seg.type === "icon" ? (
+      <InlineImage {...seg.props} />
+    ) : (
+      <Fragment set:html={seg.html} />
+    )
+  )
+}

@@ -13,10 +13,10 @@ const glossaryEntries = await getGlossary();
 
 const entry = id
   ? glossaryEntries.find((e) => e.id === id)
-  : glossaryEntries.find((e) => e.data.term === termFromSlot.trim());
+  : glossaryEntries.find((e) => e.data.term === termFromSlot.replace(/<[^>]*>?/gm, '').trim());
 
 const { description, url, image } = entry?.data || {};
-const displayTitle = entry?.data.term || termFromSlot;
+const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').trim();
 ---
 
 {
@@ -39,6 +39,7 @@ const displayTitle = entry?.data.term || termFromSlot;
                     ? "shrink-0" 
                     : "shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted overflow-hidden"} 
                   size={64} 
+                  loading="eager"
                 />
               )
             }
@@ -97,17 +98,88 @@ const displayTitle = entry?.data.term || termFromSlot;
 
     // デリゲートされたイベントリスナーで効率的かつ確実に処理
     document.addEventListener('mouseover', (e) => {
+      if (document.documentElement.getAttribute('data-glossary-hidden') === 'true') return;
+
       const container = e.target.closest('.glossary-word-container');
-      if (container) {
+      if (!container) return;
+
+      const relatedContainer = e.relatedTarget ? e.relatedTarget.closest('.glossary-word-container') : null;
+
+      // 新しくコンテナに入った（あるいは別コンテナから移動した）場合
+      if (container !== relatedContainer) {
+        // 既存の非表示タイマーがあればクリアする
+        if (container._glossaryHideTimeout) {
+          clearTimeout(container._glossaryHideTimeout);
+          container._glossaryHideTimeout = null;
+        }
+
+        // 最前面にするための z-index 制御
+        window.glossaryMaxZIndex = (window.glossaryMaxZIndex || 100) + 1;
+        container.style.zIndex = window.glossaryMaxZIndex.toString();
+        
+        // アクティブクラスを追加
+        container.classList.add('is-active');
+        
+        // 位置調整を実行
         adjustTooltip(container);
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const container = e.target.closest('.glossary-word-container');
+      if (!container) return;
+
+      const relatedContainer = e.relatedTarget ? e.relatedTarget.closest('.glossary-word-container') : null;
+
+      // コンテナから完全に外に出た場合
+      if (container !== relatedContainer) {
+        // 既存のタイマーがあれば一度クリア
+        if (container._glossaryHideTimeout) {
+          clearTimeout(container._glossaryHideTimeout);
+        }
+
+        // 500ms後に非アクティブ化するタイマーを開始
+        container._glossaryHideTimeout = setTimeout(() => {
+          container.classList.remove('is-active');
+          container.style.zIndex = ''; // z-indexをリセット
+          container._glossaryHideTimeout = null;
+        }, 500);
       }
     });
 
     // タッチデバイス対応
     document.addEventListener('touchstart', (e) => {
+      if (document.documentElement.getAttribute('data-glossary-hidden') === 'true') return;
+
       const container = e.target.closest('.glossary-word-container');
+      
+      // 他のすべてのアクティブなコンテナをクローズする（タップされたコンテナ以外）
+      document.querySelectorAll('.glossary-word-container.is-active').forEach(activeContainer => {
+        if (activeContainer !== container) {
+          if (activeContainer._glossaryHideTimeout) {
+            clearTimeout(activeContainer._glossaryHideTimeout);
+            activeContainer._glossaryHideTimeout = null;
+          }
+          activeContainer.classList.remove('is-active');
+          activeContainer.style.zIndex = ''; // z-indexをリセット
+        }
+      });
+
       if (container) {
-        adjustTooltip(container);
+        // タイマーがあればクリア
+        if (container._glossaryHideTimeout) {
+          clearTimeout(container._glossaryHideTimeout);
+          container._glossaryHideTimeout = null;
+        }
+
+        // 最前面にするための z-index 制御
+        window.glossaryMaxZIndex = (window.glossaryMaxZIndex || 100) + 1;
+        container.style.zIndex = window.glossaryMaxZIndex.toString();
+        
+        if (!container.classList.contains('is-active')) {
+          container.classList.add('is-active');
+          adjustTooltip(container);
+        }
       }
     }, { passive: true });
   })();
@@ -131,14 +203,31 @@ const displayTitle = entry?.data.term || termFromSlot;
   transform: translateX(-50%); 
   
   /* transformをtransitionに入れないことで「スライド」を防止 */
-  transition: opacity 0.3s, visibility 0.3s; 
-  transition-delay: 0.3s;
+  transition: opacity 0.2s, visibility 0.2s; 
   visibility: hidden;
+  opacity: 0;
 }
 
   .glossary-tooltip-box {
     background-color: var(--background); /* 完全に不透明なテーマ背景を使用 */
     opacity: 1 !important;
+    /* 表や親要素の書式（中央揃え、太字、斜体、折り返し禁止など）の影響を防ぐリセット */
+    text-align: left;
+    text-align: start;
+    font-weight: normal;
+    font-style: normal;
+    text-decoration: none;
+    white-space: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+  }
+
+  .glossary-tooltip-box a {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .glossary-tooltip-box a:hover {
+    text-decoration: none;
   }
 
   /* ダークモードの影 */
@@ -146,8 +235,9 @@ const displayTitle = entry?.data.term || termFromSlot;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
   }
 
-  /* ホバー時の表示（visibilityを制御してJS의計算を可能にする） */
-  .glossary-word-container:hover .glossary-tooltip {
+  /* ホバー時およびアクティブ時の表示（visibilityを制御してJSの計算を可能にする） */
+  .glossary-word-container:hover .glossary-tooltip,
+  .glossary-word-container.is-active .glossary-tooltip {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.2s;
@@ -156,6 +246,13 @@ const displayTitle = entry?.data.term || termFromSlot;
     position: absolute;
     bottom: 100%;
     left: 50%;
+    pointer-events: auto; /* カーソルのインタラクションを許可 */
+  }
+
+  /* ホバー時およびアクティブ時の文字色 */
+  .glossary-word-container:hover .glossary-word,
+  .glossary-word-container.is-active .glossary-word {
+    color: var(--accent);
   }
 
   /* ツールチップへの架け橋 */
@@ -169,17 +266,18 @@ const displayTitle = entry?.data.term || termFromSlot;
     transform: translateX(-50%);
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-    transition-delay: 0.3s;
+    transition: opacity 0.2s, visibility 0.2s;
     background-color: transparent;
     z-index: 40;
   }
   
-  .glossary-word-container:hover {
+  .glossary-word-container:hover,
+  .glossary-word-container.is-active {
     z-index: 60;
   }
 
-  .glossary-word-container:hover::after {
+  .glossary-word-container:hover::after,
+  .glossary-word-container.is-active::after {
     visibility: visible;
     opacity: 1;
     transition: none;

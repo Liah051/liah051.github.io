@@ -7,3 +7,13 @@ interface Window {
     setTheme: (val: string) => void;
   };
 }
+
+declare namespace JSX {
+  interface IntrinsicElements {
+    Word: any;
+    InlineImage: any;
+  }
+}
+
+declare module "remark-join-cjk-lines";
+

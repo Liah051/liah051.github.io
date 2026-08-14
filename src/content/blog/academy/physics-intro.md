@@ -3,7 +3,7 @@ author: Dialiah
 pubDatetime: 2026-03-03T00:00:00Z
 title: 物理学と数式のテスト (KaTeX)
 featured: true
-draft: false
+draft: true
 tags:
   - Academy
   - Physics

@@ -13,10 +13,14 @@ import { SIDEBAR_MAP, DefaultSidebar } from "@/components/sidebars";
 import Comments from "@/components/Comments.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
 import Word from "@/components/Word.astro";
-import StatusIcon from "@/components/StatusIcon.astro";
-import AspaChip from "@/components/AspaChip.astro";
+import InlineImage from "@/components/InlineImage.astro";
+import AspaChip from "@/components/ASPA/AspaChip.astro";
 import PostFooterStack from "@/components/PostFooterStack.astro";
 
+import Physics from "@/components/Physics.astro";
+import AspaCharSheet from "@/components/ASPA/AspaCharSheet.astro";
+import Tabs from "@/components/Tabs.astro";
+import Text from "@/components/Text.astro";
 
 // ... [既存のインポートを維持、手動でマージするのではなくインポート部分全体を編集すると長くなるので、最初の方に追加します]
 import { getPath } from "@/utils/getPath";
@@ -83,7 +87,7 @@ const layoutProps = {
 
 <Layout {...layoutProps}>
   <Header category_id={category_id} isPost={true} headings={headings} />
-  <BackButton backUrl={category_id && category_id !== "other" ? `/${category_id}` : undefined} backText={category_id && category_id !== "other" ? "< トップに戻る" : undefined} />
+  <BackButton backUrl={category_id && category_id !== "other" ? `/toppages/${category_id}` : undefined} backText={category_id && category_id !== "other" ? "< トップに戻る" : undefined} />
   <main
     id="main-content"
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
@@ -96,7 +100,7 @@ const layoutProps = {
     -->
     <div class="flex flex-col md:flex-row md:justify-between items-start md:items-stretch gap-18 lg:gap-24">
       <!-- Left Column: Main Content -->
-      <div class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] md:translate-x-0">
+      <div class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] md:translate-x-0 relative z-10">
 
         <h1
           transition:name={slugifyStr(title.replaceAll(".", "-"))}
@@ -126,7 +130,7 @@ const layoutProps = {
           id="article"
           class="app-prose w-full prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
         >
-          <Content components={{ Word, StatusIcon, AspaChip }} />
+          <Content components={{ Word, InlineImage, AspaChip, Physics, AspaCharSheet, Tabs, Text }} />
 
         </article>
 

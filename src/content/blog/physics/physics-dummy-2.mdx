@@ -8,14 +8,71 @@ order: 2
 thumbnail: "https://placehold.co/400x400.jpg"
 wordlist: true
 terms: ["慣性","加速度"]
+draft: true
 ---
 
 ## 摩擦力について
 
 この記事は「力学」シリーズの2番目の記事です。
 <Word>遠心力</Word>と<Word>加速度</Word>についても触れます。
-<Word id="astralparty/カッターナイフシャープ">カッターナイフシャープ</Word>はとても強いカッターナイフです。
+<Word id="astralparty/chips/カッターナイフシャープ">カッターナイフシャープ</Word>はとても強いカッターナイフです。
 <AspaChip item="カッターナイフ" rarity="金" size={64} />
 
-おそらく<StatusIcon name="Heal"/>が重要です！<Word>バッファーシールド</Word>と相性がいいです
+![ゲーム攻略画像](https://res.cloudinary.com/wmwaza50/image/upload/f_auto,q_auto/v1785762480/IMG_4322_k96bmu.png)
+
+<InlineImage name="Heal" alt="ヒール"/>が重要です！<Word id="astralparty/chips/バフシ" ><InlineImage item="バフシ" rarity="青" />バッファーシールド</Word>と相性がいいです
 <Word>標的</Word>
+
+<InlineImage item="バフシ" rarity="青" />
+
+<AspaCharSheet
+  name="キャラ名"
+  alias="二つ名"
+  icon="https://placehold.co/400x400.jpg"
+  baseStats={{
+    atk: 10,
+    def: 10,
+    hp: 10,
+  }}
+  passive={{
+    name: "パッシブ名",
+    desc: "パッシブ説明",
+  }}
+  skill={{
+    name: "スキル名",
+    ct: "1",
+    desc: "スキル説明",
+  }}
+  potential="潜在能力"
+  pveLevels={["Lv1", "Lv2", "Lv3", "Lv4", "Lv5","Lv6"]}
+  starStats={[
+    {
+      level: 0,
+      atk: 10,
+      def: 10,
+      hp: 10,
+      movement: 5,
+    },
+    {
+      level: 1,
+      atk: 10,
+      def: 10,
+      hp: 10,
+      movement: 5,
+    },
+    {
+      level: 2,
+      atk: 20,
+      def: 20,
+      hp: 20,
+      movement: 5,
+    },
+    {
+      level: 3,
+      atk: 30,
+      def: 30,
+      hp: 30,
+      movement: 5,
+    },
+  ]}
+/>

@@ -35,7 +35,7 @@ const isCollapsible = mode === "collapsible";
         <div class="mt-4 border-t border-border pt-4">
           <ul class="flex flex-col gap-2">
             {tocHeadings.map(heading => (
-              <li class={`ml-${(heading.depth - 2) * 4}`}>
+              <li style={`--depth: ${heading.depth - 2}`} class="toc-item-collapsible">
                 <a
                   href={`#${heading.slug}`}
                   class="text-sm md:text-base text-foreground hover:text-accent hover:underline transition-colors"
@@ -52,7 +52,7 @@ const isCollapsible = mode === "collapsible";
         <h3 class="mb-4 text-lg font-bold">目次</h3>
         <ul class="flex flex-col gap-2.5">
           {tocHeadings.map(heading => (
-            <li class={`ml-${(heading.depth - 2) * 3}`}>
+            <li style={`--depth: ${heading.depth - 2}`} class="toc-item-sticky">
               <a
                 href={`#${heading.slug}`}
                 class="text-sm text-foreground hover:text-accent hover:underline transition-colors"
@@ -66,3 +66,12 @@ const isCollapsible = mode === "collapsible";
     )}
   </>
 )}
+
+<style>
+  .toc-item-collapsible {
+    margin-left: calc(var(--depth) * 1rem);
+  }
+  .toc-item-sticky {
+    margin-left: calc(var(--depth) * 0.75rem);
+  }
+</style>

@@ -1,0 +1,15 @@
+.physics-diagram {
+  --svg-stroke: #000000;
+  --svg-fill-light: #f0f7ff;
+  --svg-fill-dark: #666666;
+  --svg-force: #ee0000;
+  --svg-velocity: #0000ee;
+}
+
+[data-theme="dark"] .physics-diagram {
+  --svg-stroke: #ffffff;
+  --svg-fill-light: #1e293b;
+  --svg-fill-dark: #94a3b8;
+  --svg-force: #ff6666;
+  --svg-velocity: #77aaff;
+}

@@ -30,13 +30,24 @@ const blog = defineCollection({
 });
 
 const glossary = defineCollection({
-  loader: glob({ pattern: "**/*.yaml", base: "./src/content/glossary" }),
-  schema: z.object({
-    term: z.string(),
-    description: z.string(),
-    url: z.string().optional(),
-    image: z.string().or(z.object({ type: z.string(), item: z.string(), rarity: z.string().optional() })).optional(),
-  }),
+  loader: glob({ pattern: "**/*.{yaml,md,mdx}", base: "./src/content/glossary" }),
+  schema: ({ image }) =>
+    z.object({
+      term: z.string(),
+      description: z.string(),
+      url: z.string().optional(),
+      image: image()
+        .or(z.string())
+        .or(
+          z.object({
+            type: z.string(),
+            item: z.string(),
+            rarity: z.string().optional(),
+          })
+        )
+        .optional(),
+      map: z.string().optional(),
+    }),
 });
 
 const logs = defineCollection({

@@ -2,6 +2,7 @@ import satori from "satori";
 // import { html } from "satori-html";
 import { SITE } from "@/config";
 import loadGoogleFonts from "../loadGoogleFont";
+import { cleanTitle } from "../cleanTitle";
 
 // const markup = html`<div
 //       style={{
@@ -94,6 +95,8 @@ import loadGoogleFonts from "../loadGoogleFont";
 //     </div>`;
 
 export default async post => {
+  const title = cleanTitle(post.data.title, post.data.category_id);
+
   return satori(
     {
       type: "div",
@@ -160,7 +163,7 @@ export default async post => {
                           maxHeight: "84%",
                           overflow: "hidden",
                         },
-                        children: post.data.title,
+                        children: title,
                       },
                     },
                     {
@@ -222,7 +225,7 @@ export default async post => {
       height: 630,
       embedFont: true,
       fonts: await loadGoogleFonts(
-        post.data.title + post.data.author + SITE.title + "by"
+        title + post.data.author + SITE.title + "by"
       ),
     }
   );

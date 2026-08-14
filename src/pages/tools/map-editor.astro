@@ -1,0 +1,11 @@
+---
+// src/pages/tools/map-editor.astro
+import Layout from "../../layouts/Layout.astro";
+import Editor from "../../components/MapEditor/MapEditor.tsx";
+---
+
+<Layout title="Aspa Map Maker">
+  <main class="min-h-screen bg-gray-900">
+    <Editor client:only="react" />
+  </main>
+</Layout>

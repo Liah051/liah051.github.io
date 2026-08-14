@@ -8,38 +8,26 @@ import Card from "@/components/Card.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { SITE } from "@/config";
 
-const CATEGORIES = [
-  {
-    id: "physics",
-    title: "高校物理",
-    description: "力学から原子物理まで、直感的な理解を助ける解説記事集です。",
-    thumbnail: "/dummy-image.jpg", // 適切なパスに書き換えてください
-    href: "/physics",
-  },
-  /* // 今後カテゴリーを追加する際のテンプレート（コメントアウト状態で残す）:
-  { 
-    id: "math", 
-    title: "数学", 
-    description: "基礎から応用まで。論理の積み重ねを楽しみましょう。", 
-    thumbnail: "/dummy-image.jpg", 
-    href: "/tags/math" 
-  },
-  { 
-    id: "tech", 
-    title: "テック", 
-    description: "プログラミングやIT技術に関する記事です。", 
-    thumbnail: "/dummy-image.jpg", 
-    href: "/tags/tech" 
-  },
-  { 
-    id: "gaming", 
-    title: "ゲーム", 
-    description: "ゲームのプレイ記録やレビューです。", 
-    thumbnail: "/dummy-image.jpg", 
-    href: "/tags/gaming" 
-  },
-  */
-];
+const toppagesGlob = import.meta.glob("../toppages/*.astro", { eager: true });
+const CATEGORIES = Object.values(toppagesGlob)
+  .map((mod: any) => {
+    const meta = mod.metadata;
+    if (!meta) return null;
+    const thumbnail = meta.thumbnail && meta.thumbnail !== "/dummy-image.jpg"
+      ? meta.thumbnail
+      : `/toppages/${meta.id}.png`;
+    return {
+      id: meta.id,
+      title: meta.title,
+      description: meta.description,
+      thumbnail,
+      href: `/toppages/${meta.id}`,
+      showOnIndex: meta.showOnIndex ?? false,
+      order: meta.order ?? 999,
+    };
+  })
+  .filter((c): c is NonNullable<typeof c> => c !== null && c.showOnIndex)
+  .sort((a, b) => a.order - b.order);
 
 // Fetch all posts (excluding drafts)
 const posts = await getCollection("blog", ({ data }) => !data.draft);

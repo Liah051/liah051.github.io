@@ -1,0 +1,180 @@
+{
+  "Word Component": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": ["<w", "<word", "w", "word"],
+    "body": [
+      "<Word${1: id=\"${2:value}\"}>$3</Word"
+    ],
+    "description": "Insert Word component with optional id"
+  },
+  "InlineImage Component (Name and Alt)": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": ["<i", "<inline", "<inlineimage", "i", "inline", "inlineimage"],
+    "body": [
+      "<InlineImage name=\"${1}\" alt=\"${2}\"/"
+    ],
+    "description": "Insert InlineImage with name and alt"
+  },
+  "InlineImage Component (Item, Rarity and Alt)": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": ["<i", "<inline", "<inlineimage", "i", "inline", "inlineimage", "item"],
+    "body": [
+      "<InlineImage item=\"${1}\" rarity=\"${2}\" alt=\"${3}\"/"
+    ],
+    "description": "Insert InlineImage with item, rarity and alt"
+  },
+  "Frontmatter: title": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "title",
+    "body": [
+      "title: \"${1:title}\""
+    ],
+    "description": "Frontmatter Title"
+  },
+  "Frontmatter: description": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "description",
+    "body": [
+      "description: \"${1:description}\""
+    ],
+    "description": "Frontmatter Description"
+  },
+  "Frontmatter: pubDatetime": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "pubDatetime",
+    "body": [
+      "pubDatetime: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}+09:00"
+    ],
+    "description": "Frontmatter Publish Datetime"
+  },
+  "Frontmatter: modDatetime": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "modDatetime",
+    "body": [
+      "modDatetime: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}+09:00"
+    ],
+    "description": "Frontmatter Modified Datetime"
+  },
+  "Frontmatter: updated": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "updated",
+    "body": [
+      "updated: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}+09:00"
+    ],
+    "description": "Frontmatter Updated Datetime"
+  },
+  "Frontmatter: category_id": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "category_id",
+    "body": [
+      "category_id: \"${1:category}\""
+    ],
+    "description": "Frontmatter Category ID"
+  },
+  "Frontmatter: group": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "group",
+    "body": [
+      "group: \"${1:group}\""
+    ],
+    "description": "Frontmatter Group"
+  },
+  "Frontmatter: order": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "order",
+    "body": [
+      "order: ${1:999}"
+    ],
+    "description": "Frontmatter Order"
+  },
+  "Frontmatter: tags": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "tags",
+    "body": [
+      "tags:",
+      "  - ${1:tag}"
+    ],
+    "description": "Frontmatter Tags"
+  },
+  "Frontmatter: draft": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "draft",
+    "body": [
+      "draft: ${1|false,true|}"
+    ],
+    "description": "Frontmatter Draft"
+  },
+  "Frontmatter: featured": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "featured",
+    "body": [
+      "featured: ${1|false,true|}"
+    ],
+    "description": "Frontmatter Featured"
+  },
+  "Frontmatter: author": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "author",
+    "body": [
+      "author: \"${1:author}\""
+    ],
+    "description": "Frontmatter Author"
+  },
+  "Frontmatter: thumbnail": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "thumbnail",
+    "body": [
+      "thumbnail: ${1}"
+    ],
+    "description": "Frontmatter Thumbnail"
+  },
+  "Frontmatter: wordlist": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "wordlist",
+    "body": [
+      "wordlist: ${1|false,true|}"
+    ],
+    "description": "Frontmatter Wordlist"
+  },
+  "Frontmatter: terms": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "terms",
+    "body": [
+      "terms:",
+      "  - ${1:term}"
+    ],
+    "description": "Frontmatter Terms"
+  },
+  "Frontmatter: term (glossary)": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "term",
+    "body": [
+      "term: \"${1:term}\""
+    ],
+    "description": "Frontmatter Term (Glossary)"
+  },
+  "Frontmatter: map (glossary)": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "map",
+    "body": [
+      "map: \"${1:map}\""
+    ],
+    "description": "Frontmatter Map (Glossary)"
+  },
+  "Frontmatter: date (logs)": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": "date",
+    "body": [
+      "date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}+09:00"
+    ],
+    "description": "Frontmatter Date (Logs)"
+  },
+  "Line Break": {
+    "scope": "mdx, yaml, markdown",
+    "prefix": ["<br", "br", "<br>"],
+    "body": [
+      "<br/>"
+    ],
+    "description": "Insert self-closing line break"
+  }
+}
