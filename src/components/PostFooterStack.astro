@@ -301,15 +301,22 @@ if (targetCategory && group) {
 
 <script is:inline data-astro-rerun>
   (() => {
-    // Scroll active series item into view within the list
+    // Scroll active series item into view within the list using IntersectionObserver
     const seriesContainer = document.getElementById('series-progress-list');
     const activeSeriesItem = seriesContainer?.querySelector('.is-active');
     if (seriesContainer && activeSeriesItem) {
-      const itemTop = activeSeriesItem.offsetTop;
-      const itemHeight = activeSeriesItem.offsetHeight;
-      const containerHeight = seriesContainer.clientHeight;
-      // Subtract header height or offsets if any, here we just center it within the container
-      seriesContainer.scrollTop = itemTop - (containerHeight / 2) + (itemHeight / 2);
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const itemTop = activeSeriesItem.offsetTop;
+            const itemHeight = activeSeriesItem.offsetHeight;
+            const containerHeight = seriesContainer.clientHeight;
+            seriesContainer.scrollTop = itemTop - (containerHeight / 2) + (itemHeight / 2);
+            observer.disconnect();
+          }
+        });
+      }, { rootMargin: '0px 0px 100px 0px' });
+      observer.observe(seriesContainer);
     }
 
     // Guards to prevent errors and ensure idempotency
