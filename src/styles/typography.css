@@ -10,21 +10,24 @@
     @apply prose max-w-none prose-lg;
 
     h1,
-    h2,
-    h3,
     h4,
     h5,
     h6 {
       @apply mb-3 text-foreground;
     }
 
+    h2 {
+      @apply mb-6 mt-10 border-l-4 border-accent bg-accent/5 px-4 py-2 text-foreground rounded-r-md font-bold;
+    }
+
+    h3 {
+      @apply mb-4 mt-8 border-l-[3px] border-accent/50 bg-accent/5 px-4 py-1.5 text-foreground rounded-r-md font-semibold;
+    }
+
     th {
       @apply mb-3 text-foreground;
     }
 
-    h3 {
-      @apply italic;
-    }
 
     p,
     strong,
@@ -37,11 +40,40 @@
     }
 
     a {
-      @apply wrap-break-word text-foreground decoration-dashed underline-offset-4 hover:text-accent focus-visible:no-underline;
+      @apply wrap-break-word text-accent decoration-dashed underline-offset-4 hover:opacity-80 focus-visible:no-underline;
     }
 
     ul {
       @apply overflow-x-clip;
+    }
+
+    /* Summary block styling */
+    .summary {
+      @apply relative my-8 border-2 border-accent/80 rounded-xl bg-accent/5 p-6 md:p-8;
+
+      &[data-title] {
+        @apply pt-10 md:pt-10;
+      }
+
+      &[data-title]::before {
+        content: attr(data-title);
+        @apply absolute -top-4 left-6 inline-flex items-center justify-center px-5 py-1.5 bg-accent text-background text-sm font-bold rounded-full shadow-md z-10;
+      }
+
+      ol {
+        @apply list-none m-0 p-0 relative;
+        counter-reset: summary-counter;
+      }
+
+      ol > li {
+        @apply relative pl-10 mb-4 last:mb-0 leading-relaxed;
+        counter-increment: summary-counter;
+      }
+
+      ol > li::before {
+        content: counter(summary-counter);
+        @apply absolute left-0 top-0.5 flex h-6.5 w-6.5 items-center justify-center rounded-full bg-accent text-[0.8rem] font-bold text-background;
+      }
     }
 
     li {

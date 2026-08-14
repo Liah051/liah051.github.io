@@ -6,6 +6,8 @@ import { getPath } from "@/utils/getPath";
 import Datetime from "./Datetime.astro";
 import type { ImageMetadata } from "astro";
 import SmartImage from "./SmartImage.astro";
+import { SITE } from "@/config";
+import { cleanTitle } from "@/utils/cleanTitle";
 
 type Props = {
   variant?: "h2" | "h3";
@@ -18,15 +20,26 @@ const { title, description, thumbnail, ...props } = data;
 // Handled by SmartImage component
 
 // Fallback image if no thumbnail
-const defaultThumbnail = "https://images.unsplash.com/photo-1499781366052-3569173a1b5d?q=80&w=1080&auto=format&fit=crop"; 
+const getPostThumbnail = () => {
+  const initOgImage = data.ogImage;
+  if (initOgImage) {
+    return initOgImage;
+  }
+
+  if (SITE.dynamicOgImage) {
+    return `${getPath(id, filePath)}/index.png`;
+  }
+
+  return SITE.ogImage ? `/${SITE.ogImage}` : "/og.png";
+};
 ---
 
 <li class="my-6">
   <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start group">
-    <a href={getPath(id, filePath)} class="shrink-0 w-full sm:w-48 h-32 sm:h-32 overflow-hidden rounded-lg bg-muted block">
+    <a href={getPath(id, filePath)} class="shrink-0 w-full sm:w-48 aspect-[1200/630] overflow-hidden rounded-lg bg-muted block">
       <SmartImage 
-        image={thumbnail || defaultThumbnail} 
-        alt={title} 
+        image={thumbnail || getPostThumbnail()} 
+        alt={cleanTitle(title, data.category_id)} 
         size={"100%"}
         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 bg-muted" 
       />
@@ -40,7 +53,7 @@ const defaultThumbnail = "https://images.unsplash.com/photo-1499781366052-356917
         <Heading
           style={{ viewTransitionName: slugifyStr(title.replaceAll(".", "-")) }}
         >
-          {title}
+          {cleanTitle(title, data.category_id)}
         </Heading>
       </a>
       <Datetime {...props} class="mt-1" />

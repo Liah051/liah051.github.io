@@ -1,0 +1,29 @@
+---
+import CategoryPage from "@/components/CategoryPage.astro";
+
+export const metadata = {
+  id: "physics",
+  title: "高校物理",
+  description: "力学から原子物理まで、直感的な理解を助ける解説記事集です。",
+  showOnIndex: true,
+  order: 1,
+};
+
+const groupOrder = ["力学", "熱力学", "波動", "電磁気学", "原子", "その他"];
+const groupDescriptions = {
+  "力学": "力学とは〜（ダミー説明文）物体の運動とその原因となる力についての学問です。",
+  "熱力学": "熱力学とは〜（ダミー説明文）熱現象を巨視的な立場から扱う分野です。",
+  "波動": "波動とは〜（ダミー説明文）波の性質や振動について学ぶ分野です。",
+  "電磁気学": "電磁気学とは〜（ダミー説明文）電気や磁気に関する現象を扱う分野です。",
+  "原子": "原子物理とは〜（ダミー説明文）ミクロな世界の物理法則について学ぶ分野です。",
+  "その他": "その他の物理関連記事です。"
+};
+---
+
+<CategoryPage
+  categoryId="physics"
+  title="高校物理"
+  description="高校物理の各分野について、基礎から応用までわかりやすく解説しています。このページではカテゴリー「物理（physics）」に属する記事をグループごとに一覧表示しています。"
+  groupOrder={groupOrder}
+  groupDescriptions={groupDescriptions}
+/>

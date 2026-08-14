@@ -1,0 +1,470 @@
+---
+title: "【アスパ】強化チップ完全攻略ガイド｜アストラルパーティー"
+description: "アストラルパーティー（アスパ）の強化チップについての基礎知識から、欲しいチップを効率よく狙う方法、最適なリロールのタイミングの考え方まで徹底解説！ページ下部では全チップの簡単な解説を書いたデータベースも掲載しています。"
+pubDatetime: 2026-08-11T18:00:00+09:00
+category_id: "astralparty"
+group: "仕様解説"
+order: 1
+tags:
+  - アストラルパーティー
+  - アスパ
+  - 強化チップ解説
+draft: false
+
+---
+import ChipList from "../../../components/ChipList.astro";
+
+この記事ではアストラルパーティーの強化チップについての基礎知識から、欲しいチップを効率よく狙う方法、最適なリロールのタイミングの考え方までを解説します。ページ下部では全チップの簡単な解説を書いたデータベースも掲載しています。
+
+---
+
+## 1. 強化チップとは？基本と入手方法
+強化チップは、協力チャレンジ（PvEモード）でキャラクターを大幅に強化するためのシステムです。
+
+### チップの入手方法
+以下のタイミングで3つの候補が提示され、その中から1つを選んで獲得できます。
+
+* 試合中に<Word>スターレベル</Word>を上げたとき
+* ミッションを達成したとき
+* マップ上のチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で購入したとき
+
+チップショップでの価格は**初期費用10コイン**で、購入するたびに**5コインずつ値上がり**していきます。
+
+---
+
+### レアリティとリロールの仕様
+
+チップには **<Text color="#3b82f6">青</Text>・<Text color="#a855f7">紫</Text>・<Text color="#eab308">金</Text>** の3つのレア度があり、基本的にレア度が高いほど効果が強力です。
+
+キャラクターのPvEレベルを <strong>Lv.5 または Lv.6</strong> まで上げると、ショップ等で提示されたチップをリロール(再抽選)できるようになります。<br />
+<div class="summary" data-title="リロール（再抽選）の仕様">
+* **直前の候補は出ない**<br/>リロール直前に表示されていた3つのチップは出現しません。<br />
+* **2回前の候補は出現する**<br/>2回連続でリロールした場合、2回前に出ていたチップは再び出現対象になります。
+</div>
+
+---
+
+## 2. 【超重要】キャラのスターレベルと各レア度の出現確率の関係
+<Word id="astralparty/words/スターレベル">レベル</Word>を上げた時やチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で並ぶチップの各レア度（<Text color="#3b82f6">青</Text>・<Text color="#a855f7">紫</Text>・<Text color="#eab308">金</Text>）の確率は、**自身のキャラの<Word id="astralparty/words/スターレベル">レベル</Word>**によって変化します。<Word id="astralparty/words/スターレベル">レベル</Word>が高くなるほど、よりレアなチップが出現しやすくなる仕組みです。
+<br/>※ミッション報酬の確率は**<Word id="astralparty/words/スターレベル">レベル</Word>に関係なく各ミッションごと**に設定されています。
+
+### 出現確率テーブル
+#### 難易度：普通
+
+| <Word id="astralparty/words/スターレベル">レベル</Word> | <Text color="#3b82f6">青</Text> | <Text color="#a855f7">紫</Text> | <Text color="#eab308">金</Text> |
+| :---: | :---: | :---: | :---: |
+| 0、1 | <Text color="#3b82f6">60%</Text> | <Text color="#a855f7">30%</Text> | <Text color="#eab308">10%</Text> |
+| 2 | <Text color="#3b82f6">40%</Text> | <Text color="#a855f7">40%</Text> | <Text color="#eab308">20%</Text> |
+| 3 | <Text color="#3b82f6">20%</Text> | <Text color="#a855f7">50%</Text> | <Text color="#eab308">30%</Text> |
+
+#### 難易度：普通以外
+
+| <Word id="astralparty/words/スターレベル">レベル</Word> | <Text color="#3b82f6">青</Text> | <Text color="#a855f7">紫</Text> | <Text color="#eab308">金</Text> |
+| :---: | :---: | :---: | :---: |
+| 0, 1 | <Text color="#3b82f6">60%</Text> | <Text color="#a855f7">37%</Text> | <Text color="#eab308">3%</Text> |
+| 2 | <Text color="#3b82f6">40%</Text> | <Text color="#a855f7">45%</Text> | <Text color="#eab308">15%</Text> |
+| 3 | <Text color="#3b82f6">25%</Text> | <Text color="#a855f7">50%</Text> | <Text color="#eab308">25%</Text> |
+
+この表から分かる通り、**<Word id="astralparty/words/スターレベル">レベル2</Word>になるまでは<Text color="#eab308">金</Text>チップの出現確率が極めて低い（3%）**ため、低<Word id="astralparty/words/スターレベル">レベル</Word>時にチップショップで高レアを狙うのは期待値的におすすめできません。
+
+また、ショップでチップを買うよりも、**まず<Word id="astralparty/words/スターレベル">レベル</Word>アップを目指した方が圧倒的にお得**な理由は他にも以下のようなものがあります。
+<div class="summary">
+* **PvEレベルによりステータスが強化される**<br/>実質的に<Text color="#3b82f6">青</Text>チップ2〜3枚分を追加で獲得するのと同等のアドバンテージになります。
+* **キャラによってはコインが返ってくる**<br/>PvEレベルの効果により、<Word id="astralparty/words/スターレベル">レベル</Word>アップ時に10コイン還元されるキャラもいます。
+</div>
+試合中にチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>を利用できる回数は、コインや盤面の移動などの制限により限られています。貴重なチップの抽選機会を無駄にしないためにも、**まずは<Word id="astralparty/words/スターレベル">レベル</Word>上げを最優先にし、確率を上げてからチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で購入を行う**立ち回りを徹底しましょう！
+
+※ちなみに<Word><InlineImage name="潜在能力" alt="潜在能力"/>ミミ<InlineImage name="ミミ" alt="ミミ"/></Word>の潜在能力<InlineImage name="潜在能力" alt="潜在能力"/>で出現するチップも、**現在の<Word id="astralparty/words/スターレベル">レベル</Word>の排出確率**が適用されます。
+
+---
+
+## 3. 属性をもつチップの種類と特徴
+
+強化チップの中には、特定の「属性」を持つものが存在します。これらは単体でも機能しますが、同じ属性を集めてシナジーを狙うことで真価を発揮します。
+
+属性は大きく分けて以下の**3種類**です。
+
+### 1. <InlineImage name="Mark" alt="マーク" />マーク属性
+<InlineImage name="Mark" alt="マーク"/>が付いている敵に与えるすべてのダメージが **+1** されます（※付与数に関わらず一律で+1）。敵の行動終了時に<InlineImage name="Mark" alt="マーク"/>が1減少します。
+
+* **立ち回り:** 敵に与えるダメージの最低保証を上げられるため、序盤から火力を出しやすいのが強みです。基本的には1つ付いているだけで十分仕事をしてくれますが、<InlineImage name="Mark" alt="マーク"/>の数が重要なチップやキャラも存在します。基本的に腐りにくいため、**どのキャラでも優先して獲得するのがおすすめ**です。
+
+### 2. <InlineImage name="Starlight" alt="スターライト" />スターライト属性
+<Word>ラウンドボーナス</Word>時に獲得できるスターコインの数が、所持している<InlineImage name="Starlight" alt="スターライト" />の数だけ増加します。
+
+* **立ち回り:** 盤面上のコインを増やす金策用の属性で、サポーターが取るのがおすすめです。終盤になってスタックやコインが大量に溜まらないと火力に変換しづらいため、味方からの振り込みが見込めない状況を除き、**メインアタッカーが優先して取るのはあまりおすすめできません**。
+* **サポーターの保険としての勝ち筋:** アタッカーの下振れ（事故）が発生した際に、スターライトを溜めていたサポーターが<Word id="astralparty/chips/スタハン">スターコインハンマー<InlineImage item="スタハン" rarity="金" alt="スターコインハンマー"/></Word>を獲得し、一気に大ダメージを出して試合を終わらせるような立ち回りも可能です。
+
+### 3. <InlineImage name="Heal" alt="ヒール" />ヒール属性
+ターン開始時の効果の処理がすべて終わった後に<InlineImage name="Heal" alt="ヒール"/>の数だけHPを回復し、ターン終了時の効果の処理が終わった後に<InlineImage name="Heal" alt="ヒール"/>の所持数が**半分（端数切り捨て）**になります。
+
+* **立ち回り:** 単なる生存能力（耐久）の補強にとどまらず、<Word id="astralparty/chips/カッターナイフ">カッターナイフ<InlineImage item="カッターナイフ" rarity="紫" alt="カッターナイフ-ベーシック"/></Word><Word id="astralparty/chips/カッターナイフシャープ"><InlineImage item="カッターナイフ" rarity="金" alt="カッターナイフ-シャープ"/></Word>と組み合わせることで高い火力を出せます。序盤は生存目的、中盤以降は火力源としても機能するため、**こちらも誰が取っても強いおすすめの属性**です。
+
+---
+
+### 【超重要】チップの属性の固定について
+
+これら3つの属性を持つチップには、**「3種類のうち2種類の属性を獲得すると、残りの1種類は抽選に出現しなくなる」**という重要な仕様が存在します。
+
+例えば<Word>ボニー<InlineImage name="ボニー" alt="ボニー"/></Word>を使っていて、<Word id="astralparty/chips/キャッシュカード多い">紫キャッシュ<InlineImage item="キャッシュカード" rarity="紫" alt="キャッシュカード-残高多い"/></Word>（<InlineImage name="Starlight" alt="スターライト" />）と<Word id="astralparty/chips/救急箱">青救急<InlineImage item="救急箱" rarity="青" alt="救急箱-緊急治療"/></Word>（<InlineImage name="Heal" alt="ヒール" />）を取ってしまうと属性が<InlineImage name="Starlight" alt="スターライト"/>と<InlineImage name="Heal" alt="ヒール"/>に固定され、ボニーが一番欲しい<Word id="astralparty/chips/サイト">スタンダードサイト<InlineImage item="サイト" rarity="紫" alt="スタンダードサイト"/></Word>や<Word id="astralparty/chips/サイトイーグル">イーグルアイ<InlineImage item="サイト" rarity="金" alt="イーグルアイ"/></Word>などの<InlineImage name="Mark" alt="マーク" />属性のチップが**絶対に出なくなってしまいます**。
+
+この仕様と「<Word id="astralparty/words/スターレベル">レベル</Word>が上がると高レアが出やすい」仕組みを組み合わせることで、**狙っているビルドを完成させる確率を大幅に上げる**ことができます。
+
+#### 属性の固定を利用した立ち回り
+<div class="summary">
+<strong>1. 序盤（低<Word id="astralparty/words/スターレベル">レベル</Word>時）</strong><br/>最終的に揃えたい2つの属性のチップ（<Text color="#3b82f6">青</Text>などの低レアでOK）を早めに確保し、不要な1属性を抽選対象から除外する。<br/><br/>
+<strong>2. 中盤〜終盤（高<Word id="astralparty/words/スターレベル">レベル</Word>時）</strong><br/>不要な1属性がプールから消えた状態でレベルを上げるため、狙っている2属性の<Text color="#a855f7">紫</Text>・<Text color="#eab308">金</Text>チップ（高レア）の出現率が跳ね上がる！
+</div>
+
+#### 序盤で「無属性チップ」が避けられる理由
+アストラルパーティでは属性持ちのチップが非常に強力なため、最終的な構成の主力も属性チップになりがちです。
+
+序盤に属性のない「無属性チップ」で枠を埋めてしまうと、この「2属性固定による確率アップ」ができなくなってしまいます。
+
+そのため、実は**「無属性チップ」を主軸にしたいキャラの方が、狙ったビルドを完成させる難易度が高い**という側面があります。
+
+---
+## 4. 左端チップの抽選傾向について
+
+<Word id="astralparty/words/スターレベル">レベル</Word>アップやチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>での購入時に提示される3つのチップのうち、**<Word id="astralparty/words/左端のチップ">左端のチップ</Word>にだけ適用される隠しルール**が存在します。
+
+※これは公式が明確に公表している仕様ではありませんが、有志の方々の検証によって判明した仕様であり、[ASTRAL PARTY WIKI](https://astralparty.miraheze.org/wiki/Chips) の「2.1 Character Chip Classes」に詳細なデータがまとめられています。
+
+検証によって判明した仕様なので正確ではないかもしれませんが、実際にプレイするとそのような仕様があることは実感できるので紹介することにします。
+
+### 左端のチップに出現する「偏り」の仕組み
+
+左端の枠は、キャラクターごとに「どの種類のチップが出やすいか」があらかじめ決まっています。
+
+<div class="summary" data-title="左端の枠に適用される2つのルール">
+<strong>1. <Word id="astralparty/words/スターレベル">レベル</Word>に応じたレア度の固定</strong><br />
+<Word id="astralparty/words/スターレベル">レベル0〜1</Word>なら<Text color="#3b82f6">青</Text>、<Word id="astralparty/words/スターレベル">レベル2</Word>なら<Text color="#a855f7">紫</Text>、<Word id="astralparty/words/スターレベル">レベル3</Word>なら<Text color="#eab308">金</Text>のチップが左端に確定で出現します。<br /><br />
+<strong>2. キャラごとの出現率の偏り</strong><br />
+キャラごとに「アタック系が出やすい」「サポート系が出やすい」といった傾向が決まっており、<strong>その傾向を反映したチップが左端の枠へ抽選されます。</strong>
+</div>
+
+つまり、**「自分のキャラがどの<Word id="astralparty/words/スターレベル">レベル</Word>帯で、どんなチップを引きやすいか」**を把握しておけば、狙ったチップを獲得できる確率を大幅に上げることができます。
+
+※序盤にチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>でチップを買わないほうがいいもう一つの理由は、この「<Word id="astralparty/words/スターレベル">レベル</Word>に応じたレア度の固定」です。低<Word id="astralparty/words/スターレベル">レベル</Word>時にチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で買うと左端は必ず<Text color="#3b82f6">青</Text>チップ固定となるため、ただでさえ3%と低い<Text color="#eab308">金</Text>チップが抽選される枠が実質2枠に減り、高レアが本当に出にくくなっています。
+
+---
+
+### 実践例1：レベル2やレベル3到達時にチップを狙うケース
+
+#### 【例】<Word>コマチ<InlineImage name="コマチ" alt="コマチ"/></Word>の場合
+例としてコマチのリロールを使うべきタイミングを考えてみます。
+
+ [Astral Party Wiki](https://astralparty.miraheze.org/wiki/Chips) の「2.1 Character Chip Classes」を見ると<Word>コマチ<InlineImage name="コマチ" alt="コマチ"/></Word>の傾向は以下のようになっています。
+
+| キャラクター<br/>(Character) | サポート<br/>(Support) | サステイン<br/>(Sustain) | アタック<br/>(Attack) | カード<br/>(Cards) |
+| :---: | :---: | :---: | :---: | :---: |
+| <Word>コマチ<InlineImage name="コマチ" alt="コマチ"/></Word> | 15 | 15 | 15 | **100** |
+
+<Word>コマチ<InlineImage name="コマチ" alt="コマチ"/></Word>は**カード（Cards）**の数値が「100」と圧倒的に高いため、この表から$\frac{100}{145} \approx 69\%$ の確率で左端にカード系のチップが出現することが分かります。ここで、カード系に属するチップの排出プール（出現候補）を見ると以下のようになっています。
+
+| 分類 | <Text color="#3b82f6">青チップ</Text> | <Text color="#a855f7">紫チップ</Text> | <Text color="#eab308">金チップ</Text> |
+| :---: | :---: | :---: | :---: |
+| **カード系** | <Text size="2rem"><Word id="astralparty/chips/会員カード"><InlineImage item="会員カード" rarity="青" alt="会員推薦状"/></Word> <Word id="astralparty/chips/豚貯"><InlineImage item="豚貯" rarity="青" alt="豚の貯金箱"/></Word> <Word id="astralparty/chips/スプレー"><InlineImage item="スプレー" rarity="青" alt="スプレー缶"/></Word></Text> | <Text size="2rem"><Word id="astralparty/chips/ビッグバッグ"><InlineImage item="ビッグバッグ" rarity="紫" alt="ビッグバッグ"/></Word> <Word id="astralparty/chips/トーム"><InlineImage item="トーム" rarity="紫" alt="マジックトーム"/></Word> <Word id="astralparty/chips/スマートウォッチ"><InlineImage item="スマートウォッチ" rarity="紫" alt="スマートウォッチ"/></Word> <Word id="astralparty/chips/扇風機大"><InlineImage item="扇風機" rarity="紫" alt="手持ち扇風機-大"/></Word> <Word id="astralparty/chips/矢袋"><InlineImage item="矢袋" rarity="紫" alt="魔法の矢袋"/></Word> <Word id="astralparty/chips/眠剤"><InlineImage item="眠剤" rarity="紫" alt="ビタミン剤"/></Word> <Word id="astralparty/chips/キャンディー"><InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word> <Word id="astralparty/chips/杖"><InlineImage item="杖" rarity="紫" alt="古の魔法杖"/></Word></Text> | <Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word> <Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word> <Word id="astralparty/chips/貫通銃"><InlineImage item="貫通銃" rarity="金" alt="貫通の銃"/></Word></Text> |
+
+※簡単のため、今回はマップ固有のチップ<Text size="2rem">(<Word id="astralparty/chips/杖"><InlineImage item="杖" rarity="紫" alt="古の魔法杖"/></Word>・<Word id="astralparty/chips/貫通銃"><InlineImage item="貫通銃" rarity="金" alt="貫通の銃"/></Word>)</Text>を除外して考えます。
+
+<Word>コマチ<InlineImage name="コマチ" alt="コマチ"/></Word>はできるだけ手札のカードを多く使いたいため、カードの枚数を増やしたり、使用回数を増やせるチップを最優先で確保したいキャラです。
+
+今回は狙うチップとして、<Text color="#a855f7">紫</Text>チップは<Text size="2rem"><Word id="astralparty/chips/ビッグバッグ"><InlineImage item="ビッグバッグ" rarity="紫" alt="ビッグバッグ"/></Word>・<Word id="astralparty/chips/トーム"><InlineImage item="トーム" rarity="紫" alt="マジックトーム"/></Word>・<Word id="astralparty/chips/矢袋"><InlineImage item="矢袋" rarity="紫" alt="魔法の矢袋"/></Word>・<Word id="astralparty/chips/キャンディー"><InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word></Text>の**4種類**、<Text color="#eab308">金</Text>チップは<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>の**1種類**とします。
+
+---
+
+#### 1. レベル2到達時（<Text color="#a855f7">紫</Text>チップ：全7種中4種が当たり）
+
+余事象である目的のチップが引けない「ハズレの確率」から逆算することで、リロールをした時に獲得できる確率を計算できます。
+
+**【Step 1】1回の抽選で「ハズレ」を引く確率を求める**
+
+1回の抽選でハズレになるケースは以下の2つパターンです。
+1. **カード系が選ばれたが、目当て以外の3種（ハズレ）が出た:** $\frac{100}{145} \times \frac{3}{7} = \frac{300}{1015}$
+2. **カード系以外（Support, Sustain, Attack）が選ばれた:** $\frac{45}{145} = \frac{315}{1015}$
+
+これらを足すと、1回あたりのハズレの確率は **$\frac{615}{1015} = \frac{123}{203} \approx 60.6\%$** となります。
+
+<br/>
+
+**【Step 2】リロール回数ごとの獲得確率（当たりが1回以上出る確率）を計算する**
+
+全試行でハズレを引き続ける確率を $1$ から引くことで求められます。
+
+* **レベル2になった瞬間:** $1 - \frac{123}{203} \approx 39\%$
+* **リロール1回使用:** $1 - \left( \frac{123}{203} \right)^2 \approx 63\%$
+* **リロール2回使用:** $1 - \left( \frac{123}{203} \right)^3 \approx 78\%$
+
+※この数値は左端の枠のみを考えた単純計算です。実際にはリロールをする時に「直前に提示されたチップは出現しない」仕様や、「中央と右端の2枠でも抽選される」ことを考えると、**実際に獲得できる確率は上記よりもさらに高くなります。**（リロール1〜2回で約7〜9割程度）
+
+---
+
+#### 2. レベル3到達時（<Text color="#eab308">金</Text>チップ：全2種中1種が当たり）
+
+同様に、<Text color="#eab308">金</Text>チップ2種類<Text size="2rem">(<Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word>・<Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word>)</Text>のうち、目的の1種類<Text size="2rem">(<Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word>)</Text>を獲得できる確率を考えてみます。
+
+**【Step 1】ハズレの確率から単純計算する場合**
+
+まずは<Text color="#a855f7">紫</Text>チップの時と同じように「1回の抽選でハズレる確率」を求めます。
+
+1. **カード系が選ばれたが、<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>（ハズレ）が出た:** $\frac{100}{145} \times \frac{1}{2} = \frac{100}{290}$
+2. **カード系以外（Support, Sustain, Attack）が選ばれた:** $\frac{45}{145} = \frac{90}{290}$
+
+合算すると、1回あたりのハズレの確率は **$\frac{190}{290} = \frac{19}{29} \approx 65.5\%$** となります。
+これをもとに余事象（全部ハズレ以外）を計算すると以下のようになります。
+
+* **レベル3になった瞬間:** $1 - \frac{19}{29} \approx 34\%$
+* **リロール1回使用:** $1 - \left( \frac{19}{29} \right)^2 \approx 57\%$
+* **リロール2回使用:** $1 - \left( \frac{19}{29} \right)^3 \approx 72\%$
+
+---
+
+**【Step 2】「直前に提示されたチップは出現しない」仕様を考慮した計算**
+
+よく考えると、カード系の<Text color="#eab308">金</Text>チップは<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>と<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>の2種類しか存在しないため、初手（またはリロール1回目）でハズレの<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>が出現した場合、次のリロールで**カード系（$\frac{100}{145}$）を引き当てさえすれば確定で<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>が出現する**ことになります。
+
+そこで、初手で「<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>が出たか」「他系列が出たか」で場合分けをして、リロール1回目（左端枠）の確率を計算し直してみます。
+
+* **パターンA（初手で<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>が出現）:**  
+  初手で<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>（$\frac{100}{290}$） $\times$ 次でカード系(<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>確定)を引く（$\frac{100}{145} \times 100\%$） $= \frac{200}{841}$
+* **パターンB（初手で他系列が出現）:**  
+  初手で他系列（$\frac{90}{290}$） $\times$ 次で<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>を引く（$\frac{100}{290}$） $= \frac{90}{841}$
+
+これらを初手の的中率（$\frac{100}{290} = \frac{290}{841}$）と足し合わせると：
+$$\frac{290}{841} + \frac{200}{841} + \frac{90}{841} = \frac{580}{841} = \frac{100}{145} \approx 69\%$$
+
+左端の枠だけでも、**リロール1回で出現率は $\frac{100}{145} \approx 69\%$**まで一気に増えます！
+
+※さらに中央と右枠での抽選（<Text color="#eab308">金</Text>確率25%）も含めると、実戦では**リロール1回で約7割、リロール2回で約9割**という高い確率で目的の<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>を引き当てることができると考えられます。
+
+---
+
+#### 【応用】「属性の固定」を掛け合わせた場合
+「自分のコマチは<InlineImage name="Starlight" alt="スターライト"/><InlineImage name="Mark" alt="マーク"/>派だ！」という場合や、序盤に<Word id="astralparty/chips/キャッシュカード多い">紫キャッシュ<InlineImage item="キャッシュカード" rarity="紫" alt="キャッシュカード-残高多い"/></Word>（<InlineImage name="Starlight" alt="スターライト"/>）等を獲得した場合は、属性が<InlineImage name="Starlight" alt="スターライト"/>と<InlineImage name="Mark" alt="マーク"/>に固定されます。
+
+これにより、<InlineImage name="Heal" alt="ヒール"/>属性である<Text size="2rem"><Word id="astralparty/chips/眠剤"><InlineImage item="眠剤" rarity="紫" alt="ビタミン剤"/></Word></Text>と<Text size="2rem"><Word id="astralparty/chips/キャンディー"><InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word></Text>がプールから除外され、<Text color="#a855f7">紫</Text>カード系の対象が7種類から**5種類**に圧縮されます。
+
+この状態で<Text size="2rem"><Word id="astralparty/chips/ビッグバッグ"><InlineImage item="ビッグバッグ" rarity="紫" alt="ビッグバッグ"/></Word>・<Word id="astralparty/chips/トーム"><InlineImage item="トーム" rarity="紫" alt="トーム"/></Word>・<Word id="astralparty/chips/矢袋"><InlineImage item="矢袋" rarity="紫" alt="矢袋"/></Word></Text>の3種類（5種中3種当たり）を狙う場合の計算は以下のようになります。
+
+**【Step 1】1回の抽選で「ハズレ」を引く確率を求める**
+1. **カード系が選ばれたが、目当て以外の2種（ハズレ）が出た:** $\frac{100}{145} \times \frac{2}{5} = \frac{40}{145}$
+2. **カード系以外（Support, Sustain, Attack）が選ばれた:** $\frac{45}{145}$
+
+これらを足すと、1回あたりのハズレの確率は **$\frac{85}{145} = \frac{17}{29} \approx 58.6\%$** となります。
+
+<br/>
+
+**【Step 2】リロール回数ごとの獲得確率を計算する**
+* **レベル2になった瞬間:** $1 - \frac{17}{29} \approx 41\%$
+* **リロール1回使用:** $1 - \left( \frac{17}{29} \right)^2 \approx 66\%$
+* **リロール2回使用:** $1 - \left( \frac{17}{29} \right)^3 \approx 80\%$
+
+このように属性を固定することで、**先ほどより少しだけ高い確率で目当ての<Text color="#a855f7">紫</Text>チップを獲得できる**ようになります。(※<Text size="2rem"><Word id="astralparty/chips/キャンディー"><InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word></Text>の仕様が変わって現在は普通に使えるチップになったため、属性を固定していない時の当たりの確率が上がって同じぐらいの確率になりました。)
+
+---
+
+**【Step 3】せっかくなので今回も「直前に提示されたチップは出現しない」仕様を考慮して計算してみる**
+
+ここでもレベル3（<Text color="#eab308">金</Text>チップ）の時と同様に、**「1つ直前に提示されたチップは次のリロールで出現しない」**仕様を踏まえたおおよその獲得確率（リロール1回目）を考えてみましょう！
+
+初手でハズレが出た場合、次の2パターンに場合分けができます。
+
+* **パターンA（初手でハズレのカード系<Text color="#a855f7">紫</Text>チップが出現）:**  
+  初手でハズレのカード系（$\frac{40}{145}$）を引き当てた場合、ハズレの選択肢が1つ削られて残り1種になります。  
+  そのため、次のリロールでカード系を引き当てた際の当たる確率は **$\frac{3}{4}$（75%）** になります！  
+  $$\text{確率} = \frac{40}{145} \times \left( \frac{100}{145} \times \frac{3}{4} \right) = \frac{40}{145} \times \frac{15}{29} = \frac{120}{841}$$
+
+* **パターンB（初手で他系列が出現）:**  
+  初手で他系列（$\frac{45}{145}$）が出た場合は、カード系のプール（5種中3種当たり）は変化しないため、次の確率は変わりません。  
+  $$\text{確率} = \frac{45}{145} \times \left( \frac{100}{145} \times \frac{3}{5} \right) = \frac{45}{145} \times \frac{12}{29} = \frac{108}{841}$$
+
+これらを初手の的中率（$\frac{12}{29} = \frac{348}{841}$）と足し合わせると：
+$$\frac{348}{841} + \frac{120}{841} + \frac{108}{841} = \frac{576}{841} \approx 68.5\%$$
+
+※これに中央と右枠の抽選も加わるため、実際の試合では**リロール1回で8割近く、リロール2回で約9割**という非常に高い確率になります。
+
+先ほどの<Text color="#eab308">金</Text>チップ（手裏剣）の例では、ハズレの<Text size="2rem"><Word id="astralparty/chips/サテライト"><InlineImage item="サテライト" rarity="金" alt="探天衛星"/></Word></Text>が消えることで次にカード系に当選すると**確定で<Text size="2rem"><Word id="astralparty/chips/手裏剣"><InlineImage item="手裏剣" rarity="金" alt="忍術手裏剣"/></Word></Text>が出る**ため、この仕様を考えるかどうかで確率には非常に大きな差（約57% ➔ 69%）ができていました。
+
+一方、今回のように**ハズレの選択肢が2つ以上残っている場合**は、ハズレが1つ消えても（当たりの確率が $\frac{3}{5} \rightarrow \frac{3}{4}$ に増える程度で）確率への影響は数%程度に収まります。
+
+そのため、ハズレが複数ある状況では、わざわざこのような場合分け計算をしなくても**上記（Step 2）のような単純な余事象計算（リロール1回で約66%、2回で約80%）を目安にするだけで十分実用的だと思います！**
+
+---
+
+### コマチの立ち回りまとめ
+
+このように、コマチは<Word id="astralparty/words/スターレベル">レベル</Word>を上げさえすれば**「左端の枠の抽選&リロール」だけで欲しいチップをほぼ確実に引き当てる**ことができます。
+<div class="summary">
+* **レベル上げを優先**<br/>途中で無理にチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で購入をするよりも、まっすぐに<Word id="astralparty/words/スターレベル">レベル2やレベル3</Word>を目指す方が圧倒的に安定します。
+* **序盤のリロール配分**<br/>1試合で使えるリロール上限は5回なので、<Word id="astralparty/words/スターレベル">レベル2とレベル3</Word>でそれぞれ1〜2回ずつリロールを切る計画から逆算すると、**序盤（<Word id="astralparty/words/スターレベル">レベル1</Word>時点）で1〜2回程度ならリロールを使っても全く問題ありません。**
+</div>
+
+---
+
+### 実践例2：特定チップの一点狙いをするケース
+
+#### 【例】ユメの場合
+<Word>ユメ<InlineImage name="ユメ" alt="ユメ"/></Word>は、バフの効果が2~4倍になる<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>を何としても確保したいキャラクターです。
+
+
+コマチの時と同様に [Astral Party Wiki](https://astralparty.miraheze.org/wiki/Chips) の「2.1 Character Chip Classes」からユメの傾向を見てみます。
+
+| キャラクター<br/>(Character) | サポート<br/>(Support) | サステイン<br/>(Sustain) | アタック<br/>(Attack) | カード<br/>(Cards) |
+| :---: | :---: | :---: | :---: | :---: |
+| <Word>ユメ<InlineImage name="ユメ" alt="ユメ"/></Word> | 15 | **100** | 15 | 15 |
+
+
+ユメは**サステイン（Sustain）**の数値が「100」と圧倒的に高いため、左端の枠には $\frac{100}{145} \approx 69\%$ の確率でサステイン系のチップが出現します。
+
+サステイン系に属するチップの排出プールは以下の通りです。
+
+| 分類 | <Text color="#3b82f6">青チップ</Text> | <Text color="#a855f7">紫チップ</Text> | <Text color="#eab308">金チップ</Text> |
+| :---: | :---: | :---: | :---: |
+| **サステイン系** | <Text size="2rem"><Word id="astralparty/chips/クッキー"><InlineImage alt="サンドクッキー-普通" item="クッキー" rarity="青"/></Word> <Word id="astralparty/chips/ヘルメット"><InlineImage alt="ヘルメット-一般" item="ヘルメット" rarity="青"/></Word> <Word id="astralparty/chips/救急箱"><InlineImage alt="救急箱-緊急治療" item="救急箱" rarity="青"/></Word> <Word id="astralparty/chips/バフシ"><InlineImage alt="バッファーシールド" item="バフシ" rarity="青"/></Word></Text> | <Text size="2rem"><Word id="astralparty/chips/クッキーなかなか"><InlineImage alt="サンドクッキー-なかなか" item="クッキー" rarity="紫"/></Word> <Word id="astralparty/chips/ヘルメット普通"><InlineImage alt="ヘルメット-普通" item="ヘルメット" rarity="紫"/></Word> <Word id="astralparty/chips/カッターナイフ"><InlineImage alt="カッターナイフ-ベーシック" item="カッターナイフ" rarity="紫"/></Word> <Word id="astralparty/chips/眠剤"><InlineImage alt="ビタミン剤" item="眠剤" rarity="紫"/></Word> <Word id="astralparty/chips/キャンディー"><InlineImage alt="おいしいキャンディー" item="キャンディー" rarity="紫"/></Word> <Word id="astralparty/chips/バッジ"><InlineImage alt="友情バッジ" item="バッジ" rarity="紫"/></Word></Text> | <Text size="2rem"><Word id="astralparty/chips/クッキーうますぎ"><InlineImage alt="サンドクッキー-ウマすぎ" item="クッキー" rarity="金"/></Word> <Word id="astralparty/chips/ヘルメット高級"><InlineImage alt="ヘルメット-高級" item="ヘルメット" rarity="金"/></Word> <Word id="astralparty/chips/カッターナイフシャープ"><InlineImage alt="カッターナイフ-シャープ" item="カッターナイフ" rarity="金"/></Word> <Word id="astralparty/chips/救急箱完備治療"><InlineImage alt="救急箱-完備治療" item="救急箱" rarity="金"/></Word> <Word id="astralparty/chips/トンポー"><InlineImage alt="トンポーロウ" item="トンポー" rarity="金"/></Word></Text> |
+
+この表を見ると、サステイン系の<Text color="#a855f7">紫</Text>チップは全部で6種類あることが分かります。
+
+ユメの強みを最大限に引き出す**<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>**は、このサステイン系の<Text color="#a855f7">紫</Text>プールの中に含まれているため、<Word id="astralparty/words/スターレベル">レベル2</Word>到達時に一点狙いをする価値が非常に高くなります。
+
+それでは、ユメが<Word id="astralparty/words/スターレベル">レベル2</Word>に到達した際に、この<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>をどれくらいの確率で引き当てることができるのか、実際に計算してみましょう。
+
+---
+
+#### レベル2到達時の<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>一点狙いの確率計算
+
+まずは、単純にリロールを回して狙う場合の確率から計算してみましょう。
+
+**【Step 1】1回の提示で「ハズレ」を引く確率を求める**
+1回の抽選で目的の<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>が出ないケースは以下の2パターンです。
+1. **サステイン系が選ばれたが、他5種（ハズレ）が出た:** $\frac{100}{145} \times \frac{5}{6} = \frac{500}{870}$
+2. **サステイン系以外（Support, Attack, Cards）が選ばれた:** $\frac{45}{145} = \frac{270}{870}$
+
+これらを足すと、1回あたりのハズレの確率は **$\frac{770}{870} = \frac{77}{87} \approx 88.5\%$** となります。
+
+**【Step 2】リロール回数ごとの獲得確率を計算する**
+全試行でハズレ続ける確率を $1$ から引きます。
+
+* **レベル2になった瞬間:** $1 - \frac{77}{87} \approx 11\%$
+* **リロール1回使用:** $1 - \left( \frac{77}{87} \right)^2 \approx 21\%$
+* **リロール2回使用:** $1 - \left( \frac{77}{87} \right)^3 \approx 30\%$
+* **リロール3回使用:** $1 - \left( \frac{77}{87} \right)^4 \approx 38\%$
+
+※直前に出たチップが出現しない仕様や中央と右枠の抽選も含めると実際の確率はこれより少しだけ高くなりますが、リロールを注ぎ込んでも<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>が出現する確率は4割弱程度にとどまります。
+
+---
+
+【実践立ち回り】リロール温存とコインの状況に応じた2つのルート
+
+単体リロールだけでの一点狙いは確率的にやや不安が残ります。また、サステイン系は「無属性」と「<InlineImage name="Heal" alt="ヒール" />属性」で構成されているため、**他の系列のように属性の固定で候補を絞るテクニックが使えません**。
+
+そこで重要になるのが、**<Word id="astralparty/words/スターレベル">レベル2</Word>になるまでにリロールを使わずに温存し、<Word id="astralparty/words/スターレベル">レベル2</Word>で最大4回使えるリロールを活用すること**、そして**その場のコイン状況に合わせて立ち回りを変えること**です。
+
+**【パターンA】コインに少し余裕がある場合**
+
+ハズレを回収してプールを圧縮してチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>に賭ける方法
+
+1. **まずはリロールで狙う:** レベル2到達時、温存したリロール（最大4回）を使ってまずは<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>を狙います。
+2. **別のサステインの<Text color="#a855f7">紫</Text>チップが出たら獲得:** リロールの途中で<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>以外のサステイン系の<Text color="#a855f7">紫</Text>チップ<Text size="2rem">(<Word id="astralparty/chips/ヘルメット普通"><InlineImage alt="ヘルメット-普通" item="ヘルメット" rarity="紫"/></Word>・<Word id="astralparty/chips/カッターナイフ"><InlineImage alt="カッターナイフ-ベーシック" item="カッターナイフ" rarity="紫"/></Word>)</Text>などが出現したら、その時点でリロールをするのを止めて、そのチップを獲得して手元に置きます。
+3. **プールが圧縮された状態でチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>で購入:** 手元に置いたチップがプールから除外（全6種 ➔ **全5種**）されます。この状態で10コインを支払ってチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>を利用します。
+
+**【全5種の時のチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>での<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>獲得率の目安】**
+* **ショップ提示（初手）:** 約14%
+* **ショップリロール1回使用:** 約26% ➔ **直前に出たチップが出現しない仕様込みで 約28%**
+* **ショップリロール2回使用:** 約36% ➔ **直前に出たチップが出現しない仕様込みで 約39%**
+
+チップショップ<InlineImage name="チップショップ" alt="チップショップ"/>へ移行すれば約28%〜39%の当たり抽選を上乗せできるため、**トータルで約7割前後の確率** まで押し上げられます。これでも確実とまでは言えませんが、少なくとも先ほどよりは拾えそうな気がします。
+
+**【パターンB】コインに余裕がない場合**
+
+リロール4回をすべて使い切って運に任せましょう！これがアスパ本来の遊び方です！
+
+チップショップ<InlineImage name="チップショップ" alt="チップショップ"/>での購入資金が見込めない場合は、<Word id="astralparty/words/スターレベル">レベル2</Word>で使えるリロール4回をすべて使い切って運に任せる立ち回りになります。
+
+リロール4回を叩き込めば、直前に出たチップが出現しない仕様や中央と右枠の抽選も含めて**実際の確率としては約5〜6割近く**まで届きます。
+
+---
+
+#### ユメの立ち回りまとめ
+
+<div class="summary">
+ユメの場合、サステイン系の<Text color="#a855f7">紫</Text>プールは全6種類と多めで、サステイン系自体も属性固定で候補を絞ることができません。<br /><br />
+そのため、<Word id="astralparty/words/スターレベル">レベル1</Word>ではリロールを温存し、<strong><Word id="astralparty/words/スターレベル">レベル2</Word>で使える最大4回の無料リロール</strong>を活用して狙うのが基本となります。<br /><br />
+もしリロールの途中でハズレのサステイン系の<Text color="#a855f7">紫</Text>チップが出現した場合は、それをあえて獲得してプールを5種へ圧縮した上で<strong>10コインを支払ってチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>を利用する（パターンA）</strong>ことで、<strong>トータルで約7割前後の確率</strong>でキーパーツである<Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>を狙い撃ちすることができます。<br /><br />
+資金に余裕がない場合でも、温存した無料リロール4回をすべて使い切る（パターンB）ことで約5〜6割近くの確率で回収可能なため、状況に応じた割り切りを持って狙いに行く立ち回りが必要です。
+</div>
+
+---
+
+### 自分のメインキャラの「隠し法則」を調べてみよう！
+
+今回はコマチとユメを例に解説しましたが、アストラルパーティに登場するすべてのキャラクターに、それぞれ異なる出現傾向が設定されています。
+
+* **「自分のメインキャラは、どのレベル帯で何が出やすいんだろう？」**
+* **「どの不要属性を弾けば、あのキーチップを確定級で引き込めるだろう？」**
+
+[Astral Party Wiki](https://astralparty.miraheze.org/wiki/Chips) のデータベースを見ながら、「自分だけの最強ビルド&リロール計画」をあらかじめ考えておくだけで、試合中の立ち回りが劇的に変わります。
+
+運任せに思えるチップ選びも、仕様を知ってある程度コントロールできるようになると**アストラルパーティが何倍も面白くなります！**
+
+ぜひ自分の愛用キャラの傾向をチェックして、次の試合から「狙い通りの最強ビルド」を完成させてみてください！
+
+## 全体のまとめ
+
+アストラルパーティにおいて、チップ構成の完成度はそのまま勝率に直結します。一見すると「運任せ」に思えるチップ選びですが、仕様を正しく理解することで**狙った最強ビルドを狙い通りに完成させる確率を引き上げる**ことができます。
+
+今回解説した内容を最後におさらいしておきましょう。
+
+<div class="summary" data-title="勝率を上げる3つの方法">
+<strong>1. 序盤のチップショップ<InlineImage name="チップショップ" alt="チップショップ"/>購入を避ける</strong><br />
+低<Word id="astralparty/words/スターレベル">レベル</Word>時は高レア（<Text color="#eab308">金</Text>・<Text color="#a855f7">紫</Text>）の出現率が極めて低いだけでなく、左端枠が<Text color="#3b82f6">青</Text>チップで固定されてしまうためチャンス枠が減ってしまいます。序盤は無理に買わず、<Word id="astralparty/words/スターレベル">レベル</Word>上げに資金を回しましょう。<br /><br />
+<strong>2. 属性を固定して不要なチップを排除する</strong><br />
+3属性(<InlineImage name="Mark" alt="マーク"/><InlineImage name="Starlight" alt="スターライト"/><InlineImage name="Heal" alt="ヒール"/>)のうち2属性のチップを獲得すると、残りの1属性は抽選から完全に消えます。序盤に不要な1属性を排除しておくことで、高<Word id="astralparty/words/スターレベル">レベル</Word>になった時に狙ったチップが出る確率が跳ね上がります。<br /><br />
+<strong>3. 左端の枠の傾向を知ってリロールのタイミングを事前に考えておこう</strong><br />
+各キャラの左端のチップの傾向とレベル帯（Lv1は<Text color="#3b82f6">青</Text>、Lv2は<Text color="#a855f7">紫</Text>、Lv3は<Text color="#eab308">金</Text>）の法則を把握し、ここぞというタイミングでリロールを使うことで、狙ったチップを高確率で獲得できます。
+</div>
+
+---
+
+### 知識を武器に、勝率をコントロールしよう！
+
+運要素の強いパーティゲームに見えて、実は**「確率をコントロールする知識」を持ったプレイヤーが圧倒的に有利になる**のがアストラルパーティの奥深いところです。
+
+「ただ提示されたチップを選ぶ立ち回り」から脱却し、事前の属性の固定やリロールの計算などを駆使して、狙い通りの最強ビルドで勝利を掴み取りましょう！
+
+---
+
+### おわりに
+
+ここまで確率や抽選の仕様など、少し難しい話も交えて解説してきましたが、**「これらの法則を知らないと勝てない」「必ず厳密に計算しなければならない」ということは全くありません！**
+
+アストラルパーティの魅力は、その場のひらめきや運の要素をみんなで楽しむところにあります。
+
+* 「今日はこのチップが面白そうだから取ってみよう！」
+* 「なんとなく直感でリロールしてみよう！」
+
+といった遊ぶ方の楽しさも、このゲームの素晴らしい醍醐味の一つです。
+
+「どうしても勝ちたい試合がある」「自分の好きなキャラで理想のビルドを突き詰めてみたい！」と思った時に、この記事で紹介した知識をちょっとしたお守りとして思い出していただければ幸いです。
+
+---
+
+## 強化チップ一覧
+
+※ここに書かれている内容は筆者のプレイや検証の記憶を基に作成しているため、仕様変更や誤りが含まれている可能性があります。あらかじめご了承ください。<br/>
+もし間違いや最新仕様との相違に気づいた場合は、コメント等でご指摘いただけますと非常に助かります！
+
+<div class="summary" data-title="評価基準や前提条件">
+* **対象難易度**<br/>本一覧で触れている評価や立ち回りは、主に**野良の「狂気」および「極限」難易度**を想定しています。メンバー間で意思疎通ができる環境や、異なる難易度では評価や立ち回りが変化する場合があります。
+* **評価の視点**<br/>全体的な汎用性（一般的な評価）をベースに記載しています。特定のキャラクターにとっては評価がガラリと変わるケースも多いため、あくまで目安としてご活用ください。
+* **今後の更新予定**<br/>各チップの「適性キャラの適正である理由」「相性の良いチップの組み合わせ」などの詳細解説は、順次追記や更新していく予定です。
+</div>
+
+---
+
+### 全チップのデータベースと評価
+
+以下の検索・絞り込みツールから、各チップの性能や立ち回りでの評価を確認できます。
+属性固定の検討や、レベルアップ時に提示されたチップの採用判断に迷った際の辞書代わりとしてご活用ください！
+<ChipList />
+

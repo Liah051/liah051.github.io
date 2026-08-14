@@ -1,0 +1,27 @@
+---
+import '../styles/physics-theme.css';
+
+interface Props {
+  svgCode: string;
+}
+
+const { svgCode } = Astro.props;
+
+// 正規表現を使用して、SVG内の固定色をCSS変数に自動置換します
+// dvisvgm などが生成するシングルクォートや短縮Hex（例：#000）にも対応します
+const processedSvg = svgCode
+  // 黒（線・文字）：#000, #000000, black
+  .replace(/(stroke|fill)=["']?(?:#000000|#000|black)["']?/gi, '$1="var(--svg-stroke)"')
+  // 薄い青（背景）：#e6f2ff, #e6e6ff
+  .replace(/(stroke|fill)=["']?(?:#e6f2ff|#e6e6ff)["']?/gi, '$1="var(--svg-fill-light)"')
+  // 灰色（車輪など）：#808080, gray
+  .replace(/(stroke|fill)=["']?(?:#808080|gray)["']?/gi, '$1="var(--svg-fill-dark)"')
+  // 赤（力ベクトル）：red, #f00, #ee0000
+  .replace(/(stroke|fill)=["']?(?:#ee0000|#f00|red)["']?/gi, '$1="var(--svg-force)"')
+  // 青（速度ベクトル）：blue, #0000ee, #00f
+  .replace(/(stroke|fill)=["']?(?:#0000ee|#00f|blue)["']?/gi, '$1="var(--svg-velocity)"');
+---
+
+<div class="physics-diagram">
+  <Fragment set:html={processedSvg} />
+</div>

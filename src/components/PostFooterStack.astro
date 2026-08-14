@@ -2,6 +2,7 @@
 import { type CollectionEntry } from "astro:content";
 import { getGlossary } from "@/utils/glossary";
 import { getPath } from "@/utils/getPath";
+import { cleanTitle } from "@/utils/cleanTitle";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { Lightbulb, ThumbsUp, Frown, ExternalLink } from "@lucide/astro";
@@ -154,7 +155,7 @@ if (targetCategory && group) {
           <IconChevronLeft class="h-6 w-6 flex-none text-muted-foreground transition-transform group-hover:-translate-x-1" />
           <div class="min-w-0">
             <span class="text-xs text-muted-foreground">{seriesPosts.length > 0 ? "前の記事" : "Older Post"}</span>
-            <div class="truncate font-medium text-accent">{prevPost.data.title}</div>
+            <div class="truncate font-medium text-accent">{cleanTitle(prevPost.data.title, prevPost.data.category_id)}</div>
           </div>
         </a>
       )
@@ -167,7 +168,7 @@ if (targetCategory && group) {
         >
           <div class="text-right min-w-0">
             <span class="text-xs text-muted-foreground">{seriesPosts.length > 0 ? "次の記事" : "Newer Post"}</span>
-            <div class="truncate font-medium text-accent">{nextPost.data.title}</div>
+            <div class="truncate font-medium text-accent">{cleanTitle(nextPost.data.title, nextPost.data.category_id)}</div>
           </div>
           <IconChevronRight class="h-6 w-6 flex-none text-muted-foreground transition-transform group-hover:translate-x-1" />
         </a>
@@ -208,7 +209,7 @@ if (targetCategory && group) {
                     {index + 1}
                   </span>
                   <span class:list={["grow truncate", isCurrent ? "font-bold text-foreground" : "text-muted-foreground"]}>
-                    {p.data.title}
+                    {cleanTitle(p.data.title, p.data.category_id)}
                   </span>
                   {isCurrent && (
                     <span class="shrink-0 text-xs font-bold text-accent">読み終えた！</span>

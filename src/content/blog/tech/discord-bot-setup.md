@@ -3,7 +3,7 @@ author: Dialiah
 pubDatetime: 2026-03-03T01:00:00Z
 title: Discord Botの作り方 (discord.js)
 featured: true
-draft: false
+draft: true
 tags:
   - Tech
   - Discord

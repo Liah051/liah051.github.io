@@ -1,0 +1,27 @@
+---
+import CategoryPage from "@/components/CategoryPage.astro";
+
+export const metadata = {
+  id: "astralparty",
+  title: "アストラルパーティー",
+  description: "アストラルパーティーの強化チップ一覧や仕様解説、各種攻略情報をまとめています。",
+  showOnIndex: true,
+  order: 2,
+};
+
+const groupOrder = ["仕様解説", "攻略情報", "その他"];
+const groupDescriptions = {
+  "仕様解説": "アストラルパーティーのゲームシステムや、強化チップなどの仕様解説です。",
+  "攻略情報": "キャラクターの立ち回りやマップごとの攻略情報です。",
+  "その他": "その他のアストラルパーティー関連記事です。",
+
+};
+---
+
+<CategoryPage
+  categoryId="astralparty"
+  title="アストラルパーティー"
+  description="アストラルパーティーの強化チップ一覧や仕様解説、各種攻略情報をまとめています。"
+  groupOrder={groupOrder}
+  groupDescriptions={groupDescriptions}
+/>

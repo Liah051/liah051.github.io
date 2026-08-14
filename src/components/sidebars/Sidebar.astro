@@ -1,0 +1,163 @@
+---
+// src/components/sidebars/Sidebar.astro
+import { getCollection } from "astro:content";
+import { cleanTitle } from "@/utils/cleanTitle";
+
+export interface SidebarGroupItem {
+  type: "group";
+  name: string;
+}
+
+export interface SidebarCustomGroupItem {
+  type: "custom-group";
+  name: string;
+  posts: string[];
+}
+
+export interface SidebarPostItem {
+  type: "post";
+  id: string;
+}
+
+export interface SidebarLinkItem {
+  type: "link";
+  label: string;
+  url: string;
+  description?: string;
+}
+
+export type SidebarItem = SidebarGroupItem | SidebarCustomGroupItem | SidebarPostItem | SidebarLinkItem;
+
+export interface Props {
+  title: string;
+  category?: string;
+  items: SidebarItem[];
+}
+
+const { title, category, items } = Astro.props;
+
+// 下書き以外の全記事を取得
+const allPosts = await getCollection("blog", ({ data }) => data.draft !== true);
+
+// 表示用データの解決
+const resolvedItems = items.map((item) => {
+  if (item.type === "group") {
+    // カテゴリーおよびグループ名が一致する記事をフィルタ
+    const groupPosts = allPosts.filter((post) => {
+      const matchesCategory = category ? post.data.category_id === category : true;
+      if (!matchesCategory) return false;
+
+      const postGroup = post.data.group || "その他";
+      return postGroup === item.name;
+    });
+
+    // order順でソート
+    groupPosts.sort((a, b) => {
+      const orderA = a.data.order ?? 999;
+      const orderB = b.data.order ?? 999;
+      return orderA - orderB;
+    });
+
+    return {
+      type: "group" as const,
+      name: item.name,
+      posts: groupPosts.map((post) => ({
+        id: post.id,
+        title: cleanTitle(post.data.title, post.data.category_id),
+        url: `/posts/${post.id}/`
+      }))
+    };
+  } else if (item.type === "custom-group") {
+    // 手動指定された記事リストを解決
+    const groupPosts = item.posts.map((postId) => {
+      const post = allPosts.find(p => p.id === postId || p.id.replace(/\.(md|mdx)$/, '') === postId.replace(/\.(md|mdx)$/, ''));
+      if (post) {
+        return {
+          id: post.id,
+          title: cleanTitle(post.data.title, post.data.category_id),
+          url: `/posts/${post.id}/`
+        };
+      }
+      return {
+        id: postId,
+        title: `⚠️ 記事が見つかりません (${postId})`,
+        url: "#"
+      };
+    });
+
+    return {
+      type: "group" as const,
+      name: item.name,
+      posts: groupPosts
+    };
+  } else if (item.type === "post") {
+    // 個別記事を解決
+    const post = allPosts.find(p => p.id === item.id || p.id.replace(/\.(md|mdx)$/, '') === item.id.replace(/\.(md|mdx)$/, ''));
+    if (post) {
+      return {
+        type: "post" as const,
+        title: cleanTitle(post.data.title, post.data.category_id),
+        url: `/posts/${post.id}/`
+      };
+    }
+    return {
+      type: "link" as const,
+      title: `⚠️ 記事が見つかりません (${item.id})`,
+      url: "#"
+    };
+  } else if (item.type === "link") {
+    // カスタムリンク
+    return {
+      type: "link" as const,
+      title: item.label,
+      url: item.url,
+      description: item.description
+    };
+  }
+  return null;
+}).filter((item): item is NonNullable<typeof item> => item !== null);
+---
+
+<div class="rounded-xl border border-border bg-background p-5 shadow-sm">
+  <h3 class="mb-4 text-lg font-bold">
+    {category ? (
+      <a href={`/toppages/${category}`} class="hover:text-accent hover:underline">
+        {title}
+      </a>
+    ) : (
+      title
+    )}
+  </h3>
+  <ul class="flex flex-col gap-3 text-sm">
+    {resolvedItems.map((item) => {
+      if (item.type === "group") {
+        return (
+          <li>
+            <h4 class="font-semibold mb-2">{item.name}</h4>
+            <ul class="flex flex-col gap-2 pl-2">
+              {item.posts.map((post) => (
+                <li>
+                  <a href={post.url} class="hover:text-accent hover:underline leading-tight block">
+                    {post.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        );
+      } else if (item.type === "post" || item.type === "link") {
+        return (
+          <li>
+            <a href={item.url} class="hover:text-accent hover:underline leading-tight block font-medium">
+              {item.title}
+            </a>
+            {item.description && (
+              <p class="mt-1 text-xs opacity-70">{item.description}</p>
+            )}
+          </li>
+        );
+      }
+      return null;
+    })}
+  </ul>
+</div>
