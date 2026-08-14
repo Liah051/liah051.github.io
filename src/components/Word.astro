@@ -206,6 +206,7 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
   transition: opacity 0.2s, visibility 0.2s; 
   visibility: hidden;
   opacity: 0;
+  display: none;
 }
 
   .glossary-tooltip-box {
@@ -238,6 +239,7 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
   /* ホバー時およびアクティブ時の表示（visibilityを制御してJSの計算を可能にする） */
   .glossary-word-container:hover .glossary-tooltip,
   .glossary-word-container.is-active .glossary-tooltip {
+    display: block;
     opacity: 1;
     visibility: visible;
     transition: opacity 0.2s;
