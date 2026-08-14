@@ -308,10 +308,10 @@ if (targetCategory && group) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            const itemTop = activeSeriesItem.offsetTop;
-            const itemHeight = activeSeriesItem.offsetHeight;
-            const containerHeight = seriesContainer.clientHeight;
-            seriesContainer.scrollTop = itemTop - (containerHeight / 2) + (itemHeight / 2);
+            const containerRect = seriesContainer.getBoundingClientRect();
+            const itemRect = activeSeriesItem.getBoundingClientRect();
+            const relativeTop = itemRect.top - containerRect.top + seriesContainer.scrollTop;
+            seriesContainer.scrollTop = relativeTop - (containerRect.height / 2) + (itemRect.height / 2);
             observer.disconnect();
           }
         });
