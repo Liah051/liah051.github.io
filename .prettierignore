@@ -12,3 +12,7 @@
 !.prettierrc
 !eslint.config.js
 !README.md
+
+# Ignore markdown/mdx content files to prevent layout/spacing issues from auto-formatting
+**/*.md
+**/*.mdx
