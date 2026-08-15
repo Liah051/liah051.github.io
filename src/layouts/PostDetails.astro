@@ -93,11 +93,7 @@ const layoutProps = {
     class:list={["app-layout pb-12", { "mt-8": !SITE.showBackButton }]}
     data-pagefind-body
   >
-    <!-- 
-      - justify-between と gap-x を併用してサイドバーを右端に可能な限り押し出し、「プロフィール」メニュー右側配置へ誘導
-      - メインコンテンツは明確な最大幅を指定し、右端が「タグ」中央に来るよう制限
-      - -ml-[1em] 等で全角1文字分ほどの左寄りシフトを実現
-    -->
+
     <div class="flex flex-col md:flex-row md:justify-between items-start md:items-stretch gap-18 lg:gap-24">
       <!-- Left Column: Main Content -->
       <div class="w-full min-w-0 md:max-w-[780px] lg:max-w-[800px] md:translate-x-0 relative z-10">
