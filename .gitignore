@@ -29,7 +29,6 @@ public/pagefind
 
 # temp files
 *.txt
-*.md
 
 # salesforce dx
 .sfdx/
