@@ -26,6 +26,8 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 
     const params = new URLSearchParams(window.location.search);
 
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
     const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 1));
 
     onIdle(async () => {
@@ -48,11 +50,23 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
         showImages: false,
         showSubResults: true,
         processTerm: function (term: string) {
-          params.set("q", term); // Update the `q` parameter in the URL
-          history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading
-
-          const backUrl = pageFindSearch?.dataset?.backurl;
-          sessionStorage.setItem("backUrl", backUrl + "?" + params.toString());
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            if (term.trim() === "") {
+              history.replaceState(history.state, "", window.location.pathname);
+              const backUrl = pageFindSearch?.dataset?.backurl;
+              if (backUrl) {
+                sessionStorage.setItem("backUrl", backUrl);
+              }
+            } else {
+              params.set("q", term); // Update the `q` parameter in the URL
+              history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading
+              const backUrl = pageFindSearch?.dataset?.backurl;
+              if (backUrl) {
+                sessionStorage.setItem("backUrl", backUrl + "?" + params.toString());
+              }
+            }
+          }, 400);
 
           return term;
         },
@@ -71,8 +85,14 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       clearButton?.addEventListener("click", resetSearchParam);
 
       function resetSearchParam(e: Event) {
-        if ((e.target as HTMLInputElement)?.value.trim() === "") {
+        const val = (e.target as HTMLInputElement)?.value;
+        if (val === undefined || val.trim() === "") {
+          clearTimeout(debounceTimer);
           history.replaceState(history.state, "", window.location.pathname);
+          const backUrl = pageFindSearch?.dataset?.backurl;
+          if (backUrl) {
+            sessionStorage.setItem("backUrl", backUrl);
+          }
         }
       }
     });
