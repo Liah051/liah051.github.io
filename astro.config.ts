@@ -21,22 +21,29 @@ import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 
 import react from "@astrojs/react";
+import iosBackNavFix from "@tinloof/astro-ios-backnav-fix";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
-  integrations: [sitemap({
-    filter: page => SITE.showArchives || !page.endsWith("/archives"),
-  }), mdx(), d2({
-    theme: {
-      default: '0',    // 明るいテーマ
-      dark: '200',     // ダークモード用テーマ
-    },
-    inline: true,      // SVGをHTMLに直接埋め込む
-    experimental: {
-      useD2js: true,    // WASM版のD2を使用（アダプティブ・ダークモードに対応）
-    },
-  }), react()],
+  integrations: [
+    iosBackNavFix(),
+    sitemap({
+      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+    }),
+    mdx(),
+    d2({
+      theme: {
+        default: '0',    // 明るいテーマ
+        dark: '200',     // ダークモード用テーマ
+      },
+      inline: true,      // SVGをHTMLに直接埋め込む
+      experimental: {
+        useD2js: true,    // WASM版のD2を使用（アダプティブ・ダークモードに対応）
+      },
+    }),
+    react()
+  ],
   markdown: {
     remarkPlugins: [
       remarkStrongJsx,
