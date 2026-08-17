@@ -21,12 +21,12 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
 
 {
   entry ? (
-    <span class="glossary-word-container relative inline group cursor-help transition-all duration-300">
+    <span class="glossary-word-container relative inline group cursor-help">
       <span class="glossary-word transition-colors group-hover:text-accent">
         <slot />
       </span>
       {/* ツールチップコンテナ：影を一体化するために filter: drop-shadow を使用 */}
-      <span class="glossary-tooltip absolute bottom-full mb-3 z-50 pointer-events-none group-hover:pointer-events-auto opacity-0 transition-opacity duration-300 overflow-visible">
+      <span class="glossary-tooltip mb-3">
         <span class="glossary-tooltip-box inline-block w-max max-w-[280px] p-3 text-card-foreground text-sm rounded-lg border border-border relative z-10 shadow-none overflow-hidden">
           <span class="block font-bold mb-2">{displayTitle}</span>
           <span class="flex gap-3 items-center" style="display: flex;">
@@ -62,60 +62,67 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
   )
 }
 
-<script is:inline data-astro-rerun>
-  (() => {
+<script>
+  let glossaryPositioningInitialized = false;
+
+  const adjustTooltip = (container: HTMLElement) => {
+    const tooltip = container.querySelector('.glossary-tooltip') as HTMLElement | null;
+    if (!tooltip) return;
+
+    // 1. まず中央揃えのデフォルト状態にする
+    tooltip.style.transform = 'translateX(-50%)';
+
+    // 2. レイアウトを確定させて位置を計測
+    void tooltip.offsetWidth; 
+    const rect = tooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const margin = 12;
+
+    // 3. はみ出し判定
+    let shift = 0;
+    if (rect.left < margin) {
+      shift = margin - rect.left;
+    } else if (rect.right > viewportWidth - margin) {
+      shift = (viewportWidth - margin) - rect.right;
+    }
+
+    // 4. 必要に応じて補正適用
+    if (shift !== 0) {
+      // メインボックスをシフト
+      tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`;
+    }
+  };
+
+  const initGlossaryPositioning = () => {
     // 既に初期化済みの場合はスキップ（イベントリスナーの重複防止）
-    if (window.glossaryPositioningInitialized) return;
-    window.glossaryPositioningInitialized = true;
-
-    const adjustTooltip = (container) => {
-      const tooltip = container.querySelector('.glossary-tooltip');
-      if (!tooltip) return;
-
-      // 1. まず中央揃えのデフォルト状態にする
-      tooltip.style.transform = 'translateX(-50%)';
-
-      // 2. レイアウトを確定させて位置を計測
-      void tooltip.offsetWidth; 
-      const rect = tooltip.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const margin = 12;
-
-      // 3. はみ出し判定
-      let shift = 0;
-      if (rect.left < margin) {
-        shift = margin - rect.left;
-      } else if (rect.right > viewportWidth - margin) {
-        shift = (viewportWidth - margin) - rect.right;
-      }
-
-      // 4. 必要に応じて補正適用
-      if (shift !== 0) {
-        // メインボックスをシフト
-        tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`;
-      }
-    };
+    if (glossaryPositioningInitialized) return;
+    glossaryPositioningInitialized = true;
 
     // デリゲートされたイベントリスナーで効率的かつ確実に処理
     document.addEventListener('mouseover', (e) => {
       if (document.documentElement.getAttribute('data-glossary-hidden') === 'true') return;
 
-      const container = e.target.closest('.glossary-word-container');
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const container = target.closest('.glossary-word-container') as HTMLElement | null;
       if (!container) return;
 
-      const relatedContainer = e.relatedTarget ? e.relatedTarget.closest('.glossary-word-container') : null;
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      const relatedContainer = relatedTarget ? relatedTarget.closest('.glossary-word-container') : null;
 
       // 新しくコンテナに入った（あるいは別コンテナから移動した）場合
       if (container !== relatedContainer) {
         // 既存の非表示タイマーがあればクリアする
-        if (container._glossaryHideTimeout) {
-          clearTimeout(container._glossaryHideTimeout);
-          container._glossaryHideTimeout = null;
+        const containerWithTimeout = container as HTMLElement & { _glossaryHideTimeout?: number | null };
+        if (containerWithTimeout._glossaryHideTimeout) {
+          clearTimeout(containerWithTimeout._glossaryHideTimeout);
+          containerWithTimeout._glossaryHideTimeout = null;
         }
 
         // 最前面にするための z-index 制御
-        window.glossaryMaxZIndex = (window.glossaryMaxZIndex || 100) + 1;
-        container.style.zIndex = window.glossaryMaxZIndex.toString();
+        const win = window as any;
+        win.glossaryMaxZIndex = (win.glossaryMaxZIndex || 100) + 1;
+        container.style.zIndex = win.glossaryMaxZIndex.toString();
         
         // アクティブクラスを追加
         container.classList.add('is-active');
@@ -126,23 +133,27 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
     });
 
     document.addEventListener('mouseout', (e) => {
-      const container = e.target.closest('.glossary-word-container');
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const container = target.closest('.glossary-word-container') as HTMLElement | null;
       if (!container) return;
 
-      const relatedContainer = e.relatedTarget ? e.relatedTarget.closest('.glossary-word-container') : null;
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      const relatedContainer = relatedTarget ? relatedTarget.closest('.glossary-word-container') : null;
 
       // コンテナから完全に外に出た場合
       if (container !== relatedContainer) {
+        const containerWithTimeout = container as HTMLElement & { _glossaryHideTimeout?: number | null };
         // 既存のタイマーがあれば一度クリア
-        if (container._glossaryHideTimeout) {
-          clearTimeout(container._glossaryHideTimeout);
+        if (containerWithTimeout._glossaryHideTimeout) {
+          clearTimeout(containerWithTimeout._glossaryHideTimeout);
         }
 
         // 500ms後に非アクティブ化するタイマーを開始
-        container._glossaryHideTimeout = setTimeout(() => {
+        containerWithTimeout._glossaryHideTimeout = window.setTimeout(() => {
           container.classList.remove('is-active');
           container.style.zIndex = ''; // z-indexをリセット
-          container._glossaryHideTimeout = null;
+          containerWithTimeout._glossaryHideTimeout = null;
         }, 500);
       }
     });
@@ -151,30 +162,35 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
     document.addEventListener('touchstart', (e) => {
       if (document.documentElement.getAttribute('data-glossary-hidden') === 'true') return;
 
-      const container = e.target.closest('.glossary-word-container');
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const container = target.closest('.glossary-word-container') as HTMLElement | null;
       
       // 他のすべてのアクティブなコンテナをクローズする（タップされたコンテナ以外）
       document.querySelectorAll('.glossary-word-container.is-active').forEach(activeContainer => {
         if (activeContainer !== container) {
-          if (activeContainer._glossaryHideTimeout) {
-            clearTimeout(activeContainer._glossaryHideTimeout);
-            activeContainer._glossaryHideTimeout = null;
+          const actContainer = activeContainer as HTMLElement & { _glossaryHideTimeout?: number | null };
+          if (actContainer._glossaryHideTimeout) {
+            clearTimeout(actContainer._glossaryHideTimeout);
+            actContainer._glossaryHideTimeout = null;
           }
-          activeContainer.classList.remove('is-active');
-          activeContainer.style.zIndex = ''; // z-indexをリセット
+          actContainer.classList.remove('is-active');
+          actContainer.style.zIndex = ''; // z-indexをリセット
         }
       });
 
       if (container) {
+        const containerWithTimeout = container as HTMLElement & { _glossaryHideTimeout?: number | null };
         // タイマーがあればクリア
-        if (container._glossaryHideTimeout) {
-          clearTimeout(container._glossaryHideTimeout);
-          container._glossaryHideTimeout = null;
+        if (containerWithTimeout._glossaryHideTimeout) {
+          clearTimeout(containerWithTimeout._glossaryHideTimeout);
+          containerWithTimeout._glossaryHideTimeout = null;
         }
 
         // 最前面にするための z-index 制御
-        window.glossaryMaxZIndex = (window.glossaryMaxZIndex || 100) + 1;
-        container.style.zIndex = window.glossaryMaxZIndex.toString();
+        const win = window as any;
+        win.glossaryMaxZIndex = (win.glossaryMaxZIndex || 100) + 1;
+        container.style.zIndex = win.glossaryMaxZIndex.toString();
         
         if (!container.classList.contains('is-active')) {
           container.classList.add('is-active');
@@ -182,7 +198,10 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
         }
       }
     }, { passive: true });
-  })();
+  };
+
+  // Astro View Transitions に対処
+  document.addEventListener("astro:page-load", initGlossaryPositioning);
 </script>
 
 <style>
@@ -195,19 +214,17 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
     padding-bottom: 2px;
   }
 
-  /* ツールチップの不透明度とフィルタ */
-.glossary-tooltip {
-  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
-  /* デフォルトでセンターに配置 */
-  left: 50%;
-  transform: translateX(-50%); 
-  
-  /* transformをtransitionに入れないことで「スライド」を防止 */
-  transition: opacity 0.2s, visibility 0.2s; 
-  visibility: hidden;
-  opacity: 0;
-  display: none;
-}
+  /* ツールチップのデフォルト（非アクティブ）状態：レンダーツリーおよびGPUレイヤーから完全に除外 */
+  .glossary-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    z-index: 50;
+    overflow: visible;
+  }
 
   .glossary-tooltip-box {
     background-color: var(--background); /* 完全に不透明なテーマ背景を使用 */
@@ -236,19 +253,23 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
   }
 
-  /* ホバー時およびアクティブ時の表示（visibilityを制御してJSの計算を可能にする） */
+  /* ホバー時およびアクティブ時の表示（display: blockでレンダーツリーに追加） */
   .glossary-word-container:hover .glossary-tooltip,
   .glossary-word-container.is-active .glossary-tooltip {
     display: block;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.2s;
-    transition-delay: 0s;
-    /* absoluteな位置関係を維持 */
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
     pointer-events: auto; /* カーソルのインタラクションを許可 */
+    
+    /* アニメーション用のフェードインを実行（非表示時のGPU負荷なし） */
+    animation: glossary-fade-in 0.2s ease-out forwards;
+  }
+
+  @keyframes glossary-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   /* ホバー時およびアクティブ時の文字色 */
@@ -257,18 +278,16 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
     color: var(--accent);
   }
 
-  /* ツールチップへの架け橋 */
+  /* ツールチップへの架け橋（非表示時はレンダーツリーから除外） */
   .glossary-word-container::after {
     content: "";
+    display: none;
     position: absolute;
     bottom: 100%;
     left: 50%;
     width: 100%;
     height: 24px;
     transform: translateX(-50%);
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.2s, visibility 0.2s;
     background-color: transparent;
     z-index: 40;
   }
@@ -280,9 +299,7 @@ const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').
 
   .glossary-word-container:hover::after,
   .glossary-word-container.is-active::after {
-    visibility: visible;
-    opacity: 1;
-    transition: none;
+    display: block;
   }
 
   :global(html[data-glossary-hidden="true"]) .glossary-word {
