@@ -37,9 +37,9 @@ const SelectedSidebar =
 <!-- Drawer panel -->
 <div
   id="mobile-drawer"
-  class="fixed top-0 right-0 z-50 h-full w-full max-w-sm translate-x-full overflow-y-auto bg-background p-6 shadow-2xl transition-transform duration-300 ease-in-out"
+  class="fixed top-0 right-0 z-50 h-full w-full max-w-sm translate-x-full overflow-y-auto bg-background shadow-2xl transition-transform duration-300 ease-in-out"
 >
-  <div class="mb-8 flex items-center justify-between">
+  <div class="sticky top-0 z-10 flex items-center justify-between bg-background px-6 pt-6 pb-4">
     <span class="text-xl font-bold">{SITE.title}</span>
     <button
       id="close-drawer-btn"
@@ -50,7 +50,7 @@ const SelectedSidebar =
     </button>
   </div>
 
-  <nav class="mb-8 flex flex-col space-y-4">
+  <nav class="mb-8 flex flex-col space-y-4 px-6">
     <a
       href="/posts"
       class={`text-lg font-medium hover:text-accent ${isActive("/posts") ? "text-accent" : ""}`}
@@ -75,10 +75,10 @@ const SelectedSidebar =
     }
   </nav>
 
-  <hr class="my-8 border-border" />
+  <hr class="mx-6 my-8 border-border" />
 
   <!-- サイドバーの内容 -->
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6 px-6 pb-6">
     {isPost && <TableOfContents headings={headings} mode="collapsible" />}
 
     <SelectedSidebar />
