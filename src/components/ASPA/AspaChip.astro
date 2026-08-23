@@ -30,9 +30,10 @@ const chipHeight =
 
 <span
   class="aspa-chip-container"
+  role={alt ? "img" : undefined}
+  aria-label={alt || undefined}
   style={`width: ${typeof size === "number" ? size + "px" : size || "64px"}; height: ${typeof size === "number" ? size + "px" : size || "64px"};`}
 >
-  {alt && <span class="sr-only">{alt}</span>}
   {
     bgImage ? (
       <Image

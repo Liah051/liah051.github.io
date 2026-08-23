@@ -11,12 +11,17 @@ const { id } = Astro.props;
 const termFromSlot = await Astro.slots.render("default");
 const glossaryEntries = await getGlossary();
 
+const cleanTerm = termFromSlot
+  .replace(/<span[^>]*class="[^"]*sr-only[^"]*"[^>]*>.*?<\/span>/gs, "")
+  .replace(/<[^>]*>?/gm, "")
+  .trim();
+
 const entry = id
   ? glossaryEntries.find((e) => e.id === id)
-  : glossaryEntries.find((e) => e.data.term === termFromSlot.replace(/<[^>]*>?/gm, '').trim());
+  : glossaryEntries.find((e) => e.data.term === cleanTerm);
 
 const { description, url, image } = entry?.data || {};
-const displayTitle = entry?.data.term || termFromSlot.replace(/<[^>]*>?/gm, '').trim();
+const displayTitle = entry?.data.term || cleanTerm;
 ---
 
 {

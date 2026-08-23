@@ -38,6 +38,17 @@ const { labels } = Astro.props;
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .tabs-container {
+    overflow: visible;
+  }
+  .tabs-panel {
+    overflow: visible;
+  }
+  .tabs-panel > *,
+  .tabs-panel ul,
+  .tabs-panel ol {
+    overflow: visible;
+  }
 </style>
 
 <script>
