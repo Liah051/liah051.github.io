@@ -7,10 +7,32 @@ const DARK = "dark";
 // Can be "light", "dark", or empty string for system's prefers-color-scheme
 const initialColorScheme = "";
 
+function getCookie(name: string): string | null {
+  try {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? match[1] : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function hasManualPreference(): boolean {
+  try {
+    if (localStorage.getItem(THEME)) return true;
+  } catch (e) {}
+  if (getCookie(THEME)) return true;
+  return false;
+}
+
 function getPreferTheme(): string {
-  // get theme data from local storage (user's explicit choice)
-  const currentTheme = localStorage.getItem(THEME);
-  if (currentTheme) return currentTheme;
+  // get theme data from local storage or cookie (user's explicit choice)
+  try {
+    const currentTheme = localStorage.getItem(THEME);
+    if (currentTheme) return currentTheme;
+  } catch (e) {}
+
+  const cookieTheme = getCookie(THEME);
+  if (cookieTheme) return cookieTheme;
 
   // return initial color scheme if it is set (site default)
   if (initialColorScheme) return initialColorScheme;
@@ -21,11 +43,16 @@ function getPreferTheme(): string {
     : LIGHT;
 }
 
-// Use existing theme value from inline script if available, otherwise detect
-let themeValue = window.theme?.themeValue ?? getPreferTheme();
+// Bypassing window.theme.themeValue to re-evaluate from storage (prevents race condition in WebView)
+let themeValue = getPreferTheme();
 
 function setPreference(): void {
-  localStorage.setItem(THEME, themeValue);
+  try {
+    localStorage.setItem(THEME, themeValue);
+  } catch (e) {}
+  try {
+    document.cookie = `${THEME}=${themeValue}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch (e) {}
   reflectPreference();
 }
 
@@ -54,8 +81,14 @@ function reflectPreference(): void {
 
 // Update the global theme API
 if (window.theme) {
+  window.theme.themeValue = themeValue;
   window.theme.setPreference = setPreference;
   window.theme.reflectPreference = reflectPreference;
+  window.theme.getTheme = () => themeValue;
+  window.theme.setTheme = (val: string) => {
+    themeValue = val;
+    if (window.theme) window.theme.themeValue = val;
+  };
 } else {
   window.theme = {
     themeValue,
@@ -64,6 +97,7 @@ if (window.theme) {
     getTheme: () => themeValue,
     setTheme: (val: string) => {
       themeValue = val;
+      if (window.theme) window.theme.themeValue = val;
     },
   };
 }
@@ -108,9 +142,8 @@ document.addEventListener("astro:before-swap", event => {
 window
   .matchMedia("(prefers-color-scheme: dark)")
   .addEventListener("change", ({ matches: isDark }) => {
-    if (localStorage.getItem(THEME)) return;
+    if (hasManualPreference()) return;
     themeValue = isDark ? DARK : LIGHT;
     window.theme?.setTheme(themeValue);
     reflectPreference();
   });
-

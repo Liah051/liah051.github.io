@@ -157,7 +157,25 @@ const structuredData = {
     <script is:inline>
       (function () {
         const initialColorScheme = ""; // "light" | "dark"
-        const currentTheme = localStorage.getItem("theme");
+
+        function getCookie(name) {
+          try {
+            const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+            return match ? match[1] : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function getSavedTheme() {
+          try {
+            const localTheme = localStorage.getItem("theme");
+            if (localTheme) return localTheme;
+          } catch (e) {}
+          return getCookie("theme");
+        }
+
+        const currentTheme = getSavedTheme();
 
         function getPreferTheme() {
           if (currentTheme) return currentTheme;
@@ -173,7 +191,13 @@ const structuredData = {
         document.documentElement.setAttribute("data-theme", themeValue);
 
         // Glossary state persistence
-        const isGlossaryEnabled = localStorage.getItem("isGlossaryEnabled") !== "false";
+        const isGlossaryEnabled = (function () {
+          try {
+            return localStorage.getItem("isGlossaryEnabled") !== "false";
+          } catch (e) {
+            return true;
+          }
+        })();
         if (!isGlossaryEnabled) {
           document.documentElement.setAttribute("data-glossary-hidden", "true");
         }
@@ -189,7 +213,13 @@ const structuredData = {
 
         // Re-apply state after Astro swap
         document.addEventListener("astro:after-swap", () => {
-          const isEnabled = localStorage.getItem("isGlossaryEnabled") !== "false";
+          const isEnabled = (function () {
+            try {
+              return localStorage.getItem("isGlossaryEnabled") !== "false";
+            } catch (e) {
+              return true;
+            }
+          })();
           if (!isEnabled) {
             document.documentElement.setAttribute("data-glossary-hidden", "true");
           }
