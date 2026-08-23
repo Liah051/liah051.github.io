@@ -122,10 +122,6 @@ const displayTitle = entry?.data.term || cleanTerm;
       hintTimeoutId = null;
     }
 
-    window.removeEventListener('scroll', dismissHint);
-    document.removeEventListener('touchstart', dismissHint);
-    document.removeEventListener('click', dismissHint);
-
     const hint = document.querySelector('.glossary-micro-hint');
     if (hint) {
       hint.classList.add('fade-out');
@@ -138,26 +134,37 @@ const displayTitle = entry?.data.term || cleanTerm;
   const showMicroHint = (target: HTMLElement) => {
     if (document.querySelector('.glossary-micro-hint')) return;
 
-    const hint = document.createElement('div');
+    const hint = document.createElement('span'); // span 要素にしてインラインレイアウトの崩れを防ぐ
     hint.className = 'glossary-micro-hint';
     
     const hintInner = document.createElement('span');
-    // タッチデバイスかどうかで表記を切り替える
+    hintInner.className = 'glossary-micro-hint-text';
+    // タッチデバイスかどうかで表記を切り替える（マークダウン記法を含まないプレーンテキスト）
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     hintInner.textContent = hasTouch ? 'タップで解説' : 'ホバーで解説';
     hint.appendChild(hintInner);
+
+    // 閉じるボタン（×）
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'glossary-micro-hint-close';
+    closeBtn.textContent = '×';
+    hint.appendChild(closeBtn);
     
     target.appendChild(hint);
 
-    // 2.5〜3秒程度経過したら自動フェードアウト (2800ms)
-    hintTimeoutId = window.setTimeout(() => {
+    const handleClose = (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
+      try {
+        localStorage.setItem('has_opened_word_tooltip', 'true');
+      } catch (err) {
+        console.warn(err);
+      }
       dismissHint();
-    }, 2800);
+    };
 
-    // ユーザーが画面をスクロール/タップした場合はフェードアウトして自然に消す
-    window.addEventListener('scroll', dismissHint, { passive: true });
-    document.addEventListener('touchstart', dismissHint, { passive: true });
-    document.addEventListener('click', dismissHint, { passive: true });
+    closeBtn.addEventListener('click', handleClose);
+    closeBtn.addEventListener('touchstart', handleClose);
   };
 
   const setupMicroHint = () => {
@@ -167,24 +174,31 @@ const displayTitle = entry?.data.term || cleanTerm;
       console.warn('localStorage is not available:', err);
     }
 
-    const firstWord = document.querySelector('.glossary-word-container');
-    if (!firstWord) return;
+    const allWords = document.querySelectorAll('.glossary-word-container');
+    if (allWords.length === 0) return;
 
     microHintObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+      for (const entry of entries) {
         if (entry.isIntersecting) {
-          showMicroHint(entry.target as HTMLElement);
-          if (microHintObserver) {
-            microHintObserver.disconnect();
-            microHintObserver = null;
+          const target = entry.target as HTMLElement;
+          // 表示状態（非表示タブ内の display: none などではない）かチェック
+          if (target.offsetParent !== null) {
+            showMicroHint(target);
+            if (microHintObserver) {
+              microHintObserver.disconnect();
+              microHintObserver = null;
+            }
+            break; // 最初の可視要素の交差で完了
           }
         }
-      });
+      }
     }, {
       rootMargin: '-30% 0px -30% 0px' // 画面中央付近
     });
 
-    microHintObserver.observe(firstWord);
+    allWords.forEach(word => {
+      microHintObserver?.observe(word);
+    });
   };
 
   const cleanupMicroHint = () => {
@@ -362,6 +376,11 @@ const displayTitle = entry?.data.term || cleanTerm;
 </script>
 
 <style>
+  :global(.glossary-word-container) {
+    position: relative;
+    display: inline-block;
+  }
+
   .glossary-word {
     /* カスタムドット下線 */
     background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
@@ -473,14 +492,15 @@ const displayTitle = entry?.data.term || cleanTerm;
   }
 
   /* マイクロヒントの吹き出し */
-  .glossary-micro-hint {
+  :global(.glossary-micro-hint) {
     position: absolute;
     bottom: calc(100% + 8px); /* 単語の少し上に配置 */
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    pointer-events: none; /* 下の要素のタップを邪魔しない */
+    pointer-events: none; /* 下の要素のタップを邪魔しない（ボタン以外） */
     white-space: nowrap;
+    display: inline-block;
     
     /* 角丸ピル型・控えめなダーク系半透明背景 */
     background-color: rgba(15, 23, 42, 0.95);
@@ -488,31 +508,61 @@ const displayTitle = entry?.data.term || cleanTerm;
     font-size: 11px;
     font-weight: 500;
     line-height: 1;
-    padding: 6px 12px;
+    padding: 6px 26px 6px 12px; /* 閉じるボタン（×）用のスペースを追加 */
     border-radius: 9999px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--accent); /* アクセント色の外縁 */
     
     /* アニメーション用 */
     opacity: 0;
     animation: micro-hint-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  /* 下部矢印（三角） */
-  .glossary-micro-hint::after {
+  /* 閉じるボタン（×） */
+  :global(.glossary-micro-hint-close) {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    pointer-events: auto; /* 親要素が pointer-events: none でもクリック可能にする */
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global(.glossary-micro-hint-close:hover) {
+    color: var(--accent);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* 下部矢印（回転スクエアで枠線を一体化） */
+  :global(.glossary-micro-hint::after) {
     content: "";
     position: absolute;
-    top: 100%;
+    top: calc(100% - 5px); /* 枠線とピッタリ重なるように調整 */
     left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+    width: 8px;
+    height: 8px;
+    background-color: rgba(15, 23, 42, 0.95);
+    border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    transform: translateX(-50%) rotate(45deg);
+    transform-origin: center;
+    z-index: -1;
   }
 
   /* フェードアウト用クラス */
-  .glossary-micro-hint.fade-out {
+  :global(.glossary-micro-hint.fade-out) {
     animation: micro-hint-fade-out 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
@@ -538,5 +588,22 @@ const displayTitle = entry?.data.term || cleanTerm;
     }
   }
 
+  /* ダークモード時の配色変更：背景を白、文字を黒 */
+  :global(html[data-theme="dark"]) :global(.glossary-micro-hint) {
+    background-color: #ffffff;
+    color: #000000;
+  }
 
+  :global(html[data-theme="dark"]) :global(.glossary-micro-hint::after) {
+    background-color: #ffffff;
+  }
+
+  :global(html[data-theme="dark"]) :global(.glossary-micro-hint-close) {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  :global(html[data-theme="dark"]) :global(.glossary-micro-hint-close:hover) {
+    color: var(--accent);
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 </style>
