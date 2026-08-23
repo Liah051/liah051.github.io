@@ -69,6 +69,8 @@ const displayTitle = entry?.data.term || cleanTerm;
 
 <script>
   let glossaryPositioningInitialized = false;
+  let microHintObserver: IntersectionObserver | null = null;
+  let hintTimeoutId: number | null = null;
 
   const adjustTooltip = (container: HTMLElement) => {
     const tooltip = container.querySelector('.glossary-tooltip') as HTMLElement | null;
@@ -98,9 +100,119 @@ const displayTitle = entry?.data.term || cleanTerm;
     }
   };
 
+  const dismissHint = (e?: Event) => {
+    // ユーザーが実際にワードコンテナをタップ/クリックした場合はフラグ保存
+    if (e && e.target) {
+      const target = e.target as HTMLElement;
+      if (target.closest('.glossary-word-container')) {
+        try {
+          localStorage.setItem('has_opened_word_tooltip', 'true');
+        } catch (err) {
+          console.warn('localStorage is not available:', err);
+        }
+        if (microHintObserver) {
+          microHintObserver.disconnect();
+          microHintObserver = null;
+        }
+      }
+    }
+
+    if (hintTimeoutId) {
+      clearTimeout(hintTimeoutId);
+      hintTimeoutId = null;
+    }
+
+    window.removeEventListener('scroll', dismissHint);
+    document.removeEventListener('touchstart', dismissHint);
+    document.removeEventListener('click', dismissHint);
+
+    const hint = document.querySelector('.glossary-micro-hint');
+    if (hint) {
+      hint.classList.add('fade-out');
+      hint.addEventListener('animationend', () => {
+        hint.remove();
+      }, { once: true });
+    }
+  };
+
+  const showMicroHint = (target: HTMLElement) => {
+    if (document.querySelector('.glossary-micro-hint')) return;
+
+    const hint = document.createElement('div');
+    hint.className = 'glossary-micro-hint';
+    
+    const hintInner = document.createElement('span');
+    // タッチデバイスかどうかで表記を切り替える
+    const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    hintInner.textContent = hasTouch ? 'タップで解説' : 'ホバーで解説';
+    hint.appendChild(hintInner);
+    
+    target.appendChild(hint);
+
+    // 2.5〜3秒程度経過したら自動フェードアウト (2800ms)
+    hintTimeoutId = window.setTimeout(() => {
+      dismissHint();
+    }, 2800);
+
+    // ユーザーが画面をスクロール/タップした場合はフェードアウトして自然に消す
+    window.addEventListener('scroll', dismissHint, { passive: true });
+    document.addEventListener('touchstart', dismissHint, { passive: true });
+    document.addEventListener('click', dismissHint, { passive: true });
+  };
+
+  const setupMicroHint = () => {
+    try {
+      if (localStorage.getItem('has_opened_word_tooltip') === 'true') return;
+    } catch (err) {
+      console.warn('localStorage is not available:', err);
+    }
+
+    const firstWord = document.querySelector('.glossary-word-container');
+    if (!firstWord) return;
+
+    microHintObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          showMicroHint(entry.target as HTMLElement);
+          if (microHintObserver) {
+            microHintObserver.disconnect();
+            microHintObserver = null;
+          }
+        }
+      });
+    }, {
+      rootMargin: '-30% 0px -30% 0px' // 画面中央付近
+    });
+
+    microHintObserver.observe(firstWord);
+  };
+
+  const cleanupMicroHint = () => {
+    if (microHintObserver) {
+      microHintObserver.disconnect();
+      microHintObserver = null;
+    }
+    if (hintTimeoutId) {
+      clearTimeout(hintTimeoutId);
+      hintTimeoutId = null;
+    }
+    window.removeEventListener('scroll', dismissHint);
+    document.removeEventListener('touchstart', dismissHint);
+    document.removeEventListener('click', dismissHint);
+    
+    const hint = document.querySelector('.glossary-micro-hint');
+    if (hint) {
+      hint.remove();
+    }
+  };
+
   const initGlossaryPositioning = () => {
-    // 既に初期化済みの場合はスキップ（イベントリスナーの重複防止）
-    if (glossaryPositioningInitialized) return;
+    cleanupMicroHint();
+
+    if (glossaryPositioningInitialized) {
+      setupMicroHint();
+      return;
+    }
     glossaryPositioningInitialized = true;
 
     // デリゲートされたイベントリスナーで効率的かつ確実に処理
@@ -117,6 +229,16 @@ const displayTitle = entry?.data.term || cleanTerm;
 
       // 新しくコンテナに入った（あるいは別コンテナから移動した）場合
       if (container !== relatedContainer) {
+        // デスクトップ等でのホバーによる解説展開のタイミングでフラグを記録
+        try {
+          localStorage.setItem('has_opened_word_tooltip', 'true');
+        } catch (err) {
+          console.warn('localStorage is not available:', err);
+        }
+        
+        // マイクロヒントが表示されていれば非表示にする
+        dismissHint();
+
         // 既存の非表示タイマーがあればクリアする
         const containerWithTimeout = container as HTMLElement & { _glossaryHideTimeout?: number | null };
         if (containerWithTimeout._glossaryHideTimeout) {
@@ -185,6 +307,16 @@ const displayTitle = entry?.data.term || cleanTerm;
       });
 
       if (container) {
+        // 実際にタップされた瞬間にフラグを記録
+        try {
+          localStorage.setItem('has_opened_word_tooltip', 'true');
+        } catch (err) {
+          console.warn('localStorage is not available:', err);
+        }
+        
+        // マイクロヒントが表示されていれば非表示にする
+        dismissHint();
+
         const containerWithTimeout = container as HTMLElement & { _glossaryHideTimeout?: number | null };
         // タイマーがあればクリア
         if (containerWithTimeout._glossaryHideTimeout) {
@@ -203,6 +335,26 @@ const displayTitle = entry?.data.term || cleanTerm;
         }
       }
     }, { passive: true });
+
+    // クリックイベントでもフラグを記録
+    document.addEventListener('click', (e) => {
+      if (document.documentElement.getAttribute('data-glossary-hidden') === 'true') return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const container = target.closest('.glossary-word-container') as HTMLElement | null;
+
+      if (container) {
+        try {
+          localStorage.setItem('has_opened_word_tooltip', 'true');
+        } catch (err) {
+          console.warn('localStorage is not available:', err);
+        }
+        dismissHint();
+      }
+    });
+
+    setupMicroHint();
   };
 
   // Astro View Transitions に対処
@@ -319,4 +471,72 @@ const displayTitle = entry?.data.term || cleanTerm;
   :global(html[data-glossary-hidden="true"]) .glossary-word-container {
     cursor: default !important;
   }
+
+  /* マイクロヒントの吹き出し */
+  .glossary-micro-hint {
+    position: absolute;
+    bottom: calc(100% + 8px); /* 単語の少し上に配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none; /* 下の要素のタップを邪魔しない */
+    white-space: nowrap;
+    
+    /* 角丸ピル型・控えめなダーク系半透明背景 */
+    background-color: rgba(15, 23, 42, 0.95);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    
+    /* アニメーション用 */
+    opacity: 0;
+    animation: micro-hint-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* 下部矢印（三角） */
+  .glossary-micro-hint::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+  }
+
+  /* フェードアウト用クラス */
+  .glossary-micro-hint.fade-out {
+    animation: micro-hint-fade-out 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes micro-hint-fade-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 4px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  @keyframes micro-hint-fade-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -4px);
+    }
+  }
+
+
 </style>
