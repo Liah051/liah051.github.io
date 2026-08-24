@@ -29,7 +29,23 @@ export default defineConfig({
   integrations: [
     iosBackNavFix(),
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => {
+        const url = new URL(page);
+        const cleanPath = url.pathname.endsWith("/") ? url.pathname.slice(0, -1) : url.pathname;
+        if (!SITE.showArchives && cleanPath.endsWith("/archives")) {
+          return false;
+        }
+        // Exclude pagination URLs like /posts/2, /posts/3, etc.
+        if (/\/posts\/\d+$/.test(cleanPath)) {
+          return false;
+        }
+        // Exclude tag-specific pages and their pagination (e.g., /tags/tag-name, /tags/tag-name/2)
+        // Keep the main tags directory page (/tags) if it exists.
+        if (cleanPath.startsWith("/tags/")) {
+          return false;
+        }
+        return true;
+      },
     }),
     mdx(),
     d2({
