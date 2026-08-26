@@ -10,10 +10,13 @@
     @apply prose max-w-none prose-lg;
 
     h1,
-    h4,
     h5,
     h6 {
       @apply mb-3 text-foreground;
+    }
+
+    h4 {
+      @apply mb-3 mt-6 border-l-2 border-accent/30 pl-3 text-foreground font-semibold;
     }
 
     h2 {

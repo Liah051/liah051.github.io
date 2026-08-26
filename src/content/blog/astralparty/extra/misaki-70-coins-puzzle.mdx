@@ -49,7 +49,7 @@ featured: true
 * 全員の初期手札は効果カード2枚と攻撃カード1枚、防御カード1枚であった
 
 
-### 某新人捜査官の「ライフ・ブック」に記された内容
+### 某新人捜査官の「ライフ・ブック」に記された手がかり
 * ファニィは1ターン目に自分から雰囲気系ロボに戦闘を仕掛けていない
 * メガスは1ターン目にショップを通ったが、そこで自分の所持金を減らす行動はしていない
 * ミサキは2ターン目にレールキャノンで爆竹ゲロゲロを倒し、......、突撃マスから雰囲気系ロボを倒した
@@ -118,14 +118,14 @@ featured: true
   <div>
     **ヒント2**
 
-    * 初期手札の並び順は全員共通で左から `[効果, 効果, バトル, バトル]` である。
-    * 新しく獲得したカードは必ず手札の**一番右端（末尾）**に追加される。
+    * ファニィが効果カードを使える回数を考えてみよう。
 
   </div>
   <div>
     **ヒント3**
 
-    * ファニィのバフ欄に注目してみよう。
+    * 初期手札の並び順は全員共通で左から `[効果, 効果, バトル, バトル]` である。
+    * 新しく獲得したカードは必ず手札の**一番右端（末尾）**に追加される。
 
   </div>
   <div>
@@ -194,15 +194,15 @@ featured: true
 
     ファニィには現在<InlineImage name="Heal" alt="ヒール"/>が2スタック付与されています。<InlineImage name="Heal" alt="ヒール"/>はターン終了時に半減（端数切り捨て）されるため、ターン終了時に2残るためには**直前に4スタック以上**たまっている必要があります。提示された4つの選択肢を順に検証します。
 
-    * **1. <Word id="astralparty/chips/バフシ">バッファーシールド<InlineImage item="バフシ" rarity="青" alt="バッファーシールド"/></Word>の否定**
+    * **1. <Word id="astralparty/chips/バフシ">バッファーシールド<InlineImage item="バフシ" rarity="青" alt="バッファーシールド"/></Word>の否定**<br/>
       <Word id="astralparty/chips/バフシ">バッファーシールド<InlineImage item="バフシ" rarity="青" alt="バッファーシールド"/></Word>を取った場合は、2回攻撃を受けることで<InlineImage name="Heal" alt="ヒール"/>が4たまり、ターン終了時に2になったと考えられます。
       しかし、「方向転換」や「支援」を使わずに、ファニィが<Word id="astralparty/chips/バフシ">バッファーシールド<InlineImage item="バフシ" rarity="青" alt="バッファーシールド"/></Word>を獲得してから雰囲気系ロボから反撃込みで2回攻撃を受けることは不可能です。なぜなら、謎1で特定した通りファニィは1番手のスタートポイントでレベルを上げており、その後に移動ダイス8以下で雰囲気系ロボの反撃を受けることはできないからです。
 
-    * **2. <Word id="astralparty/chips/キャンディー">おいしいキャンディー<InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word>の否定**
+    * **2. <Word id="astralparty/chips/キャンディー">おいしいキャンディー<InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word>の否定**<br/>
       <Word id="astralparty/chips/キャンディー">おいしいキャンディー<InlineImage item="キャンディー" rarity="紫" alt="おいしいキャンディー"/></Word>はカードを使うたびに<InlineImage name="Heal" alt="ヒール"/>が+1されます。
       しかし、現在のファニィが1ターンに使用できるカード枚数では、ターン終了時の半減後に<InlineImage name="Heal" alt="ヒール"/>を2残すことはできません。
 
-    * **3. <Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>の確定**
+    * **3. <Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="友情バッジ"/></Word>の確定**<br/>
       <Word id="astralparty/chips/バッジ">友情バッジ<InlineImage item="バッジ" rarity="紫" alt="バッジ"/></Word>はショップで他プレイヤーに送金するたびに<InlineImage name="Heal" alt="ヒール"/>が+2されます。2回送金することでスタックが4たまり、ターン終了時の半減で「2」になります。
 
       所持金10のファニィが2回送金（-10コイン）し、さらに誰かが「天からの贈り物」を1回発生させて+3コインを得たと考えると、現在の所持金は `10 - 10 + 3 = 3コイン` となり完全に合致します。
@@ -214,7 +214,7 @@ featured: true
       4. 送金を2回行って「王の力」を購入（所持金3）。
       という流れになります。バトルカードはこの一連の流れで発生した戦闘で使ったと考えるのが適切です。
 
-    * **4. <Word id="astralparty/chips/眠剤">ビタミン剤<InlineImage alt="ビタミン剤" item="眠剤" rarity="紫"/></Word>の否定**
+    * **4. <Word id="astralparty/chips/眠剤">ビタミン剤<InlineImage alt="ビタミン剤" item="眠剤" rarity="紫"/></Word>の否定**<br/>
       <Word id="astralparty/chips/眠剤">ビタミン剤<InlineImage alt="ビタミン剤" item="眠剤" rarity="紫"/></Word>はカードを1枚獲得するたびに<InlineImage name="Heal" alt="ヒール"/>が+1されます。手がかりより「あなたもどうぞ」を使った人はいない上に、メガスとミサキが2ターン目にイベントマスを踏んでいないのは明らかなので、ファニィが2ターン目の行動終了後に他者からカードを受け取ることはできません。
 
       したがって、行動終了前にカードを4〜5枚獲得し、半減処理によって<InlineImage name="Heal" alt="ヒール"/>を2残した場合のみを考えれば十分です。
