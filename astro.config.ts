@@ -91,10 +91,16 @@ function rehypeOptimizeImages() {
               existingClasses.push("cursor-zoom-in");
             }
             node.properties.className = existingClasses;
+          } else {
+            // Guard: If src is empty or invalid, set a safe transparent SVG placeholder
+            const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+            node.properties.src = placeholder;
+            node.properties["data-full-src"] = placeholder;
+            node.properties.dataFullSrc = placeholder;
           }
 
-          // Fallback check if src is missing
-          if (!node.properties.src && typeof node.properties["data-src"] === "string") {
+          // Fallback check if src is missing or empty
+          if ((!node.properties.src || node.properties.src === "") && typeof node.properties["data-src"] === "string") {
             node.properties.src = node.properties["data-src"];
           }
 
