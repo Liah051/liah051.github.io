@@ -212,6 +212,8 @@ const layoutProps = {
       link.className =
         "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
       link.href = "#" + heading.id;
+      const text = heading.textContent?.replace(/#/g, "").trim() || "";
+      link.setAttribute("aria-label", text ? `「${text}」へのリンク` : "セクションへのリンク");
 
       const span = document.createElement("span");
       span.ariaHidden = "true";
@@ -263,10 +265,76 @@ const layoutProps = {
     }
   }
 
+  /** Image Lightbox Modal */
+  function setupLightbox() {
+    let lightboxModal = document.getElementById("lightbox-modal");
+    if (!lightboxModal) {
+      lightboxModal = document.createElement("div");
+      lightboxModal.id = "lightbox-modal";
+      lightboxModal.className =
+        "fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm transition-all duration-200 select-none";
+      lightboxModal.innerHTML = `
+        <button id="lightbox-close" type="button" aria-label="閉じる" class="absolute top-4 right-4 z-10 p-2 text-white/80 hover:text-white focus:outline-none text-2xl font-bold rounded-full bg-black/40 hover:bg-black/70 w-10 h-10 flex items-center justify-center transition-colors">
+          &times;
+        </button>
+        <div class="relative max-w-full max-h-full flex items-center justify-center">
+          <img id="lightbox-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl transition-transform duration-200 cursor-zoom-out" />
+        </div>
+      `;
+      document.body.appendChild(lightboxModal);
+
+      const closeLightbox = () => {
+        lightboxModal.classList.add("hidden");
+        document.body.style.overflow = "";
+        const modalImg = lightboxModal.querySelector("#lightbox-img");
+        if (modalImg) modalImg.src = "";
+      };
+
+      const closeBtn = lightboxModal.querySelector("#lightbox-close");
+      closeBtn?.addEventListener("click", closeLightbox);
+      lightboxModal.addEventListener("click", (e) => {
+        if (e.target === lightboxModal || e.target.id === "lightbox-img" || e.target.id === "lightbox-close") {
+          closeLightbox();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !lightboxModal.classList.contains("hidden")) {
+          closeLightbox();
+        }
+      });
+    }
+
+    const article = document.getElementById("article");
+    if (!article) return;
+
+    const images = article.querySelectorAll("img");
+    for (const img of images) {
+      if (img.classList.contains("inline-image") || img.classList.contains("status-icon")) continue;
+      if (img.dataset.lightboxAttached) continue;
+      img.dataset.lightboxAttached = "true";
+      img.classList.add("cursor-zoom-in");
+
+      img.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const fullSrc = img.getAttribute("data-full-src") || img.src;
+        const modalImg = lightboxModal.querySelector("#lightbox-img");
+        if (modalImg) {
+          modalImg.src = fullSrc;
+          modalImg.alt = img.alt || "";
+        }
+        lightboxModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      });
+    }
+  }
+
   // Initialize features
   setupProgressBar();
   addHeadingLinks();
   attachCopyButtons();
+  setupLightbox();
 
   // Handle scroll reset after transition
   document.addEventListener("astro:after-swap", () => {

@@ -46,7 +46,7 @@ if (name && !item) {
       <AspaChip item={item} rarity={rarity} size="1.2em" alt={displayAlt} />
     </span>
   ) : (
-    image && <img src={image.src} alt={displayAlt} class="inline-image" />
+    image && <img src={image.src} alt={displayAlt} class="inline-image" loading="lazy" decoding="async" width={image.width} height={image.height} />
   )
 }
 

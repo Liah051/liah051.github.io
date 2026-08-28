@@ -7,7 +7,7 @@
 html[data-theme="light"] {
   --background: #fdfdfd;
   --foreground: #282728;
-  --accent: #006cac;
+  --accent: #005f9e;
   --muted: #e6e6e6;
   --border: #ece9e9;
 }
@@ -15,7 +15,7 @@ html[data-theme="light"] {
 html[data-theme="dark"] {
   --background: #212737;
   --foreground: #eaedf3;
-  --accent: #ff6b01;
+  --accent: #ff771a;
   --muted: #343f60;
   --border: #ab4b08;
 }
@@ -30,6 +30,10 @@ html[data-theme="dark"] {
 }
 
 @layer base {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 
   /* '*' ではなく 'html, body, div, span, ...' と主要要素に限定するか、iframeを除外する */
   *:not(iframe) {

@@ -98,7 +98,7 @@ if (targetCategory && group) {
                 </div>
                 <div class="flex gap-4 items-start">
                   {term.data.image && (
-                    <img src={term.data.image} alt={term.data.term} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" />
+                    <img src={term.data.image} alt={term.data.term} class="shrink-0 w-16 h-16 object-cover rounded-md border border-border bg-muted" width={64} height={64} loading="lazy" decoding="async" />
                   )}
                   <p class="flex-1 min-w-0 text-sm text-muted-foreground leading-relaxed"><GlossaryDescription text={term.data.description} /></p>
                 </div>
@@ -186,7 +186,7 @@ if (targetCategory && group) {
           <h3 class="font-bold">
             <span class="text-accent">#{group}</span> シリーズの進捗
           </h3>
-          <span class="text-sm font-medium bg-accent/10 text-accent px-2 py-1 rounded">
+          <span class="text-sm font-semibold bg-accent/15 text-accent px-2 py-1 rounded">
             {currentPosition} / {seriesPosts.length}
           </span>
         </div>

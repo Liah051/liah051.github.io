@@ -32,8 +32,8 @@ if (typeof image === "string") {
       <AspaChip item={(image as any).item} rarity={(image as any).rarity} size={size} />
     </span>
   ) : imgType === "metadata" ? (
-    <Image src={image as ImageMetadata} alt={alt} width={(image as ImageMetadata).width} height={(image as ImageMetadata).height} class={className} loading={loading} />
+    <Image src={image as ImageMetadata} alt={alt} width={(image as ImageMetadata).width} height={(image as ImageMetadata).height} class={className} loading={loading} decoding="async" />
   ) : imgType === "string" ? (
-    <img src={image as string} alt={alt} class={className} width={size} height={size} loading={loading} />
+    <img src={image as string} alt={alt} class={className} width={size} height={size} loading={loading} decoding="async" />
   ) : null
 }

@@ -23,6 +23,82 @@ import { SITE } from "./src/config";
 import react from "@astrojs/react";
 import iosBackNavFix from "@tinloof/astro-ios-backnav-fix";
 
+function rehypeOptimizeImages() {
+  return (tree: any) => {
+    let imgIndex = 0;
+    function visit(node: any) {
+      if (!node) return;
+      if (node.type === "element" && node.tagName === "img") {
+        if (node.properties) {
+          if (typeof node.properties.src === "string") {
+            const src: string = node.properties.src;
+
+            if (src.includes("res.cloudinary.com") && src.includes("/image/upload/")) {
+              let fullSrc = src;
+              let lightSrc = src;
+
+              if (src.includes("/image/upload/f_auto,q_auto,w_1200/")) {
+                fullSrc = src.replace(
+                  "/image/upload/f_auto,q_auto,w_1200/",
+                  "/image/upload/f_auto,q_auto/"
+                );
+                lightSrc = src;
+              } else if (src.includes("/image/upload/f_auto,q_auto/")) {
+                fullSrc = src;
+                lightSrc = src.replace(
+                  "/image/upload/f_auto,q_auto/",
+                  "/image/upload/f_auto,q_auto,w_1200/"
+                );
+              } else {
+                fullSrc = src.replace(
+                  "/image/upload/",
+                  "/image/upload/f_auto,q_auto/"
+                );
+                lightSrc = src.replace(
+                  "/image/upload/",
+                  "/image/upload/f_auto,q_auto,w_1200/"
+                );
+              }
+
+              node.properties.src = lightSrc;
+              node.properties["data-full-src"] = fullSrc;
+              node.properties.dataFullSrc = fullSrc;
+            } else {
+              node.properties["data-full-src"] = src;
+              node.properties.dataFullSrc = src;
+            }
+
+            const existingClasses = Array.isArray(node.properties.className)
+              ? node.properties.className
+              : typeof node.properties.className === "string"
+              ? node.properties.className.split(" ")
+              : typeof node.properties.class === "string"
+              ? node.properties.class.split(" ")
+              : [];
+
+            if (!existingClasses.includes("cursor-zoom-in")) {
+              existingClasses.push("cursor-zoom-in");
+            }
+            node.properties.className = existingClasses;
+          }
+
+          if (imgIndex === 0) {
+            node.properties.loading = "eager";
+          } else {
+            node.properties.loading = "lazy";
+          }
+          node.properties.decoding = "async";
+        }
+        imgIndex++;
+      }
+      if (node.children && Array.isArray(node.children)) {
+        node.children.forEach(visit);
+      }
+    }
+    visit(tree);
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
@@ -68,7 +144,7 @@ export default defineConfig({
       remarkMath,
       remarkJoinCjkLines,
     ],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [rehypeKatex, rehypeOptimizeImages],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },

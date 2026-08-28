@@ -97,9 +97,9 @@ const parseDesc = (desc: string) => {
   <div class="header-grid">
     <div class="icon-box">
       {resolvedImage ? (
-        <Image src={resolvedImage} alt={name} width={120} height={120} />
+        <Image src={resolvedImage} alt={name} width={120} height={120} loading="lazy" decoding="async" />
       ) : (
-        <img src={icon} alt={name} />
+        <img src={icon} alt={name} width="120" height="120" loading="lazy" decoding="async" />
       )}
     </div>
     <div class="info-box">
