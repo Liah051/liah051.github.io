@@ -5,7 +5,7 @@ const DARK = "dark";
 
 // Initial color scheme
 // Can be "light", "dark", or empty string for system's prefers-color-scheme
-const initialColorScheme = "";
+const initialColorScheme = "light";
 
 function getCookie(name: string): string | null {
   try {
