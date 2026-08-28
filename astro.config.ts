@@ -30,8 +30,18 @@ function rehypeOptimizeImages() {
       if (!node) return;
       if (node.type === "element" && node.tagName === "img") {
         if (node.properties) {
-          if (typeof node.properties.src === "string") {
-            const src: string = node.properties.src;
+          // Extract string URL if src is string or object (e.g. Astro ImageMetadata)
+          let rawSrc = node.properties.src;
+          if (rawSrc && typeof rawSrc === "object") {
+            if (typeof rawSrc.src === "string") {
+              rawSrc = rawSrc.src;
+            } else if (rawSrc.default && typeof rawSrc.default.src === "string") {
+              rawSrc = rawSrc.default.src;
+            }
+          }
+
+          if (typeof rawSrc === "string" && rawSrc.trim() !== "") {
+            const src: string = rawSrc.trim();
 
             if (src.includes("res.cloudinary.com") && src.includes("/image/upload/")) {
               let fullSrc = src;
@@ -64,6 +74,7 @@ function rehypeOptimizeImages() {
               node.properties["data-full-src"] = fullSrc;
               node.properties.dataFullSrc = fullSrc;
             } else {
+              node.properties.src = src;
               node.properties["data-full-src"] = src;
               node.properties.dataFullSrc = src;
             }
@@ -80,6 +91,11 @@ function rehypeOptimizeImages() {
               existingClasses.push("cursor-zoom-in");
             }
             node.properties.className = existingClasses;
+          }
+
+          // Fallback check if src is missing
+          if (!node.properties.src && typeof node.properties["data-src"] === "string") {
+            node.properties.src = node.properties["data-src"];
           }
 
           if (imgIndex === 0) {
