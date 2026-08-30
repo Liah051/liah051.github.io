@@ -57,10 +57,10 @@ let resolvedImage = charImages[`/src/assets/images/astralparty/characters/${name
 // PvEレベル5と6は全キャラ共通のためデフォルト値を設定
 const displayPveLevels = [...(pveLevels || [])];
 if (!displayPveLevels[4] || displayPveLevels[4] === "Lv5") {
-  displayPveLevels[4] = "強化チップを2回再抽選できます。";
+  displayPveLevels[4] = "強化チップを2回再抽選できます";
 }
 if (!displayPveLevels[5] || displayPveLevels[5] === "Lv6") {
-  displayPveLevels[5] = "スターレベル上昇时、強化チップ抽選回数+1。";
+  displayPveLevels[5] = "スターレベル上昇時、強化チップ抽選回数+1";
 }
 
 // 説明テキスト内の <InlineImage name="..." alt="..." /> をパースしてコンポーネント化するヘルパー
