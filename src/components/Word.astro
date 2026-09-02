@@ -141,7 +141,7 @@ const displayTitle = entry?.data.term || cleanTerm;
     hintInner.className = 'glossary-micro-hint-text';
     // タッチデバイスかどうかで表記を切り替える（マークダウン記法を含まないプレーンテキスト）
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    hintInner.textContent = hasTouch ? 'タップで解説' : 'ホバーで解説';
+    hintInner.textContent = hasTouch ? '点線がある用語はタップで補足を見ることができます' : '点線がある用語はホバーで補足を見ることができます';
     hint.appendChild(hintInner);
 
     // 閉じるボタン（×）
