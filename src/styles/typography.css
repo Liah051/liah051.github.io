@@ -125,7 +125,20 @@
     }
 
     blockquote {
-      @apply border-s-accent/80 wrap-break-word opacity-80;
+      @apply border-s-accent/80 wrap-break-word opacity-80 not-italic;
+      font-style: normal;
+
+      p {
+        @apply not-italic;
+        font-style: normal;
+      }
+
+      &::before,
+      &::after,
+      p::before,
+      p::after {
+        content: none;
+      }
     }
 
     details {
