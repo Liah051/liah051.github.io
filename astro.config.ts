@@ -1,8 +1,59 @@
+import fs from "node:fs";
+import path from "node:path";
 import { defineConfig, envField, fontProviders } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 import d2 from 'astro-d2';
+
+function getPostDatesMap() {
+  const datesMap = new Map<string, string>();
+  const blogDir = path.resolve("src/content/blog");
+
+  function walk(dir: string) {
+    if (!fs.existsSync(dir)) return;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (
+        entry.isFile() &&
+        /\.(md|mdx)$/.test(entry.name) &&
+        !entry.name.startsWith("_")
+      ) {
+        const content = fs.readFileSync(fullPath, "utf-8");
+        const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        if (!match) continue;
+        const frontmatter = match[1];
+
+        const modMatch = frontmatter.match(
+          /(?:modDatetime|updatedDate|updated):\s*(.+)/
+        );
+        const pubMatch = frontmatter.match(/pubDatetime:\s*(.+)/);
+
+        const dateStr = modMatch?.[1]?.trim() || pubMatch?.[1]?.trim();
+        if (dateStr) {
+          const cleanDateStr = dateStr.replace(/^["']|["']$/g, "");
+          const parsedDate = new Date(cleanDateStr);
+          if (!isNaN(parsedDate.getTime())) {
+            const relPath = path.relative(blogDir, fullPath).replace(/\\/g, "/");
+            const slug = relPath
+              .replace(/\.(md|mdx)$/, "")
+              .replace(/\/index$/, "");
+            const route = `/posts/${slug}/`;
+            datesMap.set(route, parsedDate.toISOString());
+          }
+        }
+      }
+    }
+  }
+
+  walk(blogDir);
+  return datesMap;
+}
+
+const postDatesMap = getPostDatesMap();
 
 
 import remarkToc from "remark-toc";
@@ -143,6 +194,18 @@ export default defineConfig({
           return false;
         }
         return true;
+      },
+      serialize: item => {
+        const url = new URL(item.url);
+        let pathName = url.pathname;
+        if (!pathName.endsWith("/")) {
+          pathName += "/";
+        }
+        const postDate = postDatesMap.get(pathName);
+        if (postDate) {
+          item.lastmod = postDate;
+        }
+        return item;
       },
     }),
     mdx(),

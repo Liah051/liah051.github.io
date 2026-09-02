@@ -44,6 +44,8 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
+  updatedDate,
+  updated,
   timezone,
   tags,
   hideEditPost,
@@ -78,7 +80,7 @@ const layoutProps = {
   author,
   description,
   pubDatetime,
-  modDatetime,
+  modDatetime: modDatetime || updatedDate || updated,
   canonicalURL,
   ogImage,
   scrollSmooth: true,
@@ -104,8 +106,8 @@ const layoutProps = {
         >
           {title}
         </h1>
-        <div class="my-2 flex items-center gap-2">
-          <Datetime pubDatetime={pubDatetime} modDatetime={modDatetime} timezone={timezone} size="lg" />
+        <div class="my-2 flex flex-wrap items-center gap-2">
+          <Datetime pubDatetime={pubDatetime} modDatetime={modDatetime || updatedDate || updated} timezone={timezone} size="lg" />
 
           <span
             aria-hidden="true"
