@@ -39,15 +39,19 @@ const { labels } = Astro.props;
     scrollbar-width: none;
   }
   .tabs-container {
-    overflow: visible;
+    overflow: visible !important;
   }
   .tabs-panel {
-    overflow: visible;
+    overflow: visible !important;
   }
   .tabs-panel > *,
+  .tabs-panel div,
+  .tabs-panel section,
+  .tabs-panel p,
   .tabs-panel ul,
-  .tabs-panel ol {
-    overflow: visible;
+  .tabs-panel ol,
+  .tabs-panel li {
+    overflow: visible !important;
   }
 </style>
 
@@ -66,14 +70,17 @@ const { labels } = Astro.props;
       if (activeIndex === -1) activeIndex = 0;
 
       contents.forEach((content, i) => {
-        (content as HTMLElement).style.display = i === activeIndex ? 'block' : 'none';
-        (content as HTMLElement).style.opacity = i === activeIndex ? '1' : '0';
+        if (i === activeIndex) {
+          (content as HTMLElement).style.display = 'block';
+          (content as HTMLElement).style.opacity = '';
+        } else {
+          (content as HTMLElement).style.display = 'none';
+          (content as HTMLElement).style.opacity = '0';
+        }
       });
 
       // Avoid adding multiple listeners to the same button
       buttons.forEach(button => {
-        // Simple way to remove old listeners during view transitions if needed
-        // but here we just ensure we only attach it if it doesn't have one
         if (button.getAttribute('data-has-listener')) return;
 
         button.addEventListener('click', () => {
@@ -104,7 +111,7 @@ const { labels } = Astro.props;
           groupContents.forEach((content, i) => {
             if (i === index) {
               (content as HTMLElement).style.display = 'block';
-              setTimeout(() => { (content as HTMLElement).style.opacity = '1'; }, 10);
+              (content as HTMLElement).style.opacity = '';
             } else {
               (content as HTMLElement).style.display = 'none';
               (content as HTMLElement).style.opacity = '0';

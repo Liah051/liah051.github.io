@@ -76,16 +76,29 @@ const displayTitle = entry?.data.term || cleanTerm;
     const tooltip = container.querySelector('.glossary-tooltip') as HTMLElement | null;
     if (!tooltip) return;
 
-    // 1. まず中央揃えのデフォルト状態にする
+    // 1. 位置とクラスを初期化（デフォルト上向き）
+    tooltip.classList.remove('is-bottom');
+    container.classList.remove('is-bottom');
     tooltip.style.transform = 'translateX(-50%)';
 
-    // 2. レイアウトを確定させて位置を計測
+    // 2. レイアウトを確定させて計測
     void tooltip.offsetWidth; 
-    const rect = tooltip.getBoundingClientRect();
+    let rect = tooltip.getBoundingClientRect();
+
+    // 3. 上方向の空き領域チェック（ヘッダー高さ約64px + 余白）
+    const topMargin = 76;
+    if (rect.top < topMargin) {
+      // 上に十分なスペースがない場合は下向き表示に切り替え
+      tooltip.classList.add('is-bottom');
+      container.classList.add('is-bottom');
+      void tooltip.offsetWidth;
+      rect = tooltip.getBoundingClientRect();
+    }
+
     const viewportWidth = window.innerWidth;
     const margin = 12;
 
-    // 3. はみ出し判定
+    // 4. 左右のはみ出し判定と補正
     let shift = 0;
     if (rect.left < margin) {
       shift = margin - rect.left;
@@ -93,9 +106,7 @@ const displayTitle = entry?.data.term || cleanTerm;
       shift = (viewportWidth - margin) - rect.right;
     }
 
-    // 4. 必要に応じて補正適用
     if (shift !== 0) {
-      // メインボックスをシフト
       tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`;
     }
   };
@@ -468,6 +479,19 @@ const displayTitle = entry?.data.term || cleanTerm;
     z-index: 40;
   }
   
+  /* 下向き表示（上部に十分なスペースがない場合） */
+  .glossary-tooltip.is-bottom {
+    bottom: auto;
+    top: 100%;
+    margin-bottom: 0;
+    margin-top: 0.75rem;
+  }
+
+  .glossary-word-container.is-bottom::after {
+    bottom: auto;
+    top: 100%;
+  }
+
   .glossary-word-container:hover,
   .glossary-word-container.is-active {
     z-index: 60;

@@ -46,8 +46,9 @@
       @apply wrap-break-word text-accent decoration-dashed underline-offset-4 hover:opacity-80 focus-visible:no-underline;
     }
 
-    ul {
-      @apply overflow-x-clip;
+    ul,
+    ol {
+      overflow: visible;
     }
 
     /* Summary block styling */
