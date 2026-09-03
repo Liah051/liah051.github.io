@@ -1,10 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const HOST = "dialiah.com";
+const DEFAULT_HOST = "dialiah.com";
 const KEY = "b6df38a14f7d4d239165fa4ab81a95df";
-const KEY_LOCATION = "https://dialiah.com/b6df38a14f7d4d239165fa4ab81a95df.txt";
-const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
+const INITIAL_KEY_LOCATION = `https://${DEFAULT_HOST}/${KEY}.txt`;
+
+const ENDPOINTS = [
+  "https://www.bing.com/indexnow",
+  "https://api.indexnow.org/indexnow",
+];
 
 const distDir = path.resolve("dist");
 
@@ -50,7 +54,7 @@ if (sitemapFiles.size === 0) {
 
 console.log(`[IndexNow] Target sitemap files:`, Array.from(sitemapFiles).map(f => path.basename(f)));
 
-const urls = new Set();
+const rawUrls = new Set();
 
 for (const file of sitemapFiles) {
   const content = fs.readFileSync(file, "utf-8");
@@ -58,93 +62,138 @@ for (const file of sitemapFiles) {
   for (const match of matches) {
     const url = match[1].trim();
     if (url && !url.endsWith(".xml") && (url.startsWith("http://") || url.startsWith("https://"))) {
-      urls.add(url);
+      rawUrls.add(url);
     }
   }
 }
 
-const urlList = Array.from(urls);
-
-if (urlList.length === 0) {
+if (rawUrls.size === 0) {
   console.error("[IndexNow] Error: No page URLs found in sitemap files.");
   process.exit(1);
 }
 
-console.log(`[IndexNow] Successfully extracted ${urlList.length} URL(s) from sitemaps.`);
+console.log(`[IndexNow] Successfully extracted ${rawUrls.size} raw URL(s) from sitemaps.`);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Verify key file accessibility on deployed site with retry mechanism for CDN propagation
-console.log(`[IndexNow] Verifying accessibility of key file at ${KEY_LOCATION}...`);
-let keyFileOk = false;
+/**
+ * Follow redirects with redirect: 'manual' to find final canonical URL and host
+ */
+async function resolveKeyLocation(startUrl) {
+  let currentUrl = startUrl;
+  const maxRedirects = 5;
+
+  for (let i = 0; i < maxRedirects; i++) {
+    const res = await fetch(currentUrl, { redirect: "manual" });
+    if ([301, 302, 307, 308].includes(res.status)) {
+      const location = res.headers.get("location");
+      if (!location) {
+        throw new Error(`Received redirect status ${res.status} without Location header.`);
+      }
+      const nextUrl = new URL(location, currentUrl).toString();
+      console.log(`[IndexNow] Redirect detected (${res.status}): ${currentUrl} -> ${nextUrl}`);
+      currentUrl = nextUrl;
+    } else if (res.ok) {
+      const bodyText = await res.text();
+      if (!bodyText.trim().includes(KEY)) {
+        throw new Error(`Key file at ${currentUrl} returned HTTP 200, but content did not match key. Body: "${bodyText.trim()}"`);
+      }
+      return { finalUrl: currentUrl, res };
+    } else {
+      throw new Error(`HTTP status ${res.status} when fetching ${currentUrl}`);
+    }
+  }
+  throw new Error(`Exceeded maximum redirect depth of ${maxRedirects} for ${startUrl}`);
+}
+
+// Verify key file and resolve canonical host
+console.log(`[IndexNow] Verifying accessibility and resolving canonical host starting from ${INITIAL_KEY_LOCATION}...`);
+
+let canonicalHost = DEFAULT_HOST;
+let canonicalKeyLocation = INITIAL_KEY_LOCATION;
+let verified = false;
+
 for (let attempt = 1; attempt <= 6; attempt++) {
   try {
-    const res = await fetch(KEY_LOCATION);
-    if (res.ok) {
-      const text = await res.text();
-      if (text.trim().includes(KEY)) {
-        console.log(`[IndexNow] Key file verified successfully on deployed host.`);
-        keyFileOk = true;
-        break;
-      } else {
-        console.warn(`[IndexNow] Key file fetched but content did not match key. Response: "${text.trim()}"`);
-      }
-    } else {
-      console.warn(`[IndexNow] Key file returned HTTP ${res.status}. (Attempt ${attempt}/6)`);
-    }
+    const { finalUrl } = await resolveKeyLocation(INITIAL_KEY_LOCATION);
+    const parsedFinal = new URL(finalUrl);
+    canonicalHost = parsedFinal.hostname;
+    canonicalKeyLocation = finalUrl;
+    verified = true;
+    console.log(`[IndexNow] Key file verified successfully! Canonical host: "${canonicalHost}", KeyLocation: "${canonicalKeyLocation}"`);
+    break;
   } catch (err) {
-    console.warn(`[IndexNow] Failed to fetch key file: ${err.message}. (Attempt ${attempt}/6)`);
+    console.warn(`[IndexNow] Verification attempt ${attempt}/6 failed: ${err.message}`);
   }
 
   if (attempt < 6) {
-    console.log(`[IndexNow] Waiting 10s for GitHub Pages CDN propagation...`);
+    console.log(`[IndexNow] Waiting 10s for CDN propagation / network...`);
     await sleep(10000);
   }
 }
 
-if (!keyFileOk) {
-  console.warn(`[IndexNow] Warning: Could not verify key file online. Proceeding with IndexNow notification...`);
+if (!verified) {
+  console.warn(`[IndexNow] Warning: Could not verify key file online. Fallback using default host "${DEFAULT_HOST}".`);
 }
 
+// Normalize all URLs in urlList to use canonical host
+const normalizedUrls = Array.from(rawUrls).map((url) => {
+  return url.replace(/^https?:\/\/[^\/]+/, `https://${canonicalHost}`);
+});
+const urlList = Array.from(new Set(normalizedUrls));
+
 const payload = {
-  host: HOST,
+  host: canonicalHost,
   key: KEY,
-  keyLocation: KEY_LOCATION,
+  keyLocation: canonicalKeyLocation,
   urlList: urlList,
 };
 
-console.log(`[IndexNow] Sending POST request to ${INDEXNOW_ENDPOINT}...`);
+console.log("[IndexNow] Payload to send:");
+console.log(JSON.stringify(payload, null, 2));
 
-let success = false;
-for (let attempt = 1; attempt <= 3; attempt++) {
-  try {
-    const response = await fetch(INDEXNOW_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: JSON.stringify(payload),
-    });
+// Attempt POST to Bing first, then fallback to api.indexnow.org
+let overallSuccess = false;
 
-    if (response.status === 200 || response.status === 202) {
-      console.log(`[IndexNow] Success! Response status: ${response.status} (${response.statusText})`);
-      success = true;
-      break;
-    } else {
-      const errorBody = await response.text();
-      console.error(`[IndexNow] Attempt ${attempt}/3 failed with HTTP status ${response.status} (${response.statusText}):`);
-      console.error(errorBody);
+for (const endpoint of ENDPOINTS) {
+  console.log(`[IndexNow] Attempting POST request to endpoint: ${endpoint}...`);
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.status === 200 || response.status === 202) {
+        console.log(`[IndexNow] Success! Response from ${endpoint}: Status ${response.status} (${response.statusText})`);
+        overallSuccess = true;
+        break;
+      } else {
+        const errorBody = await response.text();
+        console.error(`[IndexNow] Attempt ${attempt}/3 to ${endpoint} failed with status ${response.status} (${response.statusText}):`);
+        console.error(errorBody);
+      }
+    } catch (error) {
+      console.error(`[IndexNow] Attempt ${attempt}/3 network error to ${endpoint}:`, error.message);
     }
-  } catch (error) {
-    console.error(`[IndexNow] Attempt ${attempt}/3 network error:`, error);
+
+    if (attempt < 3) {
+      console.log(`[IndexNow] Waiting 10s before retrying ${endpoint}...`);
+      await sleep(10000);
+    }
   }
 
-  if (attempt < 3) {
-    console.log(`[IndexNow] Waiting 10s before retry...`);
-    await sleep(10000);
+  if (overallSuccess) {
+    break;
+  } else {
+    console.warn(`[IndexNow] Endpoint ${endpoint} failed after retries. Trying fallback endpoint if available...`);
   }
 }
 
-if (!success) {
+if (!overallSuccess) {
+  console.error("[IndexNow] Error: All IndexNow endpoints failed to accept submission.");
   process.exit(1);
 }
