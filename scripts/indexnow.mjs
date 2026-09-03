@@ -72,6 +72,40 @@ if (urlList.length === 0) {
 
 console.log(`[IndexNow] Successfully extracted ${urlList.length} URL(s) from sitemaps.`);
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Verify key file accessibility on deployed site with retry mechanism for CDN propagation
+console.log(`[IndexNow] Verifying accessibility of key file at ${KEY_LOCATION}...`);
+let keyFileOk = false;
+for (let attempt = 1; attempt <= 6; attempt++) {
+  try {
+    const res = await fetch(KEY_LOCATION);
+    if (res.ok) {
+      const text = await res.text();
+      if (text.trim().includes(KEY)) {
+        console.log(`[IndexNow] Key file verified successfully on deployed host.`);
+        keyFileOk = true;
+        break;
+      } else {
+        console.warn(`[IndexNow] Key file fetched but content did not match key. Response: "${text.trim()}"`);
+      }
+    } else {
+      console.warn(`[IndexNow] Key file returned HTTP ${res.status}. (Attempt ${attempt}/6)`);
+    }
+  } catch (err) {
+    console.warn(`[IndexNow] Failed to fetch key file: ${err.message}. (Attempt ${attempt}/6)`);
+  }
+
+  if (attempt < 6) {
+    console.log(`[IndexNow] Waiting 10s for GitHub Pages CDN propagation...`);
+    await sleep(10000);
+  }
+}
+
+if (!keyFileOk) {
+  console.warn(`[IndexNow] Warning: Could not verify key file online. Proceeding with IndexNow notification...`);
+}
+
 const payload = {
   host: HOST,
   key: KEY,
@@ -81,24 +115,36 @@ const payload = {
 
 console.log(`[IndexNow] Sending POST request to ${INDEXNOW_ENDPOINT}...`);
 
-try {
-  const response = await fetch(INDEXNOW_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-    },
-    body: JSON.stringify(payload),
-  });
+let success = false;
+for (let attempt = 1; attempt <= 3; attempt++) {
+  try {
+    const response = await fetch(INDEXNOW_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  if (response.status === 200 || response.status === 202) {
-    console.log(`[IndexNow] Success! Response status: ${response.status} (${response.statusText})`);
-  } else {
-    const errorBody = await response.text();
-    console.error(`[IndexNow] Failed with HTTP status ${response.status} (${response.statusText}):`);
-    console.error(errorBody);
-    process.exit(1);
+    if (response.status === 200 || response.status === 202) {
+      console.log(`[IndexNow] Success! Response status: ${response.status} (${response.statusText})`);
+      success = true;
+      break;
+    } else {
+      const errorBody = await response.text();
+      console.error(`[IndexNow] Attempt ${attempt}/3 failed with HTTP status ${response.status} (${response.statusText}):`);
+      console.error(errorBody);
+    }
+  } catch (error) {
+    console.error(`[IndexNow] Attempt ${attempt}/3 network error:`, error);
   }
-} catch (error) {
-  console.error("[IndexNow] Error sending request:", error);
+
+  if (attempt < 3) {
+    console.log(`[IndexNow] Waiting 10s before retry...`);
+    await sleep(10000);
+  }
+}
+
+if (!success) {
   process.exit(1);
 }
