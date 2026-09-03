@@ -8,6 +8,8 @@ const INITIAL_KEY_LOCATION = `https://${DEFAULT_HOST}/${KEY}.txt`;
 const ENDPOINTS = [
   "https://www.bing.com/indexnow",
   "https://api.indexnow.org/indexnow",
+  "https://yandex.com/indexnow",
+  "https://search.seznam.cz/indexnow",
 ];
 
 const distDir = path.resolve("dist");
@@ -152,45 +154,37 @@ const payload = {
 console.log("[IndexNow] Payload to send:");
 console.log(JSON.stringify(payload, null, 2));
 
-// Attempt POST to Bing first, then fallback to api.indexnow.org
+// Attempt POST to endpoints in order (Bing -> api.indexnow.org -> Yandex -> Seznam)
 let overallSuccess = false;
 
 for (const endpoint of ENDPOINTS) {
   console.log(`[IndexNow] Attempting POST request to endpoint: ${endpoint}...`);
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        body: JSON.stringify(payload),
-      });
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    });
 
-      if (response.status === 200 || response.status === 202) {
-        console.log(`[IndexNow] Success! Response from ${endpoint}: Status ${response.status} (${response.statusText})`);
-        overallSuccess = true;
-        break;
-      } else {
-        const errorBody = await response.text();
-        console.error(`[IndexNow] Attempt ${attempt}/3 to ${endpoint} failed with status ${response.status} (${response.statusText}):`);
-        console.error(errorBody);
+    if (response.status === 200 || response.status === 202) {
+      const responseText = await response.text();
+      console.log(`[IndexNow] Success! Response from ${endpoint}: Status ${response.status} (${response.statusText})`);
+      if (responseText) {
+        console.log(`[IndexNow] Response body:`, responseText);
       }
-    } catch (error) {
-      console.error(`[IndexNow] Attempt ${attempt}/3 network error to ${endpoint}:`, error.message);
+      overallSuccess = true;
+      break;
+    } else {
+      const errorBody = await response.text();
+      console.warn(`[IndexNow] Endpoint ${endpoint} returned HTTP status ${response.status} (${response.statusText}): ${errorBody}`);
     }
-
-    if (attempt < 3) {
-      console.log(`[IndexNow] Waiting 10s before retrying ${endpoint}...`);
-      await sleep(10000);
-    }
+  } catch (error) {
+    console.warn(`[IndexNow] Network error connecting to ${endpoint}:`, error.message);
   }
 
-  if (overallSuccess) {
-    break;
-  } else {
-    console.warn(`[IndexNow] Endpoint ${endpoint} failed after retries. Trying fallback endpoint if available...`);
-  }
+  console.log(`[IndexNow] Trying fallback endpoint...`);
 }
 
 if (!overallSuccess) {
