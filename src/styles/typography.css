@@ -132,6 +132,7 @@
       p {
         @apply not-italic;
         font-style: normal;
+        white-space: pre-line;
       }
 
       &::before,
